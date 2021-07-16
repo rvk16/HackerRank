@@ -286,75 +286,80 @@ booleanParam(name: 'run_cleanup',          defaultValue: true,                  
         }
       }
     }
-
-    stage ('K8s deployment') {
-      when { expression { params.run_deployment == true && env.GIT_BRANCH == 'master' && params.run_Integration_test == true } }
-          steps {
-            script {
-              TEMP_IMAGE_FILE = ""
-              if (env.GIT_BRANCH == "master" ) {
-                TEMP_IMAGE_FILE = "aia-aiail-temp-images.csv"
+    stage ('Run IT and Sonar') {
+        parallel {
+          stage () {
+            stages {
+                stage ('K8s deployment') {
+                  when { expression { params.run_deployment == true && env.GIT_BRANCH == 'master' && params.run_Integration_test == true } }
+                      steps {
+                        script {
+                          TEMP_IMAGE_FILE = ""
+                          if (env.GIT_BRANCH == "master" ) {
+                            TEMP_IMAGE_FILE = "aia-aiail-temp-images.csv"
+                          }
+                          if (env.GIT_BRANCH.length() > 7) {
+                            GIT_BRANCH_SHORT = "${env.GIT_BRANCH.substring(0,7)}"
+                          }
+                          else {
+                            GIT_BRANCH_SHORT = "${env.GIT_BRANCH}"
+                          }
+                          build job: 'aia-deployment-start/master',
+                          parameters: [string(name: 'K8S_MASTER_NODE',          value: "${params.k8sHost_IT_test}"),
+                                       string(name: 'NAMESPACE',                value: "${params.nsPrefix}-${GIT_BRANCH_SHORT}"),
+                                       string(name: 'AIA_VERSION',              value: 'TRUNK-SNAPSHOT'),
+                                       string(name: 'PROPS_FILE',               value: 'properties_file.adhngtest-k8s-1.txt'),
+                                       string(name: 'CLUSTER_TYPE',             value: 'k8s'),
+                                 booleanParam(name: 'AIA_TLS',                  value: 'false'),
+                                 booleanParam(name: 'CASSANDRA_TLS',            value: 'false'),
+                                       string(name: 'security_roles',           value: 'false'),
+                                       string(name: 'stabled_version',          value: 'latest'),
+                                       string(name: 'cleanup_aia_jobs',         value: 'YES'),
+                                       string(name: 'install_spark_operator',   value: 'NO'),
+                                       string(name: 'install_airflow',          value: 'NO'),
+                                       string(name: 'install_keda',             value: 'YES'),
+                                       string(name: 'IL',                       value: 'true'),
+                                        string(name: 'UI',                     value: 'true'),
+                                 booleanParam(name: 'RUNTIME',                  value: true),
+                                 booleanParam(name: 'AUTHORING',                value: true),
+                                       string(name: 'TEMP_IMAGE_FILE',          value: "${TEMP_IMAGE_FILE}"),
+                                       string(name: 'run_migration',            value: 'NO'),]
+                        }
+                      }
+                }
+                stage('integration-tests') {
+                  when { expression { params.run_Integration_test == true } }
+                  steps {
+                    script {
+                      env.PHASE='configuration-integration-tests'
+                    }
+                    sh '''
+                      export HOST_IP=`cat /home/jenkins/slaveHostname`
+                      mvn integration-test -Pconfiguration-integration-test -Daia.test.properties=test.properties -Daia.test.mode=remote
+                      mvn failsafe:verify -Pconfiguration-integration-test
+                    '''
+                  }
+                }
               }
-              if (env.GIT_BRANCH.length() > 7) {
-                GIT_BRANCH_SHORT = "${env.GIT_BRANCH.substring(0,7)}"
-              }
-              else {
-                GIT_BRANCH_SHORT = "${env.GIT_BRANCH}"
-              }
-              build job: 'aia-deployment-start/master',
-              parameters: [string(name: 'K8S_MASTER_NODE',          value: "${params.k8sHost_IT_test}"),
-                           string(name: 'NAMESPACE',                value: "${params.nsPrefix}-${GIT_BRANCH_SHORT}"),
-                           string(name: 'AIA_VERSION',              value: 'TRUNK-SNAPSHOT'),
-                           string(name: 'PROPS_FILE',               value: 'properties_file.adhngtest-k8s-1.txt'),
-                           string(name: 'CLUSTER_TYPE',             value: 'k8s'),
-                     booleanParam(name: 'AIA_TLS',                  value: 'false'),
-                     booleanParam(name: 'CASSANDRA_TLS',            value: 'false'),
-                           string(name: 'security_roles',           value: 'false'),
-                           string(name: 'stabled_version',          value: 'latest'),
-                           string(name: 'cleanup_aia_jobs',         value: 'YES'),
-                           string(name: 'install_spark_operator',   value: 'NO'),
-                           string(name: 'install_airflow',          value: 'NO'),
-                           string(name: 'install_keda',             value: 'YES'),
-                           string(name: 'IL',                       value: 'true'),
-                            string(name: 'UI',                     value: 'true'),
-                     booleanParam(name: 'RUNTIME',                  value: true),
-                     booleanParam(name: 'AUTHORING',                value: true),
-                           string(name: 'TEMP_IMAGE_FILE',          value: "${TEMP_IMAGE_FILE}"),
-                           string(name: 'run_migration',            value: 'NO'),]
             }
-          }
-    }
-    stage('integration-tests') {
-      when { expression { params.run_Integration_test == true } }
-      steps {
-        script {
-          env.PHASE='configuration-integration-tests'
-        }
-        sh '''
-          export HOST_IP=`cat /home/jenkins/slaveHostname`
-          mvn integration-test -Pconfiguration-integration-test -Daia.test.properties=test.properties -Daia.test.mode=remote
-          mvn failsafe:verify -Pconfiguration-integration-test
-        '''
-      }
-    }
-    
-    stage('sonar') {
-      steps {
-        script {
-          env.PHASE='sonar'
-        }
-        sh '''
-          if [ ${pipeline_type} = RELEASE ]
-          then
-            REL=${RELEASE_VERSION}
-          else
-            REL=${GIT_BRANCH}-${CURRENT_VERSION}
-          fi
-          mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.8.0.2131:sonar -Dsonar.host.url=http://illin5648.corp.amdocs.com:30606 -Dsonar.login=5c2c1ebbf523e608e390896eedff8c7b7dc0b744 -Dsonar.projectVersion=${REL}
-        '''
-      }
-    }
-	
+            stage('sonar') {
+              steps {
+                script {
+                  env.PHASE='sonar'
+                }
+                sh '''
+                  if [ ${pipeline_type} = RELEASE ]
+                  then
+                    REL=${RELEASE_VERSION}
+                  else
+                    REL=${GIT_BRANCH}-${CURRENT_VERSION}
+                  fi
+                  mvn org.sonarsource.scanner.maven:sonar-maven-plugin:3.8.0.2131:sonar -Dsonar.host.url=http://illin5648.corp.amdocs.com:30606 -Dsonar.login=5c2c1ebbf523e608e390896eedff8c7b7dc0b744 -Dsonar.projectVersion=${REL}
+                '''
+              }
+            }
+	      }
+	 }
 	stage('copy images to latest') {
       when { expression { return (env.GIT_BRANCH == 'master') } }
       steps {
