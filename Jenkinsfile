@@ -381,8 +381,8 @@ booleanParam(name: 'run_cleanup',          defaultValue: true,                  
           echo 'will trigger'
           echo String.valueOf(COMMIT_HASH_SHORT)
           echo String.valueOf(PIPELINE)
-          build job: 'aia-datahub/master', wait: false
-//          build job: 'brain-copy-aia-helm-charts-to-azure/master', wait: false
+          build job: 'aia-il-collectors/master', wait: false
+          build job: 'aia-il-publisher/master', wait: false
         } else {
           echo 'will not trigger'
         }
@@ -392,7 +392,7 @@ booleanParam(name: 'run_cleanup',          defaultValue: true,                  
       echo 'I Failed!'
       script {
         if (env.BRANCH_NAME == "master"){
-          mail to: 'AiaPlatformAnalytics@int.amdocs.com, DigitalIntelligenceDVCIRDFT1@int.amdocs.com',
+          mail to: 'AiaPlatformAnalytics@int.amdocs.com, DigitalIntelligenceDVCIRDFT1@int.amdocs.com, DigitalIntelligenceDVCIRDFT2@int.amdocs.com',
           subject: "Failed Pipeline: '${currentBuild.fullDisplayName}' ,Pipeline Stage: '${env.PHASE}'",
           body: "Check this URL: ${env.BUILD_URL}."
         }
