@@ -288,7 +288,7 @@ booleanParam(name: 'run_cleanup',          defaultValue: true,                  
     }
     stage ('Run IT and Sonar') {
         parallel {
-          stage () {
+          stage ('Run IT') {
             stages {
                 stage ('K8s deployment') {
                   when { expression { params.run_deployment == true && env.GIT_BRANCH == 'master' && params.run_Integration_test == true } }
