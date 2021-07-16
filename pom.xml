@@ -21,6 +21,7 @@
         <module>aia-il-integration</module>
         <module>aia-il-dev-tools</module>
         <module>aia-il-sqlite-service</module>
+		<module>aia-il-reports</module>
     </modules>
 
     <distributionManagement>
