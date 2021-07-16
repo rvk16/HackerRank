@@ -1,0 +1,148 @@
+swagger: '2.0'
+info:
+  title: SQLite Service API
+  description: This is a REST API specification for SQLite Service.
+  version: "TRUNK-SNAPSHOT"
+schemes:
+  - http
+  - https
+basePath: /aia/api/v1/sqlite
+parameters:
+  projectKey:
+    name: projectKey
+    in: path
+    description: The project key
+    required: true
+    type: string
+paths:
+  '/projects/{projectKey}/export':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_sqlite_rest_exportDatabase
+        private-roles:
+          - aiaP_il_sqlite_rest_exportDatabase
+      summary: export sqlite database
+      description: export sqlite database
+      operationId: exportDatabase
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      tags:
+        - SQLite
+      responses:
+        200:
+          description: Database Export
+          schema:
+            type: file
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/query':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_sqlite_rest_query
+        private-roles:
+          - aiaP_il_sqlite_rest_query
+      tags:
+        - SQLite
+      summary: execute sql select statement
+      operationId: query
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: query
+          description: sql select query
+          required: true
+          schema:
+            $ref: '#/definitions/Query'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/ResultSet'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/execute':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_sqlite_rest_execute
+        private-roles:
+          - aiaP_il_sqlite_rest_execute
+      tags:
+        - SQLite
+      summary: execute sql update statement
+      operationId: execute
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: query
+          description: sql update query
+          required: true
+          schema:
+            $ref: '#/definitions/Query'
+      responses:
+        200:
+          description: OK
+        204:
+          description: Query successfully executed
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+
+definitions:
+  ResultSet:
+    type: object
+    properties:
+      resultSet:
+        type: object
+    title: ResultSet
+  Query:
+    type: object
+    description: Query
+    properties:
+      query:
+        type: string
+        description: query string
+responses:
+  NotFound:
+    description: The specified resource was not found
+  Unauthorized:
+    description: Unauthorized
+  InternalServerError:
+    description: Internal server error
+  Forbidden:
+    description: Forbidden
+  UnexpectedError:
+    description: Unexpected error

@@ -1,0 +1,29 @@
+spring.main.web-application-type: none
+
+aia:
+  repo.elements.local.path: /opt/amdocs/aia/config
+  il.bus.deployer:
+    failOnStart: false
+    default-partitions-count-kafka-source: 1
+    default-replication-factorkafka-source: 1
+    default-partitions-count-kafka-transformer: 3
+    default-replication-factorkafka-transformer: 1
+    default-partitions-count-kafka-bulk: 10
+    default-replication-factorkafka-bulk: 1
+    default-partitions-count-kafka-context-transformer-bulkTopics: 5
+    default-replication-factor-kafka-context-transformer-bulkTopics: 1
+
+#   report-folder:: /opt/amdocs/aia/
+#    kafka:
+#      namespace:
+#      brokers:
+#    topic-configurations:
+#      ALDMCUSTSVC:
+#      ALDMPRODUCT:
+#     topic4:
+#       replication-factor: 4
+#     topic5:
+#       partition-count: 5
+#     topic6:
+#       replication-factor: 6
+#       partition-count: 6

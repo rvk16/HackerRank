@@ -1,0 +1,140 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $SERVICE_NAME
+  labels:
+    service-type: runtime
+spec:
+  selector:
+    matchLabels:
+      app: $SERVICE_NAME
+  replicas: 0
+  template:
+    metadata:
+      labels:
+        app: $SERVICE_NAME
+        monitored: prometheus
+        service-type: runtime
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/probe: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      imagePullSecrets:
+      - name: ilnexusdmz02-8090-pull-secret
+      initContainers:
+      - name: configuration-container
+        image: "10.232.52.103:5000/artifactory/docker/data:TRUNK-SNAPSHOT"
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /opt/amdocs/aia
+          name: configuration-volume
+      containers:
+      - name: $SERVICE_NAME
+        # The Docker image to use
+        image: "$IMAGE_REPOSITORY/$DOCKER_IMAGE_NAME:master-TRUNK-SNAPSHOT"
+        imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /actuator/health
+            port: 8081
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          failureThreshold: 15
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /actuator/health
+            port: 8081
+          initialDelaySeconds: 30
+          timeoutSeconds: 5
+        resources:
+          requests:
+            cpu: 800m
+            memory: 800Mi
+          limits:
+            cpu: 800m
+            memory: 800Mi
+        ports:
+        - name: config-port
+          containerPort: 8080
+        - name: admin-port
+          containerPort: 8081
+        env:
+        - name: GENERIC_COLLECTOR_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: GENERIC_COLLECTOR_REPO_ELEMENTS_LOCAL_PATH
+          value: "/opt/amdocs/aia/config"
+      
+        - name: KAFKA_BROKERS
+          valueFrom:
+            configMapKeyRef:
+              name: $SERVICE_NAME-configmap
+              key: kafka.brokers
+        - name: KAFKA_SECURITY_PROTOCOL
+          valueFrom:
+            configMapKeyRef:
+              name: $SERVICE_NAME-configmap
+              key: kafka.security-protocol
+        - name: KAFKA_SASL_MECHANISM
+          valueFrom:
+            configMapKeyRef:
+              name: $SERVICE_NAME-configmap
+              key: kafka.sasl-mechanism
+
+        - name: KAFKA_SSL_KEYSTORE_LOCATION
+          valueFrom:
+            configMapKeyRef:
+              name: $SERVICE_NAME-configmap
+              key: kafka.ssl.keystore.location
+        - name: KAFKA_SSL_KEYSTORE_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: $SERVICE_NAME-configmap
+              key: kafka.ssl.keystore.password
+        - name: KAFKA_SSL_KEY_PASSWORD
+          valueFrom:
+            configMapKeyRef:
+              name: $SERVICE_NAME-configmap
+              key: kafka.ssl.key-password
+        - name: MSNEXT_JAVA_OPTS
+          value: >-
+            -Xms512M -Xmx512M
+            -Dlogging.level.com.amdocs.msnext=ERROR
+            -Dcom.amdocs.msnext.securityjwt.jwt.validation.type=FAKE
+        - name: MSNEXT_CONF_SOURCE_APP1
+          value: /deployments/config/applications/$SERVICE_NAME
+      
+        # Mount the configuration as volume in the above location
+        volumeMounts:
+        - mountPath: /deployments/config/applications/$SERVICE_NAME
+          name: $SERVICE_NAME-configmap
+        - mountPath: /opt/amdocs/aia
+          name: configuration-volume
+        - mountPath: /opt/aia/il/gc-d1-ongoing
+          name: gc-d1-ongoing-volume
+          # just an example
+      
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      # define the configmap that should be used with this deployment
+      # and the items that are expected to be mounted by that config map
+      volumes:
+      - name: gc-d1-ongoing-volume
+        persistentVolumeClaim:
+          claimName: gc-d1-ongoing-pvc
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: application.yml
+            path: application.yml
+          - key: aia-il-gc-d1-ongoing-service.yaml
+            path: aia-il-gc-d1-ongoing-service.yaml
+          name: $SERVICE_NAME-configmap
+        name: $SERVICE_NAME-configmap
+      - name: configuration-volume
+        emptyDir: {}

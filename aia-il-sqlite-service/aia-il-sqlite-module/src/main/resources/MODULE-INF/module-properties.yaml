@@ -1,0 +1,6 @@
+module:
+  name: aia-il-sqlite
+  requires:
+  - msnext-root
+  resources:
+  - aia-il-sqlite-service.yaml

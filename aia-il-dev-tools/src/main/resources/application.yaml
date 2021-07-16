@@ -1,0 +1,39 @@
+aia:
+  repo:
+    elements:
+      provider:
+        mode: local
+      local:
+        path: C:/NgDesign/export_design_d1_globe_nishchhal.zip
+
+deployer :
+  namespace: adhng
+  # Take Below Details using "kubectl config view --raw"
+  k8sServer: https://10.76.32.110:6443
+  certAuthData:
+  clientCertData:
+  clientKeyData:
+
+  schemaTypeToAliasMap:
+    CATALOG1: c1
+    DIGITAL1: d1
+    JSON_OVER_KAFKA: kafka
+
+  # Add Service Properties Here which you want in ConfigMap
+  schemaToPropertiesMap:
+    D1Order_bulk:
+      kafka.common.inputDataChannel: D1Order
+      kafka.common.brokers: cdp71-ranger-1.eaas.amdocs.com:9092,cdp71-ranger-2.eaas.amdocs.com:9092,cdp71-ranger-3.eaas.amdocs.com:9092
+      kafka.common.sourceName: D1Order
+    D1Order_ongoing:
+      kafka.common.inputDataChannel: D1Order
+      kafka.common.brokers: cdp71-ranger-1.eaas.amdocs.com:9092,cdp71-ranger-2.eaas.amdocs.com:9092,cdp71-ranger-3.eaas.amdocs.com:9092
+      kafka.common.sourceName: D1Order
+    C1_bulk:
+      kafka.common.inputDataChannel: CatalogFullV2
+      kafka.common.brokers: cdp71-ranger-1.eaas.amdocs.com:9092,cdp71-ranger-2.eaas.amdocs.com:9092,cdp71-ranger-3.eaas.amdocs.com:9092
+      kafka.common.sourceName: C1
+    C1_ongoing:
+      kafka.common.inputDataChannel: CatalogChangeV2
+      kafka.common.brokers: cdp71-ranger-1.eaas.amdocs.com:9092,cdp71-ranger-2.eaas.amdocs.com:9092,cdp71-ranger-3.eaas.amdocs.com:9092
+      kafka.common.sourceName: C1

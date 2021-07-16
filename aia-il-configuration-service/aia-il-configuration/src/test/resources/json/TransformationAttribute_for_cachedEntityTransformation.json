@@ -1,0 +1,18 @@
+{
+  "attributeKey": "attributeKey1",
+  "attributeName": "Attribute Key1",
+  "description": ".",
+  "type": "STRING",
+  "origin": null,
+  "sourceMapping": null,
+  "designSource": null,
+  "keyPosition": true,
+  "sortOrder": 1000,
+  "isLogicalTime": false,
+  "isUpdateTime": false,
+  "isRequired": true,
+  "doReferencialIntegrity": null,
+  "parentSchemaKey": null,
+  "parentEntityKey": null,
+  "parentAttributeKey": null
+}

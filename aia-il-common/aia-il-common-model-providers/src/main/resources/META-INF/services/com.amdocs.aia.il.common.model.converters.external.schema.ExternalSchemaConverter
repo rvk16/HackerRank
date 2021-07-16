@@ -1,0 +1,10 @@
+com.amdocs.aia.il.common.model.converters.external.schema.ExternalSchemaToPrivateDataChannelSchemaStoreConverter
+com.amdocs.aia.il.common.model.converters.external.schema.ExternalSchemaToPublisherSchemaStoreConverter
+com.amdocs.aia.il.common.model.converters.external.schema.ExternalSchemaToCsvStoreConverter
+com.amdocs.aia.il.common.model.converters.external.schema.ExternalSchemaToSqlStoreConverter
+com.amdocs.aia.il.common.model.converters.external.schema.ExternalSchemaToKafkaStoreConverter
+com.amdocs.aia.il.common.model.converters.external.schema.ExternalSchemaToSharedDataChannelSchemaStoreConverter
+com.amdocs.aia.il.common.model.converters.external.schema.ExternalSchemaToSharedPhysicalSchemaStoreConverter
+
+
+

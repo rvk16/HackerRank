@@ -1,0 +1,7 @@
+com.amdocs.aia.il.common.model.converters.external.entity.ExternalEntityToPrivateDataChannelEntityStoreConverter
+com.amdocs.aia.il.common.model.converters.external.entity.ExternalEntityToPublisherEntityStoreConverter
+com.amdocs.aia.il.common.model.converters.external.entity.ExternalEntityToCsvStoreConverter
+com.amdocs.aia.il.common.model.converters.external.entity.ExternalEntityToSqlStoreConverter
+com.amdocs.aia.il.common.model.converters.external.entity.ExternalEntityToKafkaStoreConverter
+com.amdocs.aia.il.common.model.converters.external.entity.ExternalEntityToSharedDataChannelEntityStoreConverter
+com.amdocs.aia.il.common.model.converters.external.entity.ExternalEntityToSharedPhysicalEntityStoreConverter

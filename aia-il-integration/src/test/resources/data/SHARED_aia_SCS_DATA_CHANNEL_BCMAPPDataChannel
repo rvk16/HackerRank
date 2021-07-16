@@ -1,0 +1,30 @@
+{
+  "properties" : {
+    "dataChannelName" : {
+      "value" : "BCMAPP"
+    }
+  },
+  "tags" : null,
+  "name" : "BCMAPP",
+  "description" : "BCMAPP",
+  "origin" : null,
+  "id" : "SHARED_aia_SCS_DATA_CHANNEL_BCMAPPDataChannel",
+  "elementType" : "SCS",
+  "elementVersion" : 1,
+  "lastUpdateTime" : 1593587690748,
+  "originProcess" : "MAPPING_SHEETS_MIGRATION",
+  "sourceElementId" : null,
+  "projectKey" : "aia",
+  "ownerProjectKey" : "aia",
+  "productKey" : "SHARED",
+  "referenceIds" : null,
+  "schemaStoreKey" : "Address5DataChannel",
+  "logicalSchemaKey" : null,
+  "storeType" : "DATA_CHANNEL",
+  "category" : "PRIVATE",
+  "serializationMethod" : "SharedProtobuf",
+  "isReference" : false,
+  "typeSystem" : "proto",
+  "numericKeyAssignmentPolicy" : "AUTOMATIC",
+  "assignedEntityNumericKeys" : { }
+}

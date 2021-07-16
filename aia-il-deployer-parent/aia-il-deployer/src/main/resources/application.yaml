@@ -1,0 +1,69 @@
+spring:
+  main:
+    web-application-type: none
+
+
+aia:
+  repo:
+    service:
+      server:
+      port:
+      base:
+        path:
+    elements:
+      provider:
+        mode: local
+      local:
+        path: /opt/amdocs/aia/config
+  il:
+    deployer:
+      db:
+        keyspace: dependency
+        nodePort: 9042
+        username: cassandra
+        password: cassandra
+        connStrings: 10.76.40.121,10.76.40.122,10.76.40.120
+        MaxConnPerHost: 15
+        replicationFactor: 3
+      properties:
+        caching:
+          keys: ALL
+          rows_per_partition: ALL
+        comment: checking configurations altered
+        compaction:
+          compactionClass: TimeWindowCompactionStrategy
+          max_threshold: 32
+          min_threshold: 4
+        compression:
+          sstable_compression: org.apache.cassandra.io.compress.LZ4Compressor
+          chunk_length_kb: 32
+        crcCheckChance: 1.0
+        defaultTimeToLive: 2592000
+        gcGraceSeconds: 864000
+        maxIndexInterval: 2048
+        memtableFlushPeriodInMs: 0
+        minIndexInterval: 128
+        speculativeRetry: '99.0PERCENTILE'
+        readRepairChance: 0.1
+        bloomFilterFpChance: 0.01
+        dclocalReadRepairChance: 0.0
+
+togglz:
+  features:
+    DATASTORE_TABLE_SAVE:
+      enabled: true
+    DATASTORE_TABLE_LIST:
+      enabled: true
+    DATASTORE_TABLE_PARTITIONS:
+      enabled: false
+
+
+#com:
+#  amdocs:
+#    aia:
+#      client:
+#        set-security-authorization-header: true
+#    msnext.securityjwt.testing.test-service-jwt: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHQtanRpIjoiNDAzMGY5OGItNzVmOC00YmEzLThiMGMtY2E4ZTY0MDUwYzdjIiwic3ViIjoiZWM3ZDVlNGYtMjgxYi00MjY0LWE0ZjUtZDZkZGQzMmFiMTQzIiwiZXh0LWlhdCI6MTU1MjU3MjM4NiwibmJmIjoxNTUyNTcyMzg3LCJyb2xlcyI6WyJCaXpSb2xlMiIsIkJpelJvbGVBIiwiQml6Um9sZTEiXSwiaXNzIjoic3RzIiwiZXhwIjoyNTMxMTQyNTA0LCJpYXQiOjE1NTI1NzIzODcsInR0bCI6MTU1MjYwMTE4NywiZXh0LWlzcyI6Imh0dHA6Ly9pbG9jcHBudHMwMXcwNi5jb3JwLmFtZG9jcy5jb206MzA5MjMvYXV0aC9yZWFsbXMvYXBpZ3ciLCJqdGkiOiJkMmU4YTJiMC0wNWVjLTQ3OTEtYmQzOC02ZTdmNzMxZjc5NjYifQ.sfq-BUctJtWT3DEDJ4xHo3B7byEfbK-MqD28XkfTWWQ0DSQkiXMPxZYHeyozCA308LEO7lkw-QgYRkfVwMv9rI1wqc39wf8rGWuYwemMfce3E7cUMMi1mxSu6IZ54hWnf2UmL3EBdmEgdIk8_j-HwhjGGADK2GQWYsnXTPqGim8
+
+
+

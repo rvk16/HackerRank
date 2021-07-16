@@ -1,0 +1,6 @@
+com.amdocs.aia.il.common.model.providers.ExternalSchemaBasedElementProvider
+com.amdocs.aia.il.common.model.providers.ExternalEntityBasedElementProvider
+com.amdocs.aia.il.common.model.providers.SchemaStoreBasedElementProvider
+com.amdocs.aia.il.common.model.providers.EntityStoreBasedElementProvider
+com.amdocs.aia.il.common.model.providers.CustomLogicalSchemaProvider
+com.amdocs.aia.il.common.model.providers.CacheEntityBasedElementProvider

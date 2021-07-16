@@ -1,0 +1,3506 @@
+swagger: '2.0'
+info:
+  title: Integration Layer Configuration API
+  description: This is a REST API specification for Integration Layer Configuration application.
+  version: "TRUNK-SNAPSHOT"
+schemes:
+  - http
+  - https
+basePath: /aia/api/v1/integration-layer
+produces:
+  - application/json
+parameters:
+  projectKey:
+    name: projectKey
+    in: path
+    description: The project key
+    required: true
+    type: string
+  id:
+    name: id
+    in: path
+    description: context to be fetched
+    required: true
+    type: string
+  replicaStoreName:
+    name: replicaStoreName
+    in: path
+    description: The name of the Replica store
+    required: true
+    type: string
+  externalSchemaType:
+    in: path
+    name: externalSchemaType
+    description: External Schema Type
+    required: true
+    type: string
+  externalSchemaKey:
+    in: path
+    name: externalSchemaKey
+    description: External Schema Key
+    required: true
+    type: string
+  externalEntityKey:
+    in: path
+    name: externalEntityKey
+    description: External Entity Key
+    required: true
+    type: string
+  schemaStoreKey:
+    in: path
+    name: schemaStoreKey
+    description: Schema Store Key
+    required: true
+    type: string
+  entityStoreKey:
+    in: path
+    name: entityStoreKey
+    description: Entity Store Key
+    required: true
+    type: string
+  logicalSchemaKey:
+    in: path
+    name: logicalSchemaKey
+    description: Logical Schema Key
+    required: true
+    type: string
+  logicalEntityKey:
+    in: path
+    name: logicalEntityKey
+    description: Logical Entity Key
+    required: true
+    type: string
+  bulkGroupKey:
+    in: path
+    name: bulkGroupKey
+    description: Bulk Group Key
+    required: true
+    type: string
+  cacheReferenceEntityKey:
+    in: path
+    name: cacheReferenceEntityKey
+    description: Cache Reference Entity Key
+    required: true
+    type: string
+paths:
+  '/projects/{projectKey}/configuration/transformation-contexts':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_listContexts
+        private-roles:
+          - aiaP_il_configuration_authoring_listContexts
+      tags:
+        - Context
+      summary: List all contexts
+      operationId: listContexts
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addContext
+        private-roles:
+          - aiaP_il_configuration_authoring_addContext
+      tags:
+        - Context
+      summary: Add new context
+      operationId: addContext
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: context
+          description: context to be created
+          required: true
+          schema:
+            $ref: '#/definitions/Context'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Context'
+        201:
+          description: OK context created
+          schema:
+            $ref: '#/definitions/Context'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/configuration/transformation-contexts/contexts-bulk':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addContexts
+        private-roles:
+          - aiaP_il_configuration_authoring_addContexts
+      tags:
+        - Context
+      summary: Add new contexts
+      operationId: addContexts
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: context
+          description: contexts to be created
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Context'
+      responses:
+        201:
+          description: OK Contexts created
+          schema:
+            $ref: '#/definitions/SaveElementsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/configuration/transformation-contexts/{id}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getContext
+        private-roles:
+          - aiaP_il_configuration_authoring_getContext
+      tags:
+        - Context
+      summary: Get a Context
+      operationId: getContext
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/id'
+      responses:
+        200:
+          description: Context found
+          schema:
+            $ref: '#/definitions/Context'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateContext
+        private-roles:
+          - aiaP_il_configuration_authoring_updateContext
+      tags:
+        - Context
+      summary: Update an existing context
+      operationId: updateContext
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/id'
+        - in: body
+          name: context
+          description: Context to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/Context'
+      responses:
+        200:
+          description: OK Context updated
+          schema:
+            $ref: '#/definitions/Context'
+        201:
+          description: Created
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteContext
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteContext
+      tags:
+        - Context
+      summary: Delete a context
+      operationId: deleteContext
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/id'
+      responses:
+        200:
+          description: OK
+        204:
+          description: No Content
+        400:
+          description: Invalid Context value
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+  '/projects/{projectKey}/configuration/export-transformations-scripts':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_exportTransformationScripts
+        private-roles:
+          - aia_il_configuration_authoring_exportTransformationScripts
+      tags:
+        - Export
+      summary: Export all transformations scripts
+      operationId: exportTransformationsScripts
+      produces:
+        - application/octet-stream
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: file
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/configuration/transformations':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_listTransformations
+        private-roles:
+          - aiaP_il_configuration_authoring_listTransformations
+      tags:
+        - Transformation
+      summary: List all entitiesTransformations
+      operationId: listTransformations
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_addTransformation
+      tags:
+        - Transformation
+      summary: Add new Transformation
+      operationId: addTransformation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: transformation
+          description: Transformation to be created
+          required: true
+          schema:
+            $ref: '#/definitions/Transformation'
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Transformation'
+        201:
+          description: OK Transformation created
+          schema:
+            $ref: '#/definitions/Transformation'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+  '/projects/{projectKey}/configuration/transformations-bulk':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addTransformations
+        private-roles:
+          - aiaP_il_configuration_authoring_addTransformations
+      tags:
+        - Transformation
+      summary: Add new Transformations
+      operationId: addTransformations
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: transformations
+          description: Transformations to be created
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Transformation'
+      responses:
+        201:
+          description: OK Transformations created
+          schema:
+            $ref: '#/definitions/SaveElementsResponse'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/configuration/transformations/{id}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_getTransformation
+      tags:
+        - Transformation
+      summary: Get a Transformation
+      operationId: getTransformation
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/id'
+      responses:
+        200:
+          description: Transformation found
+          schema:
+            $ref: '#/definitions/Transformation'
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_updateTransformation
+      tags:
+        - Transformation
+      summary: Update an existing transformation
+      operationId: updateTransformation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/id'
+        - in: body
+          name: transformation
+          description: Transformation to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/Transformation'
+      responses:
+        200:
+          description: OK Transformation updated
+          schema:
+            $ref: '#/definitions/Transformation'
+        201:
+          description: Created
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteTransformation
+      tags:
+        - Transformation
+      summary: Delete a Transformation
+      operationId: deleteTransformation
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/id'
+        - $ref: '#/parameters/projectKey'
+      responses:
+        200:
+          description: OK
+        204:
+          description: No Content
+        400:
+          description: Invalid Transformation value
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+  '/projects/{projectKey}/configuration/transformation-attributes/{logicalSchemaKey}/entity-stores/{logicalEntityKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getTransformationAttributes
+        private-roles:
+          - aiaP_il_configuration_authoring_getTransformationAttributes
+      tags:
+        - Transformation Attribute
+      summary: Get all transformation Attributes
+      operationId: getTransformationAttributes
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/logicalSchemaKey'
+        - $ref: '#/parameters/logicalEntityKey'
+      responses:
+        200:
+          description: TransformationAttribute loaded
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TransformationAttribute'
+        400:
+          description: Invalid keys supplied
+        404:
+          description: Transformation Attribute not found
+  '/projects/{projectKey}/configuration/transformation-attributes/{logicalSchemaKey}/{logicalEntityKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getAvailableAttributes
+        private-roles:
+          - aiaP_il_configuration_authoring_getAvailableAttributes
+      tags:
+        - Transformation Attribute
+      summary: Get all available transformation Attributes
+      operationId: getAvailableAttributes
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/logicalSchemaKey'
+        - $ref: '#/parameters/logicalEntityKey'
+      responses:
+        200:
+          description: TransformationAttribute loaded
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TransformationAttribute'
+        400:
+          description: Invalid keys supplied
+        404:
+          description: Transformation Attribute not found
+  '/projects/{projectKey}/configuration/external-schemas':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getExternalSchemas
+        private-roles:
+          - aiaP_il_configuration_authoring_getExternalSchemas
+      tags:
+        - External Schema
+      summary: Get all external schemas
+      operationId: getExternalSchemas
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        '200':
+          description: External Schemas retrieved
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ExternalSchema'
+        '400':
+          description: Invalid project key supplied
+        '404':
+          description: Project not found
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addExternalSchema
+        private-roles:
+          - aiaP_il_configuration_authoring_addExternalSchema
+      tags:
+        - External Schema
+      summary: Add a new External Schema
+      operationId: addExternalSchema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: externalSchema
+          description: The new External Schema
+          required: true
+          schema:
+            $ref: '#/definitions/ExternalSchema'
+      responses:
+        '201':
+          description: OK External Schema created
+          schema:
+            $ref: '#/definitions/ExternalSchema'
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/external-schemas/schemas-bulk':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addExternalSchemas
+        private-roles:
+          - aiaP_il_configuration_authoring_addExternalSchemas
+      tags:
+        - External Schema
+      summary: Add new External Schemas
+      operationId: addExternalSchemas
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: externalSchemas
+          description: The new External Schemas
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ExternalSchema'
+      responses:
+        '201':
+          description: OK External Schemas created
+          schema:
+            $ref: '#/definitions/SaveElementsResponse'
+        '405':
+          description: Invalid input
+
+
+  '/projects/{projectKey}/configuration/external-schemas/{externalSchemaKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getExternalSchemaByKey
+        private-roles:
+          - aiaP_il_configuration_authoring_getExternalSchemaByKey
+      tags:
+        - External Schema
+      summary: 'Get an External Schema'
+      operationId: getExternalSchemaByKey
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+      responses:
+        '200':
+          description: External Schema found
+          schema:
+            $ref: '#/definitions/ExternalSchema'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Project or target not found
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateExternalSchema
+        private-roles:
+          - aiaP_il_configuration_authoring_updateExternalSchema
+      tags:
+        - External Schema
+      summary: Update External Schema
+      operationId: updateExternalSchema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+        - in: body
+          name: externalSchema
+          description: The Updated External Schema
+          required: true
+          schema:
+            $ref: '#/definitions/ExternalSchema'
+      responses:
+        '201':
+          description: OK External Schema Updated
+          schema:
+            $ref: '#/definitions/ExternalSchema'
+        404:
+          $ref: '#/responses/NotFound'
+        '405':
+          description: Invalid input
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteExternalSchemaByKey
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteExternalSchemaByKey
+      tags:
+        - External Schema
+      summary: 'delete an External Schema'
+      operationId: deleteExternalSchemaByKey
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+      responses:
+        '204':
+          description: The External Schema was removed from the configuration. Note that 204 is returned even if the External Schema was not found and there was no need to delete anything.
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Project or target not found
+
+  '/projects/{projectKey}/configuration/external-schema-types':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getExternalSchemaTypes
+        private-roles:
+          - aiaP_il_configuration_authoring_getExternalSchemaTypes
+      tags:
+        - External Schema
+      summary: 'Get list of supported external schema types'
+      operationId: getExternalSchemaTypes
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        '200':
+          description: External Schema types
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ExternalSchemaTypeInfo'
+        '404':
+          description: Project or target not found
+  '/projects/{projectKey}/configuration/collection-channel-types':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getCollectionChannelTypes
+        private-roles:
+          - aiaP_il_configuration_authoring_getCollectionChannelTypes
+      tags:
+        - External Schema
+      summary: 'Get list of supported collection channel types'
+      operationId: getCollectionChannelTypes
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        '200':
+          description: Collection Channel Types
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CollectionChannelTypeInfo'
+        '404':
+          description: Project or target not found
+  '/projects/{projectKey}/configuration/type-systems':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getTypeSystems
+        private-roles:
+          - aiaP_il_configuration_authoring_getTypeSystems
+      tags:
+        - External Schema
+      summary: 'Get list of supported type systems'
+      operationId: getTypeSystems
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        '200':
+          description: Type Systems information
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TypeSystemInfo'
+        '404':
+          description: Project or target not found
+  '/projects/{projectKey}/configuration/external-schema-types/{externalSchemaType}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getExternalSchemaType
+        private-roles:
+          - aiaP_il_configuration_authoring_getExternalSchemaType
+      tags:
+        - External Schema
+      summary: 'Get information about a specific external schema type'
+      operationId: getExternalSchemaType
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaType'
+      responses:
+        '200':
+          description: External Schema type information
+          schema:
+            $ref: '#/definitions/ExternalSchemaTypeInfo'
+        '400':
+          description: Invalid schema type supplied
+        '404':
+          description: Project or target not found
+  '/projects/{projectKey}/configuration/external-schemas/{externalSchemaKey}/entities':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getExternalEntities
+        private-roles:
+          - aiaP_il_configuration_authoring_getExternalEntities
+      tags:
+        - External Entity
+      summary: Get all external entities
+      operationId: getExternalEntities
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+      responses:
+        '200':
+          description: External entities retrieved
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ExternalEntity'
+        '400':
+          description: Invalid project key supplied
+        '404':
+          description: Project not found
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addExternalEntity
+        private-roles:
+          - aiaP_il_configuration_authoring_addExternalEntity
+      tags:
+        - External Entity
+      summary: Add a new External Entity
+      operationId: addExternalEntity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+        - in: body
+          name: externalEntity
+          description: The new External Entity
+          required: true
+          schema:
+            $ref: '#/definitions/ExternalEntity'
+      responses:
+        '201':
+          description: OK External Entity created
+          schema:
+            $ref: '#/definitions/ExternalEntity'
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/external-schemas/entities-bulk':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addExternalEntities
+        private-roles:
+          - aiaP_il_configuration_authoring_addExternalEntities
+      tags:
+        - External Entity
+      summary: Add new External Entities
+      operationId: addExternalEntities
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: externalEntities
+          description: New External Entities
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ExternalEntity'
+      responses:
+        '201':
+          description: OK External Entity created
+          schema:
+            $ref: '#/definitions/SaveElementsResponse'
+
+        '405':
+          description: Invalid input
+
+  '/projects/{projectKey}/configuration/external-schemas/{externalSchemaKey}/entities/{externalEntityKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getExternalEntityByKey
+        private-roles:
+          - aiaP_il_configuration_authoring_getExternalEntityByKey
+      tags:
+        - External Entity
+      summary: Get an External Entity
+      operationId: getExternalEntityByKey
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+        - $ref: '#/parameters/externalEntityKey'
+      responses:
+        '200':
+          description: External Entity retrieved
+          schema:
+            $ref: '#/definitions/ExternalEntity'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: External Entity not found
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateExternalEntity
+        private-roles:
+          - aiaP_il_configuration_authoring_updateExternalEntity
+      tags:
+        - External Entity
+      summary: Update External Entity
+      operationId: updateExternalEntity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+        - $ref: '#/parameters/externalEntityKey'
+        - in: body
+          name: externalEntity
+          description: The updated External Entity
+          required: true
+          schema:
+            $ref: '#/definitions/ExternalEntity'
+      responses:
+        '201':
+          description: OK External Entity updated
+          schema:
+            $ref: '#/definitions/ExternalEntity'
+        '405':
+          description: Invalid input
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteExternalEntityByKey
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteExternalEntityByKey
+      tags:
+        - External Entity
+      summary: 'delete an External Entity'
+      operationId: deleteExternalEntityByKey
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/externalSchemaKey'
+        - $ref: '#/parameters/externalEntityKey'
+      responses:
+        '204':
+          description: The External Entity was removed from the configuration. Note that 204 is returned even if the External Entity was not found and there was no need to delete anything.
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Project or target not found
+
+  '/projects/{projectKey}/configuration/discovery/discover-external-csv':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_discoverExternalCsv
+        private-roles:
+          - aiaP_il_configuration_authoring_discoverExternalCsv
+      tags:
+        - Discovery
+      summary: Discover External Csv Async
+      operationId: discoverExternalCsvAsync
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: discoverExternalCsvRequest
+          description: The discovery external Csv request details
+          required: true
+          schema:
+            $ref: '#/definitions/DiscoverExternalCsvRequest'
+      responses:
+        '201':
+          description: OK discover External Csv Schema
+          schema:
+            $ref: '#/definitions/AsyncResponse'
+
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/discovery/discover-external-json':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_discoverExternalJson
+        private-roles:
+          - aiaP_il_configuration_authoring_discoverExternalJson
+      tags:
+        - Discovery
+      summary: Discover External Json Async
+      operationId: discoverExternalJsonAsync
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: discoverExternalJsonRequest
+          description: The discovery external Json request details
+          required: true
+          schema:
+            $ref: '#/definitions/DiscoverExternalJsonRequest'
+      responses:
+        '201':
+          description: OK discover External Json Schema
+          schema:
+            $ref: '#/definitions/AsyncResponse'
+
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/discovery/upload-file':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_uploadDiscoveryFile
+        private-roles:
+          - aiaP_il_configuration_authoring_uploadDiscoveryFile
+      tags:
+        - Discovery
+      summary: Upload Discovery File
+      operationId: uploadDiscoveryFile
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: formData
+          name: file
+          description: The fileName uploaded
+          type: file
+          required: true
+      responses:
+        '201':
+          description: OK discover External Csv Schema
+          schema:
+            $ref: '#/definitions/UploadDiscoveryFileResponse'
+        '405':
+          description: Invalid input
+
+  '/projects/{projectKey}/configuration/discovery/discover-external-schema':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_discoverExternalSchema
+        private-roles:
+          - aiaP_il_configuration_authoring_discoverExternalSchema
+      tags:
+        - Discovery
+      summary: Discover External Schema
+      description: A generic synchorinious API for discovering entities of ANY type of external schema
+      operationId: discoverExternalSchema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: discoveryRequest
+          description: The discovery request details
+          required: true
+          schema:
+            $ref: '#/definitions/SchemaDiscoveryRequest'
+      responses:
+        201:
+          description: OK External Schema created with discovered entities
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/configuration/shared-entity-transformation':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addSharedEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_addSharedEntityTransformation
+      tags:
+        - Shared Entity Transformation
+      summary: Add a Shared Entity Transformation
+      operationId: addSharedEntityTransformation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: EntityTransformation
+          description: Entity Transformation
+          required: true
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+        '405':
+          description: Invalid input
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getSharedEntityTransformationList
+        private-roles:
+          - aiaP_il_configuration_authoring_getSharedEntityTransformationList
+      tags:
+        - Shared Entity Transformation
+      summary: Get a Shared Entity Transformation List
+      operationId: GetSharedEntityTransformationList
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        '200':
+          description: Shared entity transformation list response
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/SharedEntityTransformationGridElement'
+        '400':
+          description: Invalid project key supplied
+        '404':
+          description: Project not found
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateSharedEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_updateSharedEntityTransformation
+      tags:
+        - Shared Entity Transformation
+      summary: Update a Shared Entity Transformation
+      operationId: updateSharedEntityTransformation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: EntityTransformation
+          description: Entity Transformation
+          required: true
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+      responses:
+        '200':
+          description: Updated
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/context-relation-types':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_contextRelationTypes
+        private-roles:
+          - aiaP_il_configuration_authoring_contextRelationTypes
+      tags:
+        - Context
+      summary: List of relation types
+      operationId: getRelationTypesList
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            type: object
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/bulk-groups':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addBulkGroups
+        private-roles:
+          - aiaP_il_configuration_authoring_addBulkGroups
+      tags:
+        - Bulk Groups
+      summary: Add  new Bulk Groups
+      operationId: addBulkGroups
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: bulkGroups
+          description: The new Bulk groups
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/BulkGroup'
+      responses:
+        '201':
+          description: OK Bulk Groups created
+          schema:
+            $ref: '#/definitions/SaveElementsResponse'
+        '405':
+          description: Invalid input	  
+  '/projects/{projectKey}/configuration/shared-entity-transformation/{logicalEntityKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_getEntityTransformation
+      tags:
+        - Shared Entity Transformation
+      summary: Get shared entity transformation
+      operationId: getSharedEntityTransformation
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/logicalEntityKey'
+      responses:
+        200:
+          description: Shared Entity Transformation loaded
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+        400:
+          description: Invalid keys supplied
+        404:
+          description: Transformation not found
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteSharedEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteSharedEntityTransformation
+      tags:
+        - Shared Entity Transformation
+      summary: Delete a Shared Entity Transformation
+      operationId: deleteSharedEntityTransformation
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/logicalEntityKey'
+      responses:
+        200:
+          description: OK
+        204:
+          description: No Content
+        400:
+          description: Invalid Shared Entity Transformation value
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+  '/projects/{projectKey}/schemas/{schemaStoreKey}/bulk-groups':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getBulkGroups
+        private-roles:
+          - aiaP_il_configuration_authoring_getBulkGroups
+      tags:
+        - Bulk Groups
+      summary: Get all bulk groups
+      operationId: getBulkGroups
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/schemaStoreKey'
+      responses:
+        '200':
+          description: Bulk groups loaded
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/BulkGroup'
+        '400':
+          description: Invalid project key supplied
+        '404':
+          description: Project not found
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addBulkGroup
+        private-roles:
+          - aiaP_il_configuration_authoring_addBulkGroup
+      tags:
+        - Bulk Groups
+      summary: Add a new Bulk Group
+      operationId: addBulkGroup
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/schemaStoreKey'
+        - in: body
+          name: bulkGroup
+          description: The new Bulk group
+          required: true
+          schema:
+            $ref: '#/definitions/BulkGroup'
+      responses:
+        '201':
+          description: OK Bulk Group created
+          schema:
+            $ref: '#/definitions/BulkGroup'
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/schemas/{schemaStoreKey}/bulk-groups/{bulkGroupKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getBulkGroupByKey
+        private-roles:
+          - aiaP_il_configuration_authoring_getBulkGroupByKey
+      tags:
+        - Bulk Groups
+      summary: Get a bulk group
+      operationId: getBulkGroupByKey
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/schemaStoreKey'
+        - $ref: '#/parameters/bulkGroupKey'
+      responses:
+        '200':
+          description: Bulk group found
+          schema:
+            $ref: '#/definitions/BulkGroup'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Bulk group not found
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateBulkGroup
+        private-roles:
+          - aiaP_il_configuration_authoring_updateBulkGroup
+      tags:
+        - Bulk Groups
+      summary: Update an existing bulk group
+      operationId: updateBulkGroup
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/schemaStoreKey'
+        - $ref: '#/parameters/bulkGroupKey'
+        - in: body
+          name: BulkGroup
+          description: Bulk group to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/BulkGroup'
+      responses:
+        200:
+          description: OK BulkGroup updated
+          schema:
+            $ref: '#/definitions/BulkGroup'
+        201:
+          description: Created
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteBulkGroup
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteBulkGroup
+      tags:
+        - Bulk Groups
+      summary: Delete a BulkGroup
+      operationId: deleteBulkGroup
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/schemaStoreKey'
+        - $ref: '#/parameters/bulkGroupKey'
+      responses:
+        200:
+          description: OK
+        204:
+          description: No Content
+        400:
+          description: Invalid Context value
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/schemas/{schemaStoreKey}/bulk-groups/{bulkGroupKey}/set-entity-filters':
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateBulkGroup
+        private-roles:
+          - aiaP_il_configuration_authoring_updateBulkGroup
+      tags:
+        - Bulk Groups
+      summary: Update an existing bulk group with entity filters
+      operationId: updateBulkGroupEntityFilters
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/schemaStoreKey'
+        - $ref: '#/parameters/bulkGroupKey'
+        - in: body
+          name: SetFiltersRequest
+          description: Request containing all entities with filters and the bulk group with list of filter references
+          required: true
+          schema:
+            $ref: '#/definitions/SetFiltersRequest'
+      responses:
+        200:
+          description: OK filters updated
+          schema:
+            $ref: '#/definitions/SetFiltersRequest'
+        201:
+          description: Created
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/configuration/cache-reference-bulk':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addCacheReferencesEntities
+        private-roles:
+          - aiaP_il_configuration_authoring_addCacheReferencesEntities
+      tags:
+        - Cache Reference
+      summary: Add  new Cache Reference Entities
+      operationId: addCacheReferenceEntities
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: cacheReferenceEntities
+          description: The new Cache Reference Entity
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CacheReferenceEntity'
+      responses:
+        '201':
+          description: OK Cache Reference Entities created
+          schema:
+            $ref: '#/definitions/SaveElementsResponse'
+        '405':
+          description: Invalid input
+
+  '/projects/{projectKey}/configuration/cache-reference':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getCacheReferenceEntities
+        private-roles:
+          - aiaP_il_configuration_authoring_getCacheReferenceEntities
+      tags:
+        - Cache Reference
+      summary: Get all cache reference entities
+      operationId: getCacheReferenceEntities
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+      responses:
+        '200':
+          description: Cache Reference Entities retrieved
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CacheReferenceEntity'
+        '400':
+          description: Invalid project key supplied
+        '404':
+          description: Project not found
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addCacheReferenceEntity
+        private-roles:
+          - aiaP_il_configuration_authoring_addCacheReferenceEntity
+      tags:
+        - Cache Reference
+      summary: Add a new Cache Reference Entity
+      operationId: addCacheReferenceEntity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: cacheReferenceEntity
+          description: The new Cache Reference Entity
+          required: true
+          schema:
+            $ref: '#/definitions/CacheReferenceEntity'
+      responses:
+        '201':
+          description: OK Cache Reference Entity created
+          schema:
+            $ref: '#/definitions/CacheReferenceEntity'
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/cache-reference/{cacheReferenceEntityKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getCacheReferenceEntityByKey
+        private-roles:
+          - aiaP_il_configuration_authoring_getCacheReferenceEntityByKey
+      tags:
+        - Cache Reference
+      summary: 'Get an Cache Reference Entity'
+      operationId: getCacheReferenceEntityByKey
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/cacheReferenceEntityKey'
+      responses:
+        '200':
+          description: Cache Reference Entity found
+          schema:
+            $ref: '#/definitions/CacheReferenceEntity'
+        '400':
+          description: Invalid ID supplied
+        '404':
+          description: Project or target not found
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateCacheReferenceEntity
+        private-roles:
+          - aiaP_il_configuration_authoring_updateCacheReferenceEntity
+      tags:
+        - Cache Reference
+      summary: Update a Cache Reference Entity
+      operationId: updateCacheReferenceEntity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/cacheReferenceEntityKey'
+        - in: body
+          name: cacheReferenceEntity
+          description: Cache Reference Entity
+          required: true
+          schema:
+            $ref: '#/definitions/CacheReferenceEntity'
+      responses:
+        200:
+          description: OK Cache Reference Entity updated
+          schema:
+            $ref: '#/definitions/CacheReferenceEntity'
+        201:
+          description: Created
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteCacheReferenceEntity
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteCacheReferenceEntity
+      tags:
+        - Cache Reference
+      summary: Delete a Cache Reference Entity
+      operationId: deleteCacheReferenceEntity
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/cacheReferenceEntityKey'
+      responses:
+        200:
+          description: OK
+        204:
+          description: No Content
+        400:
+          description: Invalid Context value
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+  '/projects/{projectKey}/configuration/cached-entity-transformation':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addCachedEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_addCachedEntityTransformation
+      tags:
+        - Cached Entity Transformation
+      summary: Add a Cached Entity Transformation
+      operationId: addCachedEntityTransformation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: EntityTransformation
+          description: Entity Transformation
+          required: true
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+      responses:
+        '201':
+          description: Created
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+        '405':
+          description: Invalid input
+    put:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_updateCachedEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_updateCachedEntityTransformation
+      tags:
+        - Cached Entity Transformation
+      summary: Update a Cached Entity Transformation
+      operationId: updateCachedEntityTransformation
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: EntityTransformation
+          description: Entity Transformation
+          required: true
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+      responses:
+        '200':
+          description: Updated
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+        404:
+          $ref: '#/responses/NotFound'
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/cached-entity-transformation/{cacheReferenceEntityKey}':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getCacheEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_getCacheEntityTransformation
+      tags:
+        - Cached Entity Transformation
+      summary: Get cache entity transformation
+      operationId: getCacheEntityTransformation
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/cacheReferenceEntityKey'
+      responses:
+        200:
+          description: Cache Entity Transformation loaded
+          schema:
+            $ref: '#/definitions/EntityTransformation'
+        400:
+          description: Invalid keys supplied
+        404:
+          description: Transformation not found
+    delete:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_deleteCacheEntityTransformation
+        private-roles:
+          - aiaP_il_configuration_authoring_deleteCacheEntityTransformation
+      tags:
+        - Cached Entity Transformation
+      summary: Delete a Cache Entity Transformation
+      operationId: deleteCacheEntityTransformation
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - $ref: '#/parameters/cacheReferenceEntityKey'
+      responses:
+        200:
+          description: OK
+        204:
+          description: No Content
+        400:
+          description: Invalid Cache Entity Transformation value
+        401:
+          $ref: '#/responses/Unauthorized'
+        403:
+          $ref: '#/responses/Forbidden'
+        404:
+          $ref: '#/responses/NotFound'
+        500:
+          $ref: '#/responses/InternalServerError'
+        default:
+          $ref: '#/responses/UnexpectedError'
+      deprecated: false
+
+
+  '/projects/{projectKey}/configuration/referential-integrity-bulk':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addEntitiesReferentialIntegrity
+        private-roles:
+          - aiaP_il_configuration_authoring_addEntitiesReferentialIntegrity
+      tags:
+        - Entity Referential Integrity
+      summary: Add new Entities Referential Integrity
+      operationId: addEntitiesReferentialIntegrity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: entitiesReferentialIntegrity
+          description: The new EntitiesReferentialIntegrity
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/EntityReferentialIntegrity'
+      responses:
+        '201':
+          description: OK EntitiesReferentialIntegrity created
+          schema:
+            $ref: '#/definitions/SaveElementsResponse'
+        '405':
+          description: Invalid input
+
+
+
+  '/projects/{projectKey}/configuration/referential-integrity':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_addEntityReferentialIntegrity
+        private-roles:
+          - aiaP_il_configuration_authoring_addEntityReferentialIntegrity
+      tags:
+        - Entity Referential Integrity
+      summary: Add a new Entity Referential Integrity
+      operationId: addEntityReferentialIntegrity
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: EntityReferentialIntegrity
+          description: The new EntityReferentialIntegrity
+          required: true
+          schema:
+            $ref: '#/definitions/EntityReferentialIntegrity'
+      responses:
+        '201':
+          description: OK EntityReferentialIntegrity created
+          schema:
+            $ref: '#/definitions/EntityReferentialIntegrity'
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/context-sources/shared':
+    get:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_getContextSources
+        private-roles:
+          - aiaP_il_configuration_authoring_getContextSources
+      tags:
+        - Context Sources
+      summary: Get all context sources
+      operationId: GetContextSources
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: query
+          name: schemaType
+          description: Schema type
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Context Sources retrieved
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ContextSource'
+        '400':
+          description: Invalid project key supplied
+        '404':
+          description: Project not found
+  '/projects/{projectKey}/configuration/context-sources/context-entities-metadata':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_searchContextEntitiesMetadata
+        private-roles:
+          - aiaP_il_configuration_authoring_searchContextEntitiesMetadata
+      tags:
+        - Context Sources
+      summary: Find context entities metadata
+      operationId: SearchContextEntitiesMetadata
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: entities
+          description: context entities ref
+          required: true
+          schema:
+            $ref: '#/definitions/Entities'
+      responses:
+        '200':
+          description: Context Entities Metadata retrieved
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/BaseEntity'
+        '405':
+          description: Invalid input
+definitions:
+  PropertyData:
+    type: object
+    properties:
+      value:
+        type: object
+    title: PropertyData
+  Context:
+    description: Context representation
+    x-discriminator-value: CONTEXT
+    allOf:
+      - $ref: '#/definitions/CommonModel'
+      - type: object
+        properties:
+          contextEntities:
+            type: array
+            items:
+              $ref: '#/definitions/ContextEntity'
+          contextKey:
+            type: string
+          elementType:
+            type: string
+          elementVersion:
+            type: integer
+            format: int32
+          id:
+            type: string
+          lastUpdateTime:
+            type: integer
+            format: int64
+          origin:
+            type: string
+          ownerProjectKey:
+            type: string
+          productKey:
+            type: string
+          properties:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/PropertyData'
+          propertyValues:
+            type: object
+          referenceIds:
+            type: array
+            items:
+              type: string
+          sourceElementId:
+            type: string
+          tags:
+            type: array
+            items:
+              type: string
+    title: Context
+  ContextEntity:
+    type: object
+    properties:
+      aliasedSourceEntityKey:
+        type: string
+      doPropagation:
+        type: boolean
+      entityStoreKey:
+        type: string
+      foreignKeys:
+        type: string
+      noReferentAction:
+        type: string
+        enum:
+          - MANDATORY
+          - OPTIONAL
+          - MANDATORY_PUBLISH
+      parentContextEntityKey:
+        type: string
+      relationType:
+        type: string
+        enum:
+          - LEAD
+          - OTO
+          - OTM
+          - MTO
+          - MTM
+          - REF
+      schemaStoreKey:
+        type: string
+      sourceAlias:
+        type: string
+    title: ContextEntity
+  Transformation:
+    description: Transformation representation
+    x-discriminator-value: TRANSFORMATION
+    allOf:
+      - $ref: '#/definitions/CommonModel'
+      - type: object
+        properties:
+          contextKey:
+            type: string
+          customScript:
+            type: string
+          customScriptForDeletionKeys:
+            type: string
+          customGroovyScript:
+            type: string
+          customGroovyScriptForDeletionKeys:
+            type: string
+          elementType:
+            type: string
+          elementVersion:
+            type: integer
+            format: int32
+          id:
+            type: string
+          implementationType:
+            type: string
+            enum:
+              - CUSTOM_SQL
+              - CUSTOM_GROOVY
+          lastUpdateTime:
+            type: integer
+            format: int64
+          origin:
+            type: string
+          ownerProjectKey:
+            type: string
+          productKey:
+            type: string
+          properties:
+            type: object
+            additionalProperties:
+              $ref: '#/definitions/PropertyData'
+          propertyValues:
+            type: object
+          referenceIds:
+            type: array
+            items:
+              type: string
+          referenceSourceEntities:
+            type: array
+            items:
+              $ref: '#/definitions/TransformationContextEntity'
+          sourceElementId:
+            type: string
+          sourceType:
+            type: string
+            enum:
+              - CONTEXT
+              - REFERENCE
+          tags:
+            type: array
+            items:
+              type: string
+          targetEntityStoreKey:
+            type: string
+          targetSchemaStoreKey:
+            type: string
+          targetSchemaName:
+            type: string
+          isPublished:
+            type: boolean
+          referenceAttributes:
+            type: array
+            items:
+              type: string
+          leadkeys:
+            type: array
+            items:
+              $ref: '#/definitions/LeadKey'
+
+
+    title: Transformation
+  TransformationContextEntity:
+    type: object
+    properties:
+      entityStoreKey:
+        type: string
+      filterDescription:
+        type: string
+      schemaStoreKey:
+        type: string
+    title: TransformationContextEntity
+  ReplicaStoreSource:
+    type: object
+    description: Replica Store source
+    properties:
+      schemaStoreKey:
+        type: string
+        description: Schema store's key of the entity
+      entityStoreKey:
+        type: string
+        description: Entity store's key
+  ColumnDatatype:
+    type: object
+    description: column data type
+    properties:
+      sqlType:
+        type: string
+        description: Sql type
+  Column:
+    type: object
+    description: Replica Store column
+    properties:
+      columnName:
+        type: string
+        description: the name of the Replica Store column
+      datatype:
+        $ref: '#/definitions/ColumnDatatype'
+      isLogicalTime:
+        type: boolean
+  LeadKey:
+    type: object
+    properties:
+     sourceAttribute:
+      type: string
+     targetAttribute:
+      type: string
+  PrimaryKey:
+    type: object
+    description: Primary Key
+    properties:
+      columnNames:
+        type: array
+        items:
+          type: string
+  ModelType:
+    title:  Model type
+    type: string
+    enum: &ModelType
+      - CONTEXT
+      - TRANSFORMATION
+  CommonModel:
+    description: Common fields for Replica objects
+    discriminator: modelType
+    required:
+      - modelType
+    properties:
+      modelType:
+        type: string
+        description: Common Model type
+        enum: *ModelType
+      projectKey:
+        type: string
+        description: The project key
+      displayName:
+        type: string
+        description: The Replica Entity display name
+      storeName:
+        type: string
+        description: The name of the Store Entity
+      description:
+        type: string
+        description: The Replica Entity description
+      status:
+        $ref: '#/definitions/ChangeStatus'
+      originProcess:
+        type: string
+        description: The Origin Process
+      createdBy:
+        type: string
+        readOnly: true
+      createdAt:
+        type: string
+        format: date-time
+        readOnly: true
+  SchemaStoreType:
+    title: Schema Store type
+    type: string
+    enum: &SchemaStoreType
+      - PHYSICALSCHEMA
+      - DATACHANNELSCHEMA
+      - PUBLISHERSCHEMA
+      - PUBLISHERCACHESCHEMA
+  SchemaStoreModel:
+    description: Common fields for Schema Store objects
+    discriminator: schemaStoreType
+    required:
+      - schemaStoreType
+    properties:
+      schemaStoreType:
+        type: string
+        description: Schema Store type
+        enum: *SchemaStoreType
+      projectKey:
+        type: string
+        description: The project key
+      schemaName:
+        type: string
+        description: The name of the Source Schema
+      description:
+        type: string
+        description: The Source Schema description
+      schemaStoreKey:
+        type: string
+        description: The Source Schema Store key
+      logicalSchemaKey:
+        type: string
+        description: The Logical Source Schema Store Key
+      dataChannel:
+        type: string
+        description: Source schema data channel
+      sourceTarget:
+        $ref: '#/definitions/SourceTargetType'
+      storeType:
+        $ref: '#/definitions/StoreType'
+      typeSystem:
+        type: string
+        description: The Source Schema type system
+      isReference:
+        type: boolean
+        description: The Reference Source Schema
+      category:
+        $ref: '#/definitions/StoreCategory'
+      numericKeyAssignmentPolicy:
+        $ref: '#/definitions/NumericKeyAssignmentPolicy'
+      assignedEntityNumericKey:
+        type: object
+        additionalProperties:
+          type: integer
+      status:
+        $ref: '#/definitions/ChangeStatus'
+      originProcess:
+        type: string
+        description: The Origin Process
+      createdBy:
+        type: string
+        readOnly: true
+      createdAt:
+        type: string
+        format: date-time
+        readOnly: true
+  PhysicalStoreType:
+    title: Physical Store type
+    type: string
+    enum: &PhysicalStoreType
+      - CSV
+      - SQL
+      - KAFKA
+  EntityStoreType:
+    title: Entity Store type
+    type: string
+    enum: &EntityStoreType
+      - PUBLISHERCACHEENTITY
+  EntityStoreModel:
+    description: Common fields for Entity Store objects
+    discriminator: entityStoreType
+    required:
+      - entityStoreType
+    properties:
+      entityStoreType:
+        type: string
+        description: Schema Store type
+        enum: *EntityStoreType
+      projectKey:
+        type: string
+        description: The project key
+      entityName:
+        type: string
+        description: The name of the Source Schema Entity
+      description:
+        type: string
+        description: The Source Schema description
+      schemaStoreKey:
+        type: string
+        description: The Source Schema Store key
+      logicalSchemaKey:
+        type: string
+        description: The Logical Source Schema Store Key
+      entityStoreKey:
+        type: string
+        description: The Source entity Store key
+      logicalEntityKey:
+        type: string
+        description: The Logical entity Store Key
+      storeType:
+        $ref: '#/definitions/StoreType'
+      serializationId:
+        type: integer
+        format: int32
+        description: The Source entity serialization id
+      assignedAttributeNumericKey:
+        type: object
+        additionalProperties:
+          type: integer
+      attributeStores:
+        type: array
+        description: Attributes of Entity Store
+        items:
+          $ref: '#/definitions/AttributeStore'
+      status:
+        $ref: '#/definitions/ChangeStatus'
+      originProcess:
+        type: string
+        description: The Origin Process
+      createdBy:
+        type: string
+        readOnly: true
+      createdAt:
+        type: string
+        format: date-time
+        readOnly: true
+  EntityFilter:
+    type: object
+    description: Entity filter
+    properties:
+      entityFilterKey:
+        type: string
+        description: entity filter key
+      schemaKey:
+        type: string
+        description: schema entity key
+      entityKey:
+        type: string
+        description: schema entity key
+      query:
+        type: string
+        description: The query
+
+  ExternalSchemaStoreType:
+    type: string
+    enum: &ExternalSchemaStoreType
+      - CSV
+      - SQL
+      - KAFKA
+  ExternalSchemaStoreInfo:
+    type: object
+    discriminator: storeType
+    properties:
+      storeType:
+        type: string
+        enum: *ExternalSchemaStoreType
+  ExternalCsvSchemaStoreInfo:
+    x-discriminator-value: CSV
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalSchemaStoreInfo"
+      - type: object
+        properties:
+          defaultColumnDelimiter:
+            type: string
+            description: Default column delimiter of the schema store info
+          defaultDateFormat:
+            type: string
+            description: Default column date format of the schema store info
+  ExternalSqlSchemaStoreInfo:
+    x-discriminator-value: SQL
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalSchemaStoreInfo"
+      - type: object
+        properties:
+          databaseType:
+            type: string
+            description: The underlying db technology of the SQL store (e.g. Oracle, PostgreSQL)
+  ExternalKafkaSchemaStoreInfo:
+    x-discriminator-value: KAFKA
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalSchemaStoreInfo"
+      - type: object
+        properties:
+          defaultDateFormat:
+            type: string
+            description: Default column date format of the schema store info
+  ExternalSchemaDataChannelInfo:
+    type: object
+    description: additional information regarding the management of the external schema in the system's data channel which serves as the input for transformations
+    properties:
+      dataChannelName:
+        type: string
+        description: The PHYSICAL name of the data channel
+      serializationMethod:
+        type: string
+        description: The format in which messages are serialized in the data channel
+        enum:
+          - SharedProtobuf
+          - SharedJson
+  ExternalSchema:
+    type: object
+    description: External Schema representation
+    properties:
+      schemaKey:
+        type: string
+        description: The external schema key
+      schemaName:
+        type: string
+        description: The external schema's display name
+      schemaType:
+        type: string
+        description: The external schema's type (available types can be retrieved via the 'list external schema types' API)
+      displayType:
+        type: string
+        description: Human-readable text describing the schema store type (typically used for display purposes)
+      isActive:
+        type: boolean
+        description: Indicates whether this the system's integration with this schema is currently active or not
+      description:
+        type: string
+        description: A textual description of the schema
+      typeSystem:
+        type: string
+        description: The unique name of the type system in which attribute datatypes are described. This value must match one of the type systems that are supported by the integration layer runtime engine.
+      isReference:
+        type: boolean
+        description: Indicates whether all the entities in this schema are REFERENCE entities
+      storeInfo:
+        $ref: "#/definitions/ExternalSchemaStoreInfo"
+        description: Specific store-specific inormation about the schema
+      collectionRules:
+        $ref: "#/definitions/ExternalSchemaCollectionRules"
+        description: Schema-level information describing how data should be collected from this external schema
+      dataChannelInfo:
+        $ref: "#/definitions/ExternalSchemaDataChannelInfo"
+      ongoingCollector:
+        type: string
+        description: The collector used for loading ongoing changes
+      initialCollector:
+        type: string
+        description: The collector used for initial load
+      selectiveCollector:
+        type: string
+        description: The collector used for selectively loading entities (e.g. for reconciliation)
+      availability:
+        $ref: "#/definitions/Availability"
+      subjectAreaName:
+        type: string
+        description: The external schema's subjectArea name
+      subjectAreaKey:
+        type: string
+        description: The external schema's subjectArea key
+      createdBy:
+        type: string
+        readOnly: true
+      createdAt:
+        type: integer
+        format: int64
+        readOnly: true
+      status:
+        $ref: '#/definitions/ChangeStatus'
+      originProcess:
+        type: string
+        description: The Origin Process
+    required:
+      - schemaKey
+      - schemaName
+      - typeSystem
+      - isReference
+  ExternalEntityStoreInfo:
+    type: object
+    discriminator: storeType
+    properties:
+      storeType:
+        type: string
+        enum: *ExternalSchemaStoreType
+  ExternalCsvEntityStoreInfo:
+    x-discriminator-value: CSV
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalEntityStoreInfo"
+      - type: object
+        properties:
+          fileHeader:
+            type: boolean
+            description: CSV file header
+          fileNameFormat:
+            type: string
+            description: Input file name format
+          dateFormat:
+            type: string
+            description: Date format for attributes of type Date/DateTime
+          columnDelimiter:
+            type: string
+            description: CSV column delimiter
+  ExternalSqlEntityStoreInfo:
+    x-discriminator-value: SQL
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalEntityStoreInfo"
+      - type: object
+  ExternalKafkaEntityStoreInfo:
+    x-discriminator-value: KAFKA
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalEntityStoreInfo"
+      - type: object
+        properties:
+          jsonTypeValue:
+            type: string
+            description: json type value
+          jsonTypePath:
+            type: string
+            description: json type path
+          relativePaths:
+            type: string
+            description: relative paths
+          mergedNodes:
+            type: string
+            description: merged nodes
+  ExternalEntityFilter:
+    type: object
+    description: Filter for external entity instances (used, for example, for bulk loading)
+    properties:
+      filterKey:
+        type: string
+        description: entity filter key
+      filterLogic:
+        type: string
+        description: A string representation of the logic for filtering entities (for example, for SQL entities, this will be an SQL query)
+  ExternalEntityIncrementalAttribute:
+    type: object
+    description: The attribute based on which the system can keep track of the progress when performing incremental collection (time based or sequence based)
+    properties:
+      key:
+        type: string
+      type:
+        type: string
+        enum:
+          - SEQUENCE
+          - TIMESTAMP
+  Availability:
+      type: string
+      enum:
+        - EXTERNAL
+        - SHARED
+  ExternalSchemaType:
+    type: object
+    description: The External Schema Type
+    properties:
+      type:
+        type: string
+      displayName:
+        type: string
+  ExternalSchemaTypeInfo:
+    type: object
+    description: External Schema Type Information
+    properties:
+      type:
+        type: string
+      displayName:
+        type: string
+      supportedTypeSystems:
+        type: array
+        description: List of type systems that can be used by external schemas of this type
+        items:
+          $ref: '#/definitions/TypeSystemInfo'
+      supportedOngoingChannels:
+        type: array
+        description: List of ongoing channels that are supported by data collectors for this external schema type
+        items:
+          $ref: '#/definitions/CollectionChannelTypeInfo'
+      supportedInitialLoadChannels:
+        type: array
+        description: List of initial-load channels that are supported by data collectors for this external schema type
+        items:
+          $ref: '#/definitions/CollectionChannelTypeInfo'
+      supportedReplayChannels:
+        type: array
+        description: List of replay channels that are supported by data collectors for this external schema type
+        items:
+          $ref: '#/definitions/CollectionChannelTypeInfo'
+      storeType:
+        type: string
+        enum: *ExternalSchemaStoreType
+  TypeSystemInfo:
+    type: object
+    description: Information about a type-system which defines representation for attribute datatypes
+    properties:
+      typeSystem:
+        type: string
+      displayName:
+        type: string
+  CollectionChannelTypeInfo:
+    type: object
+    description: Information of a collection channel that is used by data collectors
+    properties:
+      channelType:
+        type: string
+      displayName:
+        type: string
+  ExternalSchemaCollectionRules:
+    type: object
+    discriminator: storeType
+    properties:
+      storeType:
+        type: string
+        enum: *ExternalSchemaStoreType
+      ongoingChannel:
+        type: string
+        description: The channel used for collecting ongoing data
+      initialLoadChannel:
+        type: string
+        description: The channel used for collecting initial data
+      replayChannel:
+        type: string
+        description: The channel used for collecting selective data
+      initialLoadRelativeURL:
+        type: string
+        description: The URL used for initial load
+      partialLoadRelativeURL:
+        type: string
+        description: The URL used for partial load
+  ExternalCsvSchemaCollectionRules:
+    x-discriminator-value: CSV
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalSchemaCollectionRules"
+      - type: object
+        properties:
+          defaultInvalidFilenameAction:
+            $ref: "#/definitions/InvalidFilenameActionType"
+            description: Default file name mismatch behaviour
+  ExternalSqlSchemaCollectionRules:
+    x-discriminator-value: SQL
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalSchemaCollectionRules"
+      - type: object
+  ExternalKafkaSchemaCollectionRules:
+    x-discriminator-value: KAFKA
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalSchemaCollectionRules"
+      - type: object
+    properties:
+      inputDataChannel:
+        type: string
+        description: Input Data Channel
+      skipNodeFromParsing:
+        type: string
+        description: Skip node from parsing
+      deleteEventJsonPath:
+        type: string
+        description: Delete event json path
+      deleteEventOperation:
+        type: string
+        description: Delete event operation
+      implicitHandlerPreviousNode:
+        type: string
+        description: Implicit handler previous node
+      implicitHandlerCurrentNode:
+        type: string
+        description: Implicit handler current node
+  ExternalEntityCollectionRules:
+    type: object
+    discriminator: storeType
+    properties:
+      storeType:
+        type: string
+        enum: *ExternalSchemaStoreType
+      defaultFilter:
+        $ref: '#/definitions/ExternalEntityFilter'
+      filters:
+        type: array
+        description: Filters for this entity (in addition to the default filter)
+        items:
+          $ref: '#/definitions/ExternalEntityFilter'
+      incrementalAttribute:
+        $ref: '#/definitions/ExternalEntityIncrementalAttribute'
+  InvalidFilenameActionType:
+    type: string
+    title: File name mismatch behavior for file-based collections
+    enum:
+      - KEEP
+      - MOVE
+  ExternalCsvEntityCollectionRules:
+    x-discriminator-value: CSV
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalEntityCollectionRules"
+      - type: object
+        properties:
+          invalidFilenameAction:
+            $ref: "#/definitions/InvalidFilenameActionType"
+            description: file name mismatch behaviour
+  ExternalSqlEntityCollectionRules:
+    x-discriminator-value: SQL
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalEntityCollectionRules"
+      - type: object
+  ExternalKafkaEntityCollectionRules:
+    x-discriminator-value: KAFKA
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalEntityCollectionRules"
+      - type: object
+  ExternalEntity:
+    type: object
+    description: External Entity representation
+    properties:
+      schemaKey:
+        type: string
+        description: The external schema key
+      entityKey:
+        type: string
+        description: The external entity key (unique only inside the scope of the schema)
+      isActive:
+        type: boolean
+        description: Indicates whether this the system's integration with this external entity is currently active or not
+      entityName:
+        type: string
+        description: The external entity's display name
+      description:
+        type: string
+        description: A textual description of the entity
+      serializationId:
+        type: integer
+        description: The numeric identifier of the entity (unique inside the scope of the schema)
+      isTransient:
+        type: boolean
+        description: Indicates whether this entity is transient or whether it is maintained in the internal replica store
+      isTransaction:
+        type: boolean
+        description: Indicates whether this entity holds transactional data
+      storeInfo:
+        $ref: "#/definitions/ExternalEntityStoreInfo"
+        description: Specific store-specific inormation about the entity
+      collectionRules:
+        $ref: "#/definitions/ExternalEntityCollectionRules"
+        description: Entity-level information describing how data should be collected from the external schema for this entity
+      attributes:
+        type: array
+        description: The entity's attributes
+        items:
+          $ref: '#/definitions/ExternalAttribute'
+      createdBy:
+        type: string
+        readOnly: true
+      createdAt:
+        type: integer
+        format: int64
+        readOnly: true
+      status:
+        $ref: '#/definitions/ChangeStatus'
+      originProcess:
+        type: string
+        description: The Origin Process
+  ExternalAttribute:
+    type: object
+    description: An attribute of an external entity
+    properties:
+      attributeKey:
+        type: string
+        description: The attribute's key (unique inside the scope of the entity)
+      attributeName:
+        type: string
+        description: The attribute's display name
+      description:
+        type: string
+        description: A textual description of the attribute
+      datatype:
+        type: string
+        description: The datatype of the attribute, described according to the owner schema's type system
+      logicalDatatype:
+        type: string
+        description: The datatype of the attribute, described according to the logical type system
+        readOnly: true
+      serializationId:
+        type: integer
+        description: The numeric identifier of the attribute (unique inside the scope of the entity)
+      keyPosition:
+        type: integer
+        description: The ordinal position of the attribute inside the entity's primary key (Optional. Only relevant for the entity's primary key attributes)
+      isUpdateTime:
+        type: boolean
+        description: Indicates whether this attribute represents the entity's last update time (can be specified only for Date/DateTime attributes)
+      isLogicalTime:
+        type: boolean
+        description: Indicates whether this attribute represents the entity's instance logical time (can be specified only for Date/DateTime attributes, for entity's that are time based, such as transactions, events, etc.)
+      isRequired:
+        type: boolean
+        description: Indicates whether this attribute should always be populated in all instances of the entity
+      defaultValue:
+        type: string
+        description: A default value for this attribute (Optional)
+      validationRegex:
+        type: string
+        description: A regular expression string for validating the attribute's values (Optional)
+      storeInfo:
+        $ref: "#/definitions/ExternalAttributeStoreInfo"
+        description: Specific store-specific inormation about the attribute
+  ExternalAttributeStoreInfo:
+    type: object
+    discriminator: storeType
+    properties:
+      storeType:
+        type: string
+        enum: *ExternalSchemaStoreType
+  ExternalCsvAttributeStoreInfo:
+    x-discriminator-value: CSV
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalAttributeStoreInfo"
+      - type: object
+        properties:
+          dateFormat:
+            type: string
+            description: The attribute's date format
+  ExternalKafkaAttributeStoreInfo:
+    x-discriminator-value: KAFKA
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalAttributeStoreInfo"
+      - type: object
+        properties:
+          jsonPath:
+            type: string
+            description: The attribute's JSON path
+          dateFormat:
+            type: string
+            description: The attribute's date format
+  ExternalSqlAttributeStoreInfo:
+    x-discriminator-value: SQL
+    type: object
+    allOf:
+      - $ref: "#/definitions/ExternalAttributeStoreInfo"
+      - type: object
+  EntityFilterRef:
+    type: object
+    description: reference to entityFilter
+    properties:
+      entityKey:
+        type: string
+      entityFilterKey:
+        type: string
+  GroupFilter:
+    type: object
+    description: Group Filter
+    properties:
+      filter:
+        type: string
+  BulkGroup:
+    type: object
+    description: Bulk Group representation
+    properties:
+      schemaKey:
+        type: string
+        description: The Schema Key
+      bulkGroupName:
+        type: string
+        description: The  Bulk Group Name
+      bulkGroupKey:
+        type: string
+        description: The Bulk Group Key
+      originProcess:
+        type: string
+        description: The Origin Process
+      groupFilter:
+        $ref: '#/definitions/GroupFilter'
+      entityFilters:
+        type: array
+        description: Entity filters for bulk group
+        items:
+          $ref: '#/definitions/EntityFilterRef'
+  AttributeStoreProperty:
+    type: object
+    description: Attribute store property
+    properties:
+      propertyKey:
+        type: string
+        description: The property key
+      propertyValue:
+        type: object
+        description: The property value
+  AsyncResponse:
+    type: object
+    description: Async Process Response
+    properties:
+      processId:
+        type: integer
+        description: Process Id
+  UploadDiscoveryFileResponse:
+    type: object
+    description: Upload Discovery File Response
+    properties:
+      fileId:
+        type: string
+        description: File Id
+  AttributeStore:
+    type: object
+    description: Attribute Store representation
+    properties:
+      schemaStoreKey:
+        type: string
+        description: The schema store key
+      entityStoreKey:
+        type: string
+        description: The entity store key
+      attributeStoreKey:
+        type: string
+        description: The attribute store key
+      serializationId:
+        type: integer
+        description: The serialization ID
+      type:
+        type: string
+        description: Attribute data type
+      keyPosition:
+        type: integer
+        description: Primary Key Columns
+      isUpdateTime:
+        type: boolean
+        description: Update time column field
+      isLogicalTime:
+        type: boolean
+        description: Logical time column field
+      isRequired:
+        type: boolean
+        description: Required Field or Not
+      doImplementAttribute:
+        type: boolean
+        description: The flag to identify attribute need to be implemented or not
+      dynamicProperties:
+        type: array
+        description: Additional properties for attribute store
+        items:
+          $ref: '#/definitions/AttributeStoreProperty'
+  SourceTargetType:
+    type: string
+    enum:
+      - SOURCE
+      - TARGET
+  StoreType:
+    type: string
+    enum:
+      - PHYSICAL
+      - DATA_CHANNEL
+      - PUBLISHER_STORE
+      - PUBLISHER_CACHE
+  StoreCategory:
+    type: string
+    enum:
+      - EXTERNAL
+      - SHARED
+      - PRIVATE
+  NumericKeyAssignmentPolicy:
+    type: string
+    enum:
+      - MANUAL
+      - AUTOMATIC
+  ChangeStatus:
+    type: string
+    enum:
+      - DRAFT
+      - MODIFIED
+      - PUBLISHED
+      - NOT_EXIST
+  TransformationAttribute:
+    title: Transformation Attribute
+    type: object
+    required:
+      - attributeKey
+      - attributeName
+      - type
+      - keyPosition
+    properties:
+      attributeKey:
+        type: string
+        description: Attribute key
+      attributeName:
+        type: string
+        description: Attribute name
+      description:
+        type: string
+        description: Attribute description
+      type:
+        type: string
+        description: Attribute data type
+      origin:
+        type: string
+        description: Attribute origin
+      sourceMapping:
+        type: string
+        description: Attribute origin
+      designSource:
+        type: string
+        description: Attribute designSource
+      keyPosition:
+        type: boolean
+        description: Is the attribute a primary key
+      sortOrder:
+        type: integer
+        description: Attribute sort order
+      isLogicalTime:
+        type: boolean
+        description: Attribute is logical time.
+      isUpdateTime:
+        type: boolean
+        description: Attribute is update time.
+      isRequired:
+        type: boolean
+        description: Attribute is required (true/false)
+      doReferencialIntegrity:
+        type: boolean
+        description: boolean according to EntityReferentialIntegrity.
+      parentSchemaKey:
+        type: string
+        description: The attribute parentSchemaKey from attributeRelation in LGE
+      parentEntityKey:
+        type: string
+        description: The attribute parentEntityKey from attributeRelation in LGE
+      parentAttributeKey:
+        type: string
+        description: The attribute parentAttributeKey from attributeRelation in LGE
+    xml:
+      name: TransformationAttribute
+
+  EntityTransformationType:
+    type: string
+    title: Entity Transformation Type
+    enum: &EntityTransformationType
+      - SHARED
+      - CACHED
+
+  EntityTransformationGridElement:
+    title: Entity Transformation Grid Element
+    type: object
+    discriminator: entityTransformationType
+    required:
+      - entityTransformationType
+    properties:
+      entityTransformationType:
+        type: string
+        description: Entity Transformation Type
+        enum: *EntityTransformationType
+
+  SharedEntityTransformationGridElement:
+    title: Shared Entity Transformation Grid Element
+    x-discriminator-value: SHARED
+    allOf:
+      - $ref: '#/definitions/EntityTransformationGridElement'
+      - type: object
+        properties:
+          entityName:
+            type: string
+            description: Entity
+          entityKey:
+            type: string
+            description: Entity key
+          subjectArea:
+            type: string
+            description: Subject area
+          entityType:
+            type: string
+            description: Entity type
+          creationDate:
+            type: string
+            description: Last modified by
+          status:
+            $ref: '#/definitions/ChangeStatus'
+
+
+  CachedEntityTransformationGridElement:
+    title: Cached Entity Transformation Grid Element
+    x-discriminator-value: CACHED
+    allOf:
+      - $ref: '#/definitions/EntityTransformationGridElement'
+      - type: object
+
+  EntityTransformation:
+    title: Entity Transformation
+    type: object
+    required:
+      - logicalSchemaKey
+      - logicalEntityKey
+      - attributes
+      - transformations
+      - contexts
+    properties:
+      logicalSchemaKey:
+        type: string
+        description: Logical Schema Key
+      logicalEntityKey:
+        type: string
+        description: Logical Entity Key
+      entityName:
+        type: string
+        description: Entity Name
+      description:
+        type: string
+        description: Entity description
+      attributes:
+        type: array
+        description: Transformation Attributes
+        items:
+          $ref: '#/definitions/TransformationAttribute'
+      transformations:
+        type: array
+        description: Transformations
+        items:
+          $ref: '#/definitions/Transformation'
+      contexts:
+        type: array
+        description: Contexts
+        items:
+          $ref: '#/definitions/Context'
+      usedBy:
+        type: array
+        items:
+          type: string
+    xml:
+      name: EntityTransformation
+
+  EntityReferentialIntegrity:
+    title: Entity Referential Integrity
+    type: object
+    required:
+      - schemaStoreKey
+      - entityStoreKey
+      - parentAttributeKey
+    properties:
+      schemaStoreKey:
+        type: string
+        description: Schema store key
+      entityStoreKey:
+        type: string
+        description: Entity store key
+      relations:
+        type: array
+        description: Relations list
+        items:
+          $ref: '#/definitions/Relation'
+  Relation:
+    title: Relations Attribute for EntityReferentialIntegrity
+    type: object
+    required:
+      - attributeKey
+      - parentSchemaKey
+      - parentEntityKey
+      - parentAttributeKey
+    properties:
+      attributeKey:
+        type: string
+        description: Attribute key
+      parentSchemaKey:
+        type: string
+        description: The attribute parentSchemaKey form Transformation
+      parentEntityKey:
+        type: string
+        description: The attribute parentEntityKey form Transformation
+      parentAttributeKey:
+        type: string
+        description: The attribute parentAttributeKey form Transformation
+  CacheReferenceEntity:
+    title: Cached Reference Entity
+    type: object
+    required:
+      - cacheReferenceEntityKey
+      - cacheReferenceAttributes
+    properties:
+      cacheReferenceEntityKey:
+        type: string
+        description: Cache Reference Entity Key
+      cacheReferenceEntityName:
+        type: string
+        description: Cache Reference Entity Name
+      description:
+        type: string
+        description: Cache Reference Entity Description
+      cacheReferenceAttributes:
+        type: array
+        description: Cache Reference Attributes
+        items:
+          $ref: '#/definitions/CacheReferenceAttribute'
+      createdBy:
+        type: string
+        readOnly: true
+      createdAt:
+        type: integer
+        format: int64
+        readOnly: true
+      status:
+        $ref: '#/definitions/ChangeStatus'
+      originProcess:
+        type: string
+        description: The Origin Process
+    xml:
+      name: CacheReferenceEntity
+  CacheReferenceAttribute:
+    title: Cache Reference Attribute
+    type: object
+    required:
+      - attributeKey
+      - type
+    properties:
+      attributeKey:
+        type: string
+        description: The Attribute key
+      attributeName:
+        type: string
+        description: The attribute's display name
+      description:
+        type: string
+        description: The Attribute description
+      keyPosition:
+        type: integer
+        description: The ordinal position of the attribute inside the entity's primary key (Optional. Only relevant for the entity's primary key attributes)
+      type:
+        type: string
+        description: Attribute data type
+    xml:
+      name: CacheReferenceAttribute
+  SetFiltersRequest:
+    title: A request for setting entitiy filters on bulk group and all assosiated entities
+    properties:
+      entities:
+        description: A list of external entities
+        type: array
+        items:
+          $ref: "#/definitions/ExternalEntity"
+      bulkGroup:
+        $ref: "#/definitions/BulkGroup"
+  DiscoverExternalCsvRequest:
+    title: A parameterized request for external csv discovery
+    properties:
+      schemaName:
+        description: The schemaName of the discover External Csv Schema
+        type: string
+      columnDelimiter:
+        description: The column Delimiter of the Csv
+        type: string
+        minLength: 1
+        maxLength: 1
+      filenames:
+        description: A list of the file names
+        type: array
+        items:
+          type: string
+      availability:
+        $ref: "#/definitions/Availability"
+      subjectAreaName:
+        type: string
+        description: The external schema's subjectArea name
+      subjectAreaKey:
+        type: string
+        description: The external schema's subjectArea key
+
+  DiscoverExternalJsonRequest:
+    title: A parameterized request for external Json discovery
+    properties:
+      schemaName:
+        description: The schemaName of the discover External Json Schema
+        type: string
+      filename:
+        description: The the file names
+        type: string
+      externalSchemaType:
+        description: A schema types,valid types are CSV_OVER_JSON, DIGITAL1, CATALOG1
+        type: string
+      availability:
+        $ref: "#/definitions/Availability"
+      subjectAreaName:
+        type: string
+        description: The external schema's subjectArea name
+      subjectAreaKey:
+        type: string
+        description: The external schema's subjectArea key
+
+  SchemaDiscoveryRequest:
+    title: A parameterized request for external schema discovery
+    properties:
+      externalSchemaType:
+        type: string
+        description: The external schema type (available types can be retrieved via the 'list external schema types' API)
+      schemaName:
+        type: string
+        description: The name of the external schema (note that this can be a human-readable name. The schemaKey will be automatically generated from this name)
+      parameters:
+        type: object
+        description: Additional parameters required for the discovery (such as connection details, file ids, etc.)
+        additionalProperties:
+          type: object
+
+  ContextSource:
+    title: Context Source
+    type: object
+    required:
+      - schemaKey
+    properties:
+      schemaKey:
+        type: string
+        description: Context source schema key
+      schemaName:
+        type: string
+        description: Context source schema name
+      schemaType:
+        type: string
+        description: Context source schema type
+        enum:
+          - CACHE
+          - REFERENCE
+          - EXTERNAL
+      contextSourceEntities:
+        type: array
+        description: List of context source entities
+        items:
+          $ref: '#/definitions/ContextSourceEntity'
+
+  ContextSourceEntity:
+    title: Context source Entity
+    type: object
+    required:
+      - entityKey
+    properties:
+      entityKey:
+        type: string
+        description: Context source entity key
+      entityName:
+        type: string
+        description: Context source entity name
+
+  ContextEntityRef:
+    title: Context Entity Ref
+    type: object
+    required:
+      - entityKey
+    properties:
+      entityKey:
+        type: string
+        description: Entity key
+      schemaKey:
+        type: string
+        description: Schema key
+      type:
+        type: string
+        enum:
+          - CACHE
+          - REFERENCE
+          - EXTERNAL
+
+  BaseEntity:
+    title: Base Entity
+    type: object
+    required:
+      - entityKey
+    properties:
+      entityKey:
+        type: string
+        description: Entity key
+      entityName:
+        type: string
+        description: Entity name
+      schemaKey:
+        type: string
+        description: Schema key
+      attributes:
+        type: array
+        description: List of attributes
+        items:
+          $ref: '#/definitions/BaseAttribute'
+
+  BaseAttribute:
+    title: Base Attribute
+    type: object
+    required:
+      - attributeKey
+    properties:
+      attributeKey:
+        type: string
+        description: The attribute's key (unique inside the scope of the entity)
+      attributeName:
+        type: string
+        description: The attribute's display name
+      datatype:
+        type: string
+        description: The datatype of the attribute, described according to the owner schema's type system
+      keyPosition:
+        type: integer
+        description: The ordinal position of the attribute inside the entity's primary key (Optional. Only relevant for the entity's primary key attributes)
+  SaveElementsResponse:
+    type: "object"
+    properties:
+      savedElementsCount:
+        type: "integer"
+        format: "int64"
+  Entities:
+    title: Entities
+    type: object
+    required:
+      - contextEntities
+    properties:
+      contextEntities:
+        type: array
+        description: List of Context Entity Ref
+        items:
+          $ref: '#/definitions/ContextEntityRef'
+
+responses:
+  NotFound:
+    description: The specified resource was not found
+  Unauthorized:
+    description: Unauthorized
+  InternalServerError:
+    description: Internal server error
+  Forbidden:
+    description: Forbidden
+  UnexpectedError:
+    description: Unexpected error
+

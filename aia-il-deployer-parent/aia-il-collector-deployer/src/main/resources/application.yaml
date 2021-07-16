@@ -1,0 +1,45 @@
+spring:
+  main:
+    web-application-type: none
+
+aia:
+  repo:
+    service:
+      server:
+      port:
+      base:
+        path:
+    elements:
+      provider:
+        mode: local
+      local:
+        path: /opt/amdocs/aia/config
+
+deployer:
+  k8sMasterNode: MASTER_NODE_HOST
+  nfsPath: NFS_PATH
+#  kafkaSecret: common-secret-keystore-truststore
+#  kafkaSecurityProtocol: SSL
+#  namespace: parallel-collector
+#  imageRepository: 10.232.52.103:5000/artifactory/docker/aia/latest
+
+
+collector-map:
+  schemaTypeToAliasMap:
+    CATALOG1: c1
+    DIGITAL1: d1
+    JSON_OVER_KAFKA: kafka
+  sourceToImageNameMap:
+    kafka-bulk: aia-il-gc-kafka-bulk-runtime
+    kafka-ongoing: aia-il-gc-kafka-ongoing-runtime
+    c1-bulk: aia-il-gc-c1-bulk-runtime
+    c1-ongoing: aia-il-gc-c1-ongoing-runtime
+    d1-bulk: aia-il-gc-d1-ongoing-runtime
+    d1-ongoing: aia-il-gc-d1-ongoing-runtime
+  collectorToApplicationPropertyMap:
+    kafka-bulk: aia-il-gc-kafka-bulk-service.yaml
+    kafka-ongoing: aia-il-gc-kafka-ongoing-service.yaml
+    c1-bulk: aia-il-gc-c1-bulk-service.yaml
+    c1-ongoing: aia-il-gc-c1-ongoing-service.yaml
+    d1-bulk: aia-il-gc-d1-ongoing-service.yaml
+    d1-ongoing: aia-il-gc-d1-ongoing-service.yaml

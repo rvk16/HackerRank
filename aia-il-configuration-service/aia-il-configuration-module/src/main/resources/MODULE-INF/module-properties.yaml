@@ -1,0 +1,6 @@
+module:
+  name: aia-il-configuration
+  requires:
+  - msnext-root
+  resources:
+  - aia-il-configuration-service.yaml

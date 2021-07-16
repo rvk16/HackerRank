@@ -1,0 +1,212 @@
+swagger: '2.0'
+info:
+  version: '0.0'
+  title: Application Context - Product Accessor
+  description: >
+    This service serves as one access point for product related information
+    required by any domain functionality.
+  license:
+    name: Amdocs Inc.
+    url: 'http://'
+  contact:
+    name: Amdocs Inc.
+    url: 'http://www.amdocs.com'
+    email: support@amdocs.com
+x-dox-DesignDocs:
+  - description: |
+      ApplicationContext
+    url: 'http://confluence/display/DEP/Application+Context'
+host: amdocs.com
+basePath: /applicationContext/v0/entityAccessor
+schemes:
+  - https
+paths:
+  /product:
+    get:
+      tags:
+        - ProductAccessor
+      operationId: getProduct
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      description: |
+        A service to access product information
+      parameters:
+        - $ref: '#/parameters/query-context'
+        - $ref: '#/parameters/query-entityID'
+        - $ref: '#/parameters/query-parameters'
+        - $ref: '#/parameters/header-locale'
+      responses:
+        '200':
+          description: |
+            *OK* - Product parameters were retrieved successfully.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/EntityAccessor'
+        '400':
+          $ref: '#/responses/400-BadRequest'
+        '404':
+          $ref: '#/responses/404-NotFound'
+        '500':
+          $ref: '#/responses/500-InternalServerError'
+        '502':
+          $ref: '#/responses/502-BadGateway'
+parameters:
+  header-locale:
+    name: Accept-Language
+    in: header
+    description: |
+      The consumer's locale.
+    type: string
+  query-context:
+    name: context
+    in: query
+    description: >
+      The context with which the product accessor should be performed.
+      Represents a key/value list of parameters that exist on the Context
+      object.
+    required: false
+    type: string
+  query-entityID:
+    name: entityId
+    in: query
+    description: >
+      The identifier of the entity for which the paramters should be returned.
+      Can be list of values separated by a comma.
+      <br>Usage examples &#58;
+      <ul><li>entityId=123
+      <li>entityId=123?compositeProduct.id==456</ul>
+    required: false
+    type: array
+    items:
+      type: string
+      collectionFormat: csv
+      minLength: 0
+  query-parameters:
+    name: entityParameters
+    in: query
+    description: |
+      The parameters for which the values are required to be retrieved.
+    required: true
+    type: array
+    items:
+      type: string
+      collectionFormat: csv
+      minLength: 1
+definitions:
+  EntityAccessor:
+    description: >
+      The entity accessor for which the parameters are retrieved. Represents a
+      product.
+    type: object
+    properties:
+      id:
+        description: >
+          Identifier of the resource. Populated with the identifier of the
+          entity.
+        type: string
+      href:
+        description: |
+          The self hyperlink for this resource.
+        type: string
+      type:
+        description: |
+          The type of the returned entity.
+        type: string
+      parameters:
+        description: >
+          The array of parameters for the required entity. Populated based on the
+          parameters sent in the request or based on the default (as configured in
+          the microservice)
+        type: array
+        items:
+          $ref: '#/definitions/Parameter'
+      additionalInfo:
+        description: >
+          Aditional information related to the required entity.
+        type: array
+        items:
+          $ref: '#/definitions/AdditionalInfo'
+
+  Parameter:
+    description: |
+      Represents a parameter for the required entity
+    type: object
+    properties:
+      parameterName:
+        description: |
+          The name of the parameter.
+        type: string
+      value:
+        description: |
+          The value of the parameter.
+        type: string
+  AdditionalInfo:
+    description: |
+      Represents additiona information (name and value pairs) for the required entity
+    type: object
+    properties:
+      name:
+        description: |
+          The additional informrmation name.
+        type: string
+        readOnly: true
+      value:
+        description: |
+          The additional informrmation value.
+        type: string
+        readOnly: true
+  ErrorResponse:
+    description: |
+      Response containing descriptive error text, error code
+    type: object
+    properties:
+      code:
+        description: |
+          The code associated with the error
+        type: string
+      message:
+        description: |
+          A short localized text that describes the error
+        type: string
+      link:
+        type: string
+        format: url
+        description: |
+          The href to the item
+      rel:
+        type: string
+        description: |
+          The relation type for the item
+        default: help
+      traceId:
+        type: string
+        description: |
+          A unique tracker id used to facilitate troubleshooting.
+responses:
+  400-BadRequest:
+    description: |
+      *Bad Request* - Indicates that client has sent malformed request.
+      Possibly missing mandatory query parameters, invalid value
+      in query parameters, validation exception etc.
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+  404-NotFound:
+    description: |
+      *Not Found* - Indicates server has not found the requested URI.
+      Possibly missing path parameters, invalid web resource etc.
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+  500-InternalServerError:
+    description: |
+      *Internal Server Error* - server failed in handling the
+      client request.
+    schema:
+      $ref: '#/definitions/ErrorResponse'
+  502-BadGateway:
+    description: |
+      *Bad Gateway* - Error when calling another service.
+    schema:
+      $ref: '#/definitions/ErrorResponse'

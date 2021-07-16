@@ -1,0 +1,20 @@
+package com.amdocs.aia.il.configuration.api.unit;
+
+import com.amdocs.aia.il.configuration.config.AutoConfiguration;
+import com.amdocs.msnext.securityjwt.JwtServiceTokenProvider;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {AutoConfiguration.class})
+@AutoConfigureWebClient
+@TestPropertySource(properties = {"com.amdocs.aia.client.set-security-authorization-header=true",
+        "com.amdocs.msnext.securityjwt.testing.test-service-jwt=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHQtanRpIjoiNDAzMGY5OGItNzVmOC00YmEzLThiMGMtY2E4ZTY0MDUwYzdjIiwic3ViIjoiZWM3ZDVlNGYtMjgxYi00MjY0LWE0ZjUtZDZkZGQzMmFiMTQzIiwiZXh0LWlhdCI6MTU1MjU3MjM4NiwibmJmIjoxNTUyNTcyMzg3LCJyb2xlcyI6WyJCaXpSb2xlMiIsIkJpelJvbGVBIiwiQml6Um9sZTEiXSwiaXNzIjoic3RzIiwiZXhwIjoyNTMxMTQyNTA0LCJpYXQiOjE1NTI1NzIzODcsInR0bCI6MTU1MjYwMTE4NywiZXh0LWlzcyI6Imh0dHA6Ly9pbG9jcHBudHMwMXcwNi5jb3JwLmFtZG9jcy5jb206MzA5MjMvYXV0aC9yZWFsbXMvYXBpZ3ciLCJqdGkiOiJkMmU4YTJiMC0wNWVjLTQ3OTEtYmQzOC02ZTdmNzMxZjc5NjYifQ.sfq-BUctJtWT3DEDJ4xHo3B7byEfbK-MqD28XkfTWWQ0DSQkiXMPxZYHeyozCA308LEO7lkw-QgYRkfVwMv9rI1wqc39wf8rGWuYwemMfce3E7cUMMi1mxSu6IZ54hWnf2UmL3EBdmEgdIk8_j-HwhjGGADK2GQWYsnXTPqGim8"})
+public abstract class AbstractApiControllerUnitTest {
+    @MockBean
+    protected JwtServiceTokenProvider jwtServiceTokenProvider;
+}

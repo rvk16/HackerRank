@@ -1,0 +1,194 @@
+server.port: 8080
+
+spring.jackson.serialization.write-dates-as-timestamps: false
+springfox.documentation.swagger.v2.path: /api-docs
+management:
+  server.ssl.enabled: false
+  health:
+    security.enabled: false
+    diskspace.enabled: true
+    aia:
+      repo.services.enabled: false # shared health check already includes repo health check
+      shared.services.enabled: true
+  endpoints.web.exposure.include:
+    - health
+    - metrics
+    - prometheus
+    - info
+  endpoint:
+    prometheus.enabled: true
+    health.show-details: always
+  aia.shared.services:
+    host: shared
+    port: 8081
+    endpoint: /actuator/health
+    ssl:
+      enabled: false
+      trust-self-signed-certificates.enabled: false
+
+aia:
+  repo:
+    service:
+      server:
+      port:
+      management-port:
+      base.path: /aia/api/v1/repo
+  shared:
+    service:
+      context.path: /aia/api/v1/shrd
+      authorization.header: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHQtanRpIjoiNDAzMGY5OGItNzVmOC00YmEzLThiMGMtY2E4ZTY0MDUwYzdjIiwic3ViIjoiZWM3ZDVlNGYtMjgxYi00MjY0LWE0ZjUtZDZkZGQzMmFiMTQzIiwiZXh0LWlhdCI6MTU1MjU3MjM4NiwibmJmIjoxNTUyNTcyMzg3LCJyb2xlcyI6WyJCaXpSb2xlMiIsIkJpelJvbGVBIiwiQml6Um9sZTEiXSwiaXNzIjoic3RzIiwiZXhwIjoyNTMxMTQyNTA0LCJpYXQiOjE1NTI1NzIzODcsInR0bCI6MTU1MjYwMTE4NywiZXh0LWlzcyI6Imh0dHA6Ly9pbG9jcHBudHMwMXcwNi5jb3JwLmFtZG9jcy5jb206MzA5MjMvYXV0aC9yZWFsbXMvYXBpZ3ciLCJqdGkiOiJkMmU4YTJiMC0wNWVjLTQ3OTEtYmQzOC02ZTdmNzMxZjc5NjYifQ.sfq-BUctJtWT3DEDJ4xHo3B7byEfbK-MqD28XkfTWWQ0DSQkiXMPxZYHeyozCA308LEO7lkw-QgYRkfVwMv9rI1wqc39wf8rGWuYwemMfce3E7cUMMi1mxSu6IZ54hWnf2UmL3EBdmEgdIk8_j-HwhjGGADK2GQWYsnXTPqGim8
+    host:
+    port:
+  common:
+    model:
+      sql:
+        types:
+          default-varchar-length: 4000
+  il:
+    default-serialization-method: SharedJson
+    default-serialization-starting-value: 4000
+    discovery:
+      csv:
+        default-column-delimiter: ","
+        default-date-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+        default-filename-format: ".*\\.csv"
+        default-invalid-filename-action: KEEP
+        default-datatype: STRING
+        attribute-datatype-patterns:
+          - pattern: .*Time
+            datatype: TIMESTAMP
+          - pattern: .*Date
+            datatype: TIMESTAMP
+          - pattern: .*Timestamp
+            datatype: TIMESTAMP
+          - pattern: .*Amount
+            datatype: DECIMAL(15,4)
+          - pattern: .*Volume
+            datatype: DECIMAL(15,4)
+          - pattern: .*Count
+            datatype: INTEGER
+      json:
+        default-date-format: yyyy-MM-dd'T'HH:mm:ss.SSS'Z'
+        swagger-processing-rules:
+          DIGITAL1:
+            generate-entity-for-operation-response: false
+            additional-root-entities:
+              - entity-key: Event
+                path: event
+            forced-one-to-one-entity-paths-regex:
+              - "^event$"
+              - "^event/[^/]+$"
+            skipped-paths-regex:
+              - "^event/originalResource$"
+            json-in-json-paths-regex:
+              - "^event/[^/]+$"
+            shared-entity-key-prefix: D1
+            special-characters:
+              - special-character: '@'
+                replace-character: ref_
+          JSON_OVER_KAFKA:
+            generate-entity-for-operation-response: true
+
+monitoring:
+  enabled: true
+  registry.prefix: com.amdocs.aia.il.configuration
+
+com.amdocs:
+  aia.client.ssl.enabled: false
+  msnext:
+    securityjwt.anonymous.whitelist:
+      server.url_pattern.msnext:
+        - /webjars/springfox-swagger-ui/.*
+      management.url_equals.msnext:
+        - /actuator/health
+        - /actuator/prometheus
+        - /actuator/metrics
+        - /actuator/info
+    securitya3s:
+      service.roles:
+        roleGateway: FndP_APIGateway_gw
+        roleExportTransformationsScriptsMethod: BizRole2 #aia_il_configuration_authoring_exportTransformationsScripts
+        roleAddTransformationMethod: BizRole2 #aia_il_configuration_authoring_addTransformation
+        roleGetTransformationMethod: BizRole2 #aia_il_configuration_authoring_getTransformation
+        roleUpdateTransformationMethod: BizRole2 #aia_il_configuration_authoring_updateTransformation
+        roleDeleteTransformationMethod: BizRole2 #aia_il_configuration_authoring_deleteTransformation
+        roleListTransformationMethod: BizRole2 #aia_il_configuration_authoring_listTransformations
+        roleListContextMethod: BizRole2 #aia_il_configuration_authoring_listContexts
+        roleGetContextMethod: BizRole2 #aia_il_configuration_authoring_getContext
+        roleUpdateContextethod: BizRole2 #aia_il_configuration_authoring_updateContext
+        roleAddContextMethod: BizRole2 #aia_il_configuration_authoring_addContext
+        roleDeleteContextMethod: BizRole2 #aia_il_configuration_authoring_deleteContext
+        roleGetCacheEntityStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getCacheEntityStoreByKey
+        roleGetCacheSchemaStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getCacheSchemaStoreByKey
+        roleAddPublisherCacheEntityStoreMethod: BizRole2 #aia_il_configuration_authoring_addPublisherCacheEntityStore
+        roleAddPublisherCacheSchemaStoreMethod: BizRole2 #aia_il_configuration_authoring_addPublisherCacheSchemaStore
+        roleGetPublisherEntityStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getPublisherEntityStoreByKey
+        roleAddPublisherEntityStoreMethod: BizRole2 #aia_il_configuration_authoring_addPublisherEntityStore
+        roleGetPublisherEntityStoresMethod: BizRole2 #aia_il_configuration_authoring_getPublisherEntityStores
+        roleGetPublisherSchemaStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getPublisherSchemaStoreByKey
+        roleAddPublisherSchemaStoreMethod: BizRole2 #aia_il_configuration_authoring_addPublisherSchemaStore
+        roleGetPublisherSchemaStoresMethod: BizRole2 #aia_il_configuration_authoring_getPublisherSchemaStores
+        roleGetDataChannelEntityStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getDataChannelEntityStoreByKey
+        roleAddDataChannelEntityStoreMethod: BizRole2 #aia_il_configuration_authoring_addDataChannelEntityStore
+        roleGetDataChannelEntityStoresMethod: BizRole2 #aia_il_configuration_authoring_getDataChannelEntityStores
+        roleGetDataChannelSchemaStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getDataChannelSchemaStoreByKey
+        roleAddDataChannelSchemaStoreMethod: BizRole2 #aia_il_configuration_authoring_addDataChannelSchemaStore
+        roleGetDataChannelSchemaStoresMethod: BizRole2 #aia_il_configuration_authoring_getDataChannelSchemaStores
+        roleGetEntityStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getEntityStoreByKey
+        roleAddEntityStoreMethod: BizRole2 #aia_il_configuration_authoring_addEntityStore
+        roleGetEntityStoresMethod: BizRole2 #aia_il_configuration_authoring_getEntityStores
+        roleGetSchemaStoreByKeyMethod: BizRole2 #aia_il_configuration_authoring_getSchemaStoreByKey
+        roleAddSchemaStoreMethod: BizRole2 #aia_il_configuration_authoring_addSchemaStore
+        roleGetSchemaStoresMethod: BizRole2 #aia_il_configuration_authoring_getSchemaStores
+        roleAddSharedEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_addSharedEntityTransformation
+        roleUpdateSharedEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_updateSharedEntityTransformation
+        rolegetSharedEntityTransformationListMethod: BizRole2 #aia_il_configuration_authoring_getSharedEntityTransformationList
+        roleGetSharedEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_getSharedEntityTransformation
+        roleDeleteSharedEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_deleteSharedEntityTransformation
+        rolegetcontextRelationTypesListMethod: BizRole2 #aia_il_configuration_authoring_getcontextRelationTypesList
+        roleGetTransformationAttributesMethod: BizRole2 #aia_il_configuration_authoring_getTransformationAttributes
+        roleAddEntityReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_addEntityReferentialIntegrity
+        roleGetEntityReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_getEntityReferentialIntegrity
+        roleUpdateEntityReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_updateEntityReferentialIntegrity
+        roleDeleteEntityReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_deleteEntityReferentialIntegrity
+        roleListEntityReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_listEntityReferentialIntegritys
+        roleAddBulkGroupMethod: BizRole2 #aia_il_configuration_authoring_addBulkGroup
+        roleDeleteBulkGroupMethod: BizRole2 #aia_il_configuration_authoring_deleteBulkGroup
+        roleGetBulkGroupByKeyMethod: BizRole2 #aia_il_configuration_authoring_getBulkGroupByKey
+        roleGetBulkGroupsMethod: BizRole2 #aia_il_configuration_authoring_getBulkGroups
+        roleExternalSchemaMethod: BizRole2 #aia_il_configuration_authoring_ExternalSchema
+        roleUpdateExternalSchemaMethod: BizRole2 #aia_il_configuration_authoring_UpdateExternalSchema
+        roleDeleteExternalSchemaMethod: BizRole2 #aia_il_configuration_authoring_DeleteExternalSchema
+        roleGetExternalSchemaTypes: BizRole2 #aia_il_configuration_authoring_getExternalSchemaTypes
+        roleGetExternalSchemaType: BizRole2 #aia_il_configuration_authoring_getExternalSchemaType
+        roleGetCollectionChannelTypes: BizRole2 #aia_il_configuration_authoring_getCollectionChannelTypes
+        roleGetTypeSystems: BizRole2 #aia_il_configuration_authoring_getTypeSystems
+        roleExternalEntityMethod: BizRole2 #aia_il_configuration_authoring_EntitySchema
+        roleUpdateExternalEntityMethod: BizRole2 #aia_il_configuration_authoring_UpdateEntitySchema
+        roleDeleteExternalEntityMethod: BizRole2 #aia_il_configuration_authoring_DeleteEntitySchema
+        roleDiscoverExternalCsv: BizRole2 #aia_il_configuration_authoring_DiscoverExternalCsv
+        roleDiscoverExternalJson: BizRole2 #aia_il_configuration_authoring_roleDiscoverExternalJson
+        roleUploadDiscoveryFile: BizRole2 #aia_il_configuration_authoring_UploadDiscoveryFile
+        roleDiscoverExternalSchema: BizRole2 #aia_il_configuration_authoring_DisocverExternalSchema
+        roleUpdateBulkGroupMethod: BizRole2 #aia_il_configuration_authoring_updateBulkGroup
+        roleAddCachedEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_addCachedEntityTransformation
+        roleUpdateCachedEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_updateCachedEntityTransformation
+        roleGetCacheEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_getCacheEntityTransformation
+        roleDeleteCacheEntityTransformationMethod: BizRole2 #aia_il_configuration_authoring_deleteCacheEntityTransformation
+        roleAddCacheReferenceEntityMethod: BizRole2 #aia_il_configuration_authoring_addCacheReferenceEntity
+        roleGetCacheReferenceEntitiesMethod: BizRole2 #aia_il_configuration_authoring_getCacheReferenceEntities
+        roleGetCacheReferenceEntityByKeyMethod: BizRole2 #aia_il_configuration_authoring_getCacheReferenceEntityByKey
+        roleUpdateCacheReferenceEntityMethod: BizRole2 #aia_il_configuration_authoring_updateCacheReferenceEntity
+        roleGetContextSourcesMethod: BizRole2 #aia_il_configuration_authoring_getContextSources
+        roleGetContextEntitiesMetadataMethod: BizRole2 #aia_il_configuration_authoring_getContextEntitiesMetadata
+        roleAddExternalEntitiesMethod: BizRole2 #aia_il_configuration_authoring_addExternalEntities
+        roleAddExternalSchemasMethod: BizRole2 #aia_il_configuration_authoring_addExternalSchemas
+        roleAddContextsMethod: BizRole2 #aia_il_configuration_authoring_addContexts
+        roleAddCacheReferenceEntitiesMethod: BizRole2 #aia_il_configuration_authoring_addCacheReferenceEntities
+        roleAddBulkGroupsMethod: BizRole2 #aia_il_configuration_authoring_addBulkGroups
+        roleAddTransformationsMethod: BizRole2 #aia_il_configuration_authoring_addTransformations
+        roleAddEntitiesReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_addEntitiesReferentialIntegrity
+      tgt.enabled: true
+      roles-deployment.enabled: true
+
+com.amdocs.msnext.securityjwt.testing.test-service-jwt: eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHQtanRpIjoiNDAzMGY5OGItNzVmOC00YmEzLThiMGMtY2E4ZTY0MDUwYzdjIiwic3ViIjoiZWM3ZDVlNGYtMjgxYi00MjY0LWE0ZjUtZDZkZGQzMmFiMTQzIiwiZXh0LWlhdCI6MTU1MjU3MjM4NiwibmJmIjoxNTUyNTcyMzg3LCJyb2xlcyI6WyJCaXpSb2xlMiIsIkJpelJvbGVBIiwiQml6Um9sZTEiXSwiaXNzIjoic3RzIiwiZXhwIjoyNTMxMTQyNTA0LCJpYXQiOjE1NTI1NzIzODcsInR0bCI6MTU1MjYwMTE4NywiZXh0LWlzcyI6Imh0dHA6Ly9pbG9jcHBudHMwMXcwNi5jb3JwLmFtZG9jcy5jb206MzA5MjMvYXV0aC9yZWFsbXMvYXBpZ3ciLCJqdGkiOiJkMmU4YTJiMC0wNWVjLTQ3OTEtYmQzOC02ZTdmNzMxZjc5NjYifQ.sfq-BUctJtWT3DEDJ4xHo3B7byEfbK-MqD28XkfTWWQ0DSQkiXMPxZYHeyozCA308LEO7lkw-QgYRkfVwMv9rI1wqc39wf8rGWuYwemMfce3E7cUMMi1mxSu6IZ54hWnf2UmL3EBdmEgdIk8_j-HwhjGGADK2GQWYsnXTPqGim8

@@ -1,0 +1,821 @@
+---
+swagger: "2.0"
+info:
+  description: "Notifications published by the Party Interaction Management subdomain.\n\
+    \n###### Compliant with TMF683_Party_Interactions_API_REST_Specification_R19.5\
+    \ (To be released)\n\n`The documented APIs are not exposed at the gateway, and\
+    \ are listed here only for documentation purposes`\n"
+  version: "4.0"
+  title: "Notification Specification - Party Interaction Management"
+  contact:
+    name: "Amdocs Inc."
+    url: "http://www.amdocs.com"
+    email: "support@amdocs.com"
+  license:
+    name: "Amdocs Inc."
+    url: "http://"
+host: "amdocs.com"
+basePath: "/partyInteraction/v4"
+paths:
+  /PartyInteractionCreate:
+    get:
+      tags:
+      - "partyInteraction"
+      summary: "A new party interaction entity is created"
+      description: "Notification sent when a new party interaction entity is created.\n\
+        ###### TMF Open API compliant\n"
+      operationId: "partyInteractionCreation"
+      parameters: []
+      responses:
+        204:
+          description: "*No Content*\n"
+          schema:
+            $ref: "#/definitions/PartyInteractionCreate"
+      x-dox-Microservice: "PartyInteractionMS"
+  /PartyInteractionUpdate:
+    get:
+      tags:
+      - "partyInteraction"
+      summary: "A party interaction entity was updated - new version created"
+      description: "Notification sent when a party interaction entity is updated.\n\
+        ###### TMF Open API compliant\n"
+      operationId: "partyInteractionUpdate"
+      parameters: []
+      responses:
+        204:
+          description: "*No Content*\n"
+          schema:
+            $ref: "#/definitions/PartyInteractionUpdate"
+      x-dox-Microservice: "PartyInteractionMS"
+  /PartyInteractionStatusChangeNotification:
+    get:
+      tags:
+      - "partyInteraction"
+      summary: "Notifying about the change of the status of party interaction"
+      description: "(Future) Notification sent when a party interaction entity status\
+        \ is changed.\n###### TMF Open API compliant\n"
+      operationId: "partyInteractionStatusChange"
+      parameters: []
+      responses:
+        204:
+          description: "*No Content*\n"
+          schema:
+            $ref: "#/definitions/PartyInteractionStatusChange"
+      x-dox-Microservice: "PartyInteractionMS"
+  /PartyInteractionExportEvent:
+    get:
+      tags:
+      - "partyInteractionExport"
+      summary: "(Internal) A party interaction entity is extracted."
+      description: "notification sent when a party interaction resource is exported.\n"
+      operationId: "partyInteractionExportEvent"
+      parameters: []
+      responses:
+        204:
+          description: "*No Content*\n"
+          schema:
+            $ref: "#/definitions/PartyInteractionExportEvent"
+      x-dox-Microservice: "PartyInteractionKafkaConnector"
+  /ExportErrorEvent:
+    get:
+      tags:
+      - "Export Error Notification"
+      summary: "Notifying about error during export of an entity"
+      description: "This notification is published when a error happens during export\
+        \ of an entity.\n"
+      operationId: "ExportErrorEvent"
+      parameters: []
+      responses:
+        204:
+          description: "*No Content*\n"
+          schema:
+            $ref: "#/definitions/ExportErrorEvent"
+      x-dox-Microservice: "PartyInteractionKafkaConnector"
+definitions:
+  PartyInteractionCreate:
+    allOf:
+    - $ref: "#/definitions/Notification"
+    - type: "object"
+      properties:
+        event:
+          $ref: "#/definitions/PartyInteractionCreateEvent"
+  PartyInteractionUpdate:
+    allOf:
+    - $ref: "#/definitions/Notification"
+    - type: "object"
+      properties:
+        event:
+          $ref: "#/definitions/PartyInteractionUpdateEvent"
+  PartyInteractionStatusChange:
+    allOf:
+    - $ref: "#/definitions/Notification"
+    - type: "object"
+      properties:
+        event:
+          $ref: "#/definitions/PartyInteractionStatusChangeEvent"
+  PartyInteractionExportEvent:
+    allOf:
+    - $ref: "#/definitions/Notification"
+    - type: "object"
+      properties:
+        event:
+          $ref: "#/definitions/PartyInteractionExportEventPayload"
+  PartyInteractionCreateEvent:
+    allOf:
+    - $ref: "#/definitions/Event"
+    - type: "object"
+      properties:
+        partyInteraction:
+          $ref: "#/definitions/PartyInteraction"
+  PartyInteractionUpdateEvent:
+    allOf:
+    - $ref: "#/definitions/Event"
+    - type: "object"
+      properties:
+        partyInteraction:
+          $ref: "#/definitions/PartyInteraction"
+        originalResource:
+          $ref: "#/definitions/PartyInteraction"
+  PartyInteractionStatusChangeEvent:
+    allOf:
+    - $ref: "#/definitions/Event"
+    - type: "object"
+      properties:
+        status:
+          type: "string"
+        previousStatus:
+          type: "string"
+        partyInteraction:
+          $ref: "#/definitions/PartyInteraction"
+  PartyInteractionExportEventPayload:
+    allOf:
+    - $ref: "#/definitions/Event"
+    - type: "object"
+      properties:
+        partyInteraction:
+          $ref: "#/definitions/PartyInteraction"
+  ExportErrorEvent:
+    allOf:
+    - $ref: "#/definitions/Notification"
+    - type: "object"
+      properties:
+        event:
+          $ref: "#/definitions/ExportErrorEventPayload"
+  Notification:
+    type: "object"
+    discriminator: "eventType"
+    properties:
+      securityToken:
+        type: "string"
+        description: "Security Token of the message\n"
+      eventId:
+        type: "string"
+        description: "Identifier of the event\n"
+      eventTime:
+        type: "string"
+        description: "Creation date of the event\n"
+      eventType:
+        type: "string"
+        description: "Name of the notification resource\n"
+      eventClass:
+        type: "string"
+        description: "Fully qualified name of java class serialized in the event\n"
+      eventVersion:
+        type: "string"
+        description: "The version of the event in case there was backward compatibility\
+          \ and there is more then one\n"
+      isResource:
+        type: "boolean"
+        description: "Indicate if the notification is for resource CUD event\n"
+      resourceName:
+        type: "string"
+        description: "Name of resource entity. Filled when isResource is true.\n"
+      deprecated:
+        type: "boolean"
+        description: "Indicator if this event has been deprecated\n"
+      headers:
+        type: "object"
+        description: "Addiitonal data added to the event\n"
+        additionalProperties:
+          type: "string"
+          x-amdocs:
+            refDefinition: "EventHeaders"
+    description: "Notification structure containing the generic fields.\nThis notification\
+      \ structure owns an event structure (*SpecificEvent* placeholder) linked to\
+      \ the resource concerned by the notification using the resource name as access\
+      \ field (*resourceName* placeholder).\n"
+  ExportErrorEventPayload:
+    allOf:
+    - $ref: "#/definitions/Event"
+    - type: "object"
+      properties:
+        entityId:
+          type: "string"
+          description: "Contains the ID of the entity for which the import failed\
+            \ or succeeded.\n"
+        entityType:
+          type: "string"
+          description: "Specifies the type of entity created.\n"
+        error:
+          description: "Contains the error if the import did not succeed.\n"
+          $ref: "#/definitions/Error"
+  Event:
+    type: "object"
+    properties:
+      messageKey:
+        type: "string"
+        description: "Unqiue ID of Message in Kafka\n"
+      partitionKey:
+        type: "string"
+        description: "Key used in Kafka for partition\n"
+      name:
+        type: "string"
+        description: "Logical Name of the event\n"
+      type:
+        type: "string"
+        description: "Type of the event such as ResourceCreate, ResourceUpdate. Not\
+          \ filled for business event.\n"
+      key:
+        type: "string"
+        description: "ID of the associated resource entity. Not filled for business\
+          \ event.\n"
+      resourceIdentifier:
+        type: "string"
+        description: "Type of the associated resource entity. Not filled for business\
+          \ event.\n"
+      resourceVersion:
+        type: "string"
+        description: "Version of the associated resource entity. Not filled for business\
+          \ event.\n"
+      optimisticLockingValue:
+        type: "string"
+        description: "The current version of the resource in persistence storage(e-tag).\
+          \ Not filled for business event.\n"
+      deprecated:
+        type: "boolean"
+        description: "Indicator if this event has been deprecated"
+  Error:
+    type: "object"
+    required:
+    - "code"
+    discriminator: "@type"
+    properties:
+      code:
+        type: "string"
+        description: "Error code relevant to an application, defined in the API or\
+          \ in a common list\n"
+      reason:
+        type: "string"
+        description: "Explanation of the reason for the error that can be displayed\
+          \ to a user\n"
+      message:
+        type: "string"
+        description: "Additional information about the error  and corrective actions\
+          \ related to the error that can be displayed to a user\n"
+      status:
+        type: "string"
+        description: "HTTP error code extension\n"
+      referenceError:
+        type: "string"
+        format: "uri"
+        description: "URI of the documentation describing the error\n"
+      traceId:
+        type: "string"
+        description: "Unique tracker ID that is used to facilitate the troubleshooting\n"
+      '@type':
+        type: "string"
+        description: "Type of the error\n"
+      characteristic:
+        type: "array"
+        description: "Charachteristic parameters that are associated with the error\n"
+        items:
+          $ref: "#/definitions/ErrorCharacteristic"
+    description: "Error response. This object is used when an API throws an error,\
+      \ typically with a HTTP error response codes 3xx, 4xx, and 5xx\n"
+  ErrorCharacteristic:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "Non-localized name identifier of the characteristic\n"
+      value:
+        type: "string"
+        description: "Value of the characteristic\n"
+    description: "Parameter that is associated with the error entity\n"
+  PartyInteraction:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique identifier of the PartyInteraction \n"
+      href:
+        type: "string"
+        description: "URI reference of the PartyInteraction \n"
+      description:
+        type: "string"
+        description: "Free format textual summary of what was discussed and actions\
+          \ that took place.      \n"
+      direction:
+        type: "string"
+        description: "Direction of interaction inbound/outbound\n"
+      '@baseType':
+        type: "string"
+        description: "Base type of interaction\n"
+      '@type':
+        type: "string"
+        description: "Type of Interaction. \n"
+      '@schemaLocation':
+        type: "string"
+        description: "uri where the data model can be retrieved\n"
+      interactionDate:
+        $ref: "#/definitions/TimePeriod"
+      creationDate:
+        type: "string"
+        format: "date-time"
+        description: "Date and time when the party interaction was created.\n"
+      status:
+        type: "string"
+        description: "Status of the interaction (booked, ongoing, rescheduled, closed).\n"
+      subStatus:
+        type: "string"
+        description: "In case the status is not enough information.\n"
+      reason:
+        type: "string"
+        description: "reason for interaction happend\n"
+      statusChangeDate:
+        type: "string"
+        format: "date-time"
+        description: "Time when the status was last modified\n"
+      channel:
+        type: "array"
+        items:
+          $ref: "#/definitions/RelatedChannel"
+      interactionItem:
+        type: "array"
+        description: "Details about items created during a Party Interaction.\n"
+        items:
+          $ref: "#/definitions/InteractionItem"
+      note:
+        type: "array"
+        description: "Notes for interaction item.\n"
+        items:
+          $ref: "#/definitions/Note"
+      attachment:
+        type: "array"
+        description: "Attachments for particular item.\n"
+        items:
+          $ref: "#/definitions/AttachmentRefOrValue"
+      interactionRelationship:
+        type: "array"
+        description: "Relation to existing Interaction.\n"
+        items:
+          $ref: "#/definitions/InteractionRelationship"
+      relatedParty:
+        type: "array"
+        description: "A related party defines party or party role linked to a specific\
+          \ entity.\n"
+        items:
+          $ref: "#/definitions/RelatedParty"
+      characteristic:
+        type: "array"
+        description: "Describes the characteristics of interaction\n"
+        items:
+          $ref: "#/definitions/Characteristic"
+      contactMedium:
+        type: "array"
+        description: "The contact medium used for interaction.\n"
+        items:
+          $ref: "#/definitions/ContactMedium"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "PartyInteractionExtension"
+    description: "Party Interaction resource.\n"
+  TimePeriod:
+    type: "object"
+    properties:
+      startDateTime:
+        type: "string"
+        format: "date-time"
+        description: "The time period start date and time.\n"
+      endDateTime:
+        type: "string"
+        format: "date-time"
+        description: "The time period end date and time.\n"
+      extension:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "TimePeriodExtension"
+    description: "Time period\n"
+  RelatedChannel:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique identifier\n"
+      name:
+        type: "string"
+        description: "Name of the channel\n"
+      href:
+        type: "string"
+        description: "URI reference of the Channel\n"
+      role:
+        type: "string"
+        description: "role of channel.\n"
+      '@type':
+        type: "string"
+        description: "Type of channel. \n"
+      '@referredType':
+        type: "string"
+        description: "The referred type of the Channel.\n"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "ChannelExtension"
+    description: "Details about the used communication channel during a Party Interaction..\n"
+  InteractionItem:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique identifier\n"
+      href:
+        type: "string"
+        description: "URI reference of the InteractionItem\n"
+      reason:
+        type: "string"
+        description: "reason for this item of the interaction\n"
+      resolution:
+        type: "string"
+        description: "outcome of the interaction perticular to item.\n"
+      interactionItemType:
+        type: "string"
+        description: "(alpha) the type or classification of InteractionItem.\n"
+      interactionItemSubType:
+        type: "string"
+        description: "(alpha) the type or sub-classification of InteractionItem.\n"
+      itemDate:
+        type: "string"
+        format: "date-time"
+        description: "Date and time the interaction item was referred.\n"
+      creationDate:
+        type: "string"
+        format: "date-time"
+        description: "Date and time when the interaction item was created.\n"
+      '@type':
+        type: "string"
+        description: "Type of Interaction Item. \n"
+      attachment:
+        type: "array"
+        description: "Attachments for particular item.\n"
+        items:
+          $ref: "#/definitions/AttachmentRefOrValue"
+      item:
+        type: "object"
+        description: "Represents the relatedEntity either as EntityRef or by EntityValue.\
+          \ A relatedEntity may be a type of Customer, Individual, ProductOrder, \
+          \ etc. It must be a valid JSON structure supported by the respective related\
+          \ entity schema definition.\nAttribute - id and @type is mandatory when\
+          \ item is captured as EntityValue. id and @referredType is mandatory when\
+          \ item is captured as EntityRef.\n"
+        properties: {}
+      note:
+        type: "array"
+        description: "Notes for interaction item.\n"
+        items:
+          $ref: "#/definitions/Note"
+      characteristic:
+        type: "array"
+        description: "Describes the characteristics of interaction\n"
+        items:
+          $ref: "#/definitions/Characteristic"
+      relatedParty:
+        type: "array"
+        description: "A related party defines party or party role linked to a specific\
+          \ entity.\n"
+        items:
+          $ref: "#/definitions/RelatedParty"
+      channel:
+        type: "array"
+        description: "The channels that are used for a particular interaction item\n"
+        items:
+          $ref: "#/definitions/RelatedChannel"
+      interactionItemRelationship:
+        type: "array"
+        items:
+          $ref: "#/definitions/InteractionItemRelationship"
+        minItems: 0
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "InteractionItemExtension"
+    description: "Details about items created during a Party Interaction.\n"
+  AttachmentRefOrValue:
+    type: "object"
+    discriminator: "@type"
+    properties:
+      id:
+        type: "string"
+        description: "Unique-Identifier for this attachment"
+      href:
+        type: "string"
+        format: "uri"
+        description: "URL serving as reference for the attachment resource"
+      attachmentType:
+        type: "string"
+        description: "Type of Attachment e.g. driving License, passport, screenshot"
+      name:
+        type: "string"
+        description: "The name of the attachment. Optional."
+        x-amdocs-pii: "attachmentInfo:name"
+      url:
+        type: "string"
+        format: "uri"
+        description: "Link to the attachment media/content resource"
+        x-amdocs-pii: "attachmentInfo:url"
+      '@baseType':
+        type: "string"
+        description: "When sub-classing, this defines the super-class"
+      '@schemaLocation':
+        type: "string"
+        format: "uri"
+        description: "A URI to a JSON-Schema file that defines additional attributes\
+          \ and relationships"
+      '@type':
+        type: "string"
+        description: "When sub-classing, this defines the sub-class entity name"
+    description: "This is base model. Use either Attachment or AttachmentRef when\
+      \ creating instance of resource/sub-resource."
+  Note:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique, auto-generated identifier of the note\n"
+      author:
+        type: "string"
+        description: "Author of the note\n"
+        x-amdocs-pii: "nameInfo:name"
+      text:
+        type: "string"
+        description: "Content of note\n"
+        x-amdocs-pii: "noteInfo:text"
+      date:
+        type: "string"
+        format: "date-time"
+        description: "Date when note got created. Generated by MS.\n"
+      creationDate:
+        type: "string"
+        format: "date-time"
+        description: "Date and time when the note was created.\n"
+      '@type':
+        type: "string"
+        description: "Type of Interaction Item. \n"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "NoteExtension"
+    description: "Notes for interaction Item\n"
+  Characteristic:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "name of the characterstic\n"
+      value:
+        type: "string"
+        description: "value of the chracteristic\n"
+      valueType:
+        type: "string"
+        description: "type of chracteristic\n"
+      '@type':
+        type: "string"
+        description: "Type of the resource"
+    description: "Describes the characteristics of an entity such as in case of Customer,\
+      \ customer hobbies,center of interest etc.\nIt's recommended not to store any\
+      \ senstive information (such as PII) to be persisted here.\n"
+  RelatedParty:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique id of an existing party.\n"
+      href:
+        type: "string"
+        description: "The self href for the existing related party.\n"
+      name:
+        type: "string"
+        description: "The name of related party.\n"
+        x-amdocs-pii: "nameInfo:name"
+      role:
+        type: "string"
+        description: "The role of related party.\n"
+      '@type':
+        type: "string"
+        description: "Type of Interaction Item. \n"
+      '@referredType':
+        type: "string"
+        description: "The type of the party/party role such as Individual/Organization/Customer/User\
+          \ etc.\n"
+      validFor:
+        $ref: "#/definitions/TimePeriod"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "RelatedPartyExtension"
+    description: "Contains reference to the related party.\n"
+  InteractionItemRelationship:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique id of interaction item.\n"
+      relationshipType:
+        type: "string"
+        description: "The relationship type of the Interaction item. Supported relationship\
+          \ type is 'parent-child'.\n"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "InteractionItemRelationshipExtension"
+    description: "To link the previous interaction item which is created under same\
+      \ interaction\n"
+  InteractionRelationship:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique id of interaction.\n"
+      href:
+        type: "string"
+        description: "The self href for the created interaction.\n"
+      relationshipType:
+        type: "string"
+        description: "The relationship type of the Interaction. Supported relationship\
+          \ types are 'parent-child' and 'channelFrom-channelTo'.\n"
+      type:
+        type: "string"
+        description: "(deprecated) The type of the Interaction.\n"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "InteractionRelationshipExtension"
+    description: "To link the previous interaction which is created for same issue/order/etc...\n"
+  ContactMedium:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Identifier for the contact medium\n"
+      mediumType:
+        type: "string"
+        description: "\"Type of the contact medium, such as email address, telephone\
+          \ number, postal address\"\n"
+      preferred:
+        type: "boolean"
+        description: "Indicator for preferred contact medium for communication\n"
+      validFor:
+        $ref: "#/definitions/TimePeriod"
+      '@type':
+        type: "string"
+        description: "Contact medium type like email address, telephone number, postal\
+          \ address.\n"
+      characteristic:
+        $ref: "#/definitions/MediumCharacteristic"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "ContactMediumExtension"
+    description: "A list of contact mediums (ContactMedium [*]). Indicates the contact\
+      \ medium that could be used to contact the party\n"
+  MediumCharacteristic:
+    type: "object"
+    properties:
+      contactType:
+        type: "string"
+        description: "contact type of medium (fax, mobile phone...).\n"
+      type:
+        type: "string"
+        description: "This field has been deprecated and might be removed in future\
+          \ releases. Use contactType instead.\nType of medium (fax, mobile phone...).\n"
+      emailAddress:
+        type: "string"
+        description: "The contact's email address for the ContactMedium type of email.\n"
+        x-amdocs-pii: "contactInfo:email"
+      faxNumber:
+        type: "string"
+        description: "The fax number of the contact\n"
+        x-amdocs-pii: "contactInfo:telephoneNumber"
+      phoneNumber:
+        type: "string"
+        description: "The primary phone number of the contact\n"
+        x-amdocs-pii: "contactInfo:telephoneNumber"
+      number:
+        type: "string"
+        description: "This field has been deprecated and might be removed in future\
+          \ releases. Use phoneNumber instead.\nThe contact's phone number for Contact\
+          \ Medium type telephone number.\n"
+        x-amdocs-pii: "contactInfo:telephoneNumber"
+      socialNetworkId:
+        type: "string"
+        description: "Identifier as a member of a social network.\n"
+        x-amdocs-pii: "contactInfo:socialNetworkId"
+      city:
+        type: "string"
+        description: "The city name for the contact's address for Contact Medium type\
+          \ postal address.\n"
+        x-amdocs-pii: "contactInfo:city"
+      country:
+        type: "string"
+        description: "The country ISO code for the contact's address for Contact Medium\
+          \ type postal address.\n"
+        x-amdocs-pii: "contactInfo:country"
+      postCode:
+        type: "string"
+        description: "The postcode for the contact's address for Contact Medium type\
+          \ postal address.\n"
+        x-amdocs-pii: "contactInfo:postCode"
+      stateOrProvince:
+        type: "string"
+        description: "The state or province from contact's address for Contact Medium\
+          \ type postal address.\n"
+        x-amdocs-pii: "contactInfo:state"
+      street1:
+        type: "string"
+        description: "The first street line for the contact's address for Contact\
+          \ Medium type postal address.\n"
+        x-amdocs-pii: "contactInfo:addressLine"
+      street2:
+        type: "string"
+        description: "The second street line for the contact's address for Contact\
+          \ Medium type postal address.\n"
+        x-amdocs-pii: "contactInfo:addressLine"
+      place:
+        $ref: "#/definitions/PlaceRef"
+      extensions:
+        type: "object"
+        additionalProperties:
+          type: "object"
+          properties: {}
+        x-amdocs:
+          refDefinition: "MediumCharacteristicExtension"
+    description: "Medium information for customer(e.g. email address, mobile number,fax\
+      \ number). \n"
+  PlaceRef:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique identifier of GeographicAddress,GeographicSite or GeographicLocation\n"
+      '@referredType':
+        type: "string"
+        description: "Describes the type of entity such as GeographicAddress, GeographicSite\
+          \ or GeographicLocation\n"
+      '@type':
+        type: "string"
+        description: "Describes the type of entity \n"
+      subPlace:
+        type: "array"
+        items:
+          $ref: "#/definitions/SubPlaceRef"
+    description: "A place reference is a pointer to either GeographicAddress,GeographicSubAddress,GeographicLocation\n"
+  SubPlaceRef:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        description: "Unique identifier of entity such as GeographicSubAddress\n"
+      '@referredType':
+        type: "string"
+        description: "Describes the type of entity such as GeographicSubAddress \n"
+      '@type':
+        type: "string"
+        description: "Describes the type of entity \n"
+    description: "A subplace reference is a pointer to GeographicSubAddress\n"
