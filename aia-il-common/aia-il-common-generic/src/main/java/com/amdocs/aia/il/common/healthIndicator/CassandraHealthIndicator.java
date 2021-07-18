@@ -34,7 +34,7 @@ public class CassandraHealthIndicator extends AbstractHealthIndicator {
             LOGGER.debug("Connecting scylla DB at Custom Health Indicator:: {}", execute);
             builder.up().build();
         } catch (Exception ex) {
-            LOGGER.error("Facing issue while connecting scylla DB at Custom Health Indicator:: {}", ex.getMessage());
+            LOGGER.error("Facing issue while connecting scylla DB at Custom Health Indicator:: {}", ex);
             builder.down(ex).build();
         }
     }
