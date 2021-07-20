@@ -10,7 +10,7 @@ public class AuditUtil {
         this.auditEnable = auditEnable;
     }
 
-    public void setAuditFlag() throws IllegalArgumentException {
+    public void setAuditFlag() {
         AuditEnableConstant flagValue = AuditEnableConstant.valueOf(auditEnable.toUpperCase());
         switch(flagValue) {
             case NONE:
