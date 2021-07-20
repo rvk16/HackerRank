@@ -53,6 +53,11 @@ public class SourceAttribute implements Comparable<SourceAttribute>{
     }
 
     @Override
+    public int hashCode() {
+        return 1;
+    }
+
+    @Override
     public int compareTo(SourceAttribute sourceAttribute) {
         if(this.sourceUpdateTime >= sourceAttribute.getSourceUpdateTime()){
             return 1;

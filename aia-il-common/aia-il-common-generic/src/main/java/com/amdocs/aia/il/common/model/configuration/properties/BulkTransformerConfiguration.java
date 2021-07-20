@@ -46,11 +46,14 @@ public class BulkTransformerConfiguration extends RealtimeTransformerConfigurati
     private static final String AUDITONLY = "AuditOnly";
     private static final String AUDITLOGS = "AuditLogs";
     private String auditEnable;
+    private boolean errorHandlerEnabled;
 
+    @Override
     public String getAuditEnable() {
         return auditEnable;
     }
 
+    @Override
     public void setAuditEnable(String auditEnable) {
         this.auditEnable = auditEnable;
     }
@@ -294,6 +297,14 @@ public class BulkTransformerConfiguration extends RealtimeTransformerConfigurati
         this.auditLogsEnabled = auditLogsEnabled;
     }
 
+    public boolean isErrorHandlerEnabled() {
+        return errorHandlerEnabled;
+    }
+
+    public void setErrorHandlerEnabled(boolean errorHandlerEnabled) {
+        this.errorHandlerEnabled = errorHandlerEnabled;
+    }
+
     @Override
     public String toString() {
         return "BulkTransformerConfiguration{" +
@@ -317,7 +328,7 @@ public class BulkTransformerConfiguration extends RealtimeTransformerConfigurati
     }
 
     @Override
-    public Object clone() throws CloneNotSupportedException {
+    public Object clone() throws CloneNotSupportedException {//NOSONAR
         return super.clone();
     }
 }

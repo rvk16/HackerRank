@@ -76,14 +76,15 @@ public abstract class AbstractConfigZipConversionTool {
     private void packTarget() throws ZipException {
         final File targetFile = new File(targetZip);
         if (targetFile.isFile()) {
-            targetFile.delete();
+            Boolean status = targetFile.delete();
+            LOGGER.debug("Status of file deletion {}", status);
         }
         targetFile.getParentFile().mkdirs();
         final ZipFile targetZipFile = new ZipFile(targetZip);
 
         final File[] newContentFolders = new File(workDir).listFiles(f -> f.isDirectory());
         final File[] newContentFiles = new File(workDir).listFiles(f -> !f.isDirectory());
-        for(File folder : newContentFolders) {
+        for (File folder : newContentFolders) {
             if (folder.getName().equals("metadata") && !shouldPackMetadata()) {
                 continue;
             }
@@ -109,12 +110,14 @@ public abstract class AbstractConfigZipConversionTool {
 
     protected void deleteElement(ProjectElement element) {
         if (element != null) {
+            boolean delete1 = false;
             final File workFile = getWorkDataFile(element);
-            workFile.delete();
+            boolean delete = workFile.delete();//NOSONAR
             final File folder = workFile.getParentFile();
             if (isFolderEmpty(folder)) {
-                folder.delete();
+                delete1 = folder.delete();//NOSONAR
             }
+            LOGGER.debug("Status of deleted elements workFile {} folder {}", delete, delete1);
         }
     }
 

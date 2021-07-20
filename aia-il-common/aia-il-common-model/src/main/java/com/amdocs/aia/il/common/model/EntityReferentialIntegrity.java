@@ -6,7 +6,6 @@ import com.amdocs.aia.common.model.repo.annotations.RepoSearchable;
 import com.amdocs.aia.common.model.repo.annotations.RepoTransient;
 
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,11 +13,6 @@ import java.util.List;
 public class EntityReferentialIntegrity extends ProjectElement {
 
     private static final long serialVersionUID = -5947208761659372401L;
-
-    @RepoSearchable
-    @NotNull
-    @Pattern(regexp = "^[a-zA-Z_0-9]+$")
-    private String elementKey;
 
     @NotNull
     @RepoSearchable
@@ -33,7 +27,7 @@ public class EntityReferentialIntegrity extends ProjectElement {
     @RepoTransient
     private transient List<ElementDependency> dependencies;
 
-    public EntityReferentialIntegrity(){
+    public EntityReferentialIntegrity() {//NOSONAR
         super.setElementType(EntityReferentialIntegrity.class.getSimpleName());
         super.setProductKey(ConfigurationConstants.PRODUCT_KEY);
     }
@@ -48,7 +42,7 @@ public class EntityReferentialIntegrity extends ProjectElement {
         return String.format("%s_%s_%s_%s", getProductKey(), getProjectKey(), getElementType(), getElementKey());
     }
 
-   public String getLogicalSchemaKey() {
+    public String getLogicalSchemaKey() {
         return logicalSchemaKey;
     }
 
@@ -97,10 +91,10 @@ public class EntityReferentialIntegrity extends ProjectElement {
     }
 
     public String getElementKey() {
-        return String.format(logicalSchemaKey +"_"+ logicalEntityKey).replaceAll("\\s+", "");
+        return String.format(logicalSchemaKey + "_" + logicalEntityKey).replaceAll("\\s+", "");
     }
 
-   public void clearDependencies() {
+    public void clearDependencies() {
         if (this.dependencies != null) {
             this.dependencies.clear();
             this.dependencies = null;
