@@ -22,6 +22,7 @@
         <module>aia-il-dev-tools</module>
         <module>aia-il-sqlite-service</module>
 		<module>aia-il-reports</module>
+        <module>aia-il-rest-invoker</module>
     </modules>
 
     <distributionManagement>
