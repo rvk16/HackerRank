@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class ReplicatorGenCounter implements AuditCounter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReplicatorGenCounter.class);
     private static final long serialVersionUID = -2723134571887122724L;
     //per correlating entity per entity(contextName) per correlation id
     private Map<String, Map<String, Map<String, AtomicLong>>> recordsLoadedGen;
@@ -170,20 +171,17 @@ public class ReplicatorGenCounter implements AuditCounter {
         return auditMsgs;
     }
 
-    public Boolean checkMergeCounter(String correlationId, String context, String entity)
-    {
+    public Boolean checkMergeCounter(String correlationId, String context, String entity) {
         return recordsMergedGen.containsKey(correlationId)
                 && recordsMergedGen.get(correlationId).containsKey(context)
                 && recordsMergedGen.get(correlationId).get(context).containsKey(entity);
     }
-    public Boolean checkStoredCounter(String correlationId, String context, String entity)
-    {
+    public Boolean checkStoredCounter(String correlationId, String context, String entity) {
         return recordsStoredGen.containsKey(correlationId)
                 && recordsStoredGen.get(correlationId).containsKey(context)
                 && recordsStoredGen.get(correlationId).get(context).containsKey(entity);
     }
-    public Boolean checkDroppedCounter(String correlationId, String context, String entity)
-    {
+    public Boolean checkDroppedCounter(String correlationId, String context, String entity) {
         return recordsDroppedGen.containsKey(correlationId)
                 && recordsDroppedGen.get(correlationId).containsKey(context)
                 && recordsDroppedGen.get(correlationId).get(context).containsKey(entity);
@@ -193,8 +191,6 @@ public class ReplicatorGenCounter implements AuditCounter {
     public void setContextLead(Map<String, String> contextLead) {
         this.contextLead.putAll(contextLead);
     }
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(ReplicatorGenCounter.class);
 
     @Override
     public void clear() {

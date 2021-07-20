@@ -6,7 +6,6 @@ import com.amdocs.aia.common.serialization.messages.EnumValue;
 import com.amdocs.aia.common.serialization.messages.RepeatedMessage;
 import com.amdocs.aia.il.common.audit.RealtimeAuditDataPublisherManager;
 import com.amdocs.aia.il.common.model.configuration.entity.DeletedRowInfo;
-import com.amdocs.aia.il.common.model.configuration.properties.BulkReplicatorConfiguration;
 import com.amdocs.aia.il.common.model.configuration.tables.ColumnConfiguration;
 import com.amdocs.aia.il.common.model.configuration.tables.ConfigurationRow;
 import com.amdocs.aia.il.common.publisher.CounterType;
@@ -235,7 +234,7 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
             final ResultSet resultSet = session.execute(preparedStatement.bind(mainTable));
             resultSet.forEach(row -> matches.add(deserialize(row.getString(0))));
             //Adding Null Check to facilitate reference store job since it does not use RealtimeDataPublisherCounterManager for metrices.
-            if(RealtimeDataPublisherCounterManager.INSTANCE!=null) {
+            if (RealtimeDataPublisherCounterManager.INSTANCE != null) {
                 RealtimeDataPublisherCounterManager.INSTANCE.getRecordsAccumulator().
                         addCounter(CounterType.REPLICATOR, CounterType.UPSERTREADCOMPLETED, configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, EMPTY),
                                 1l);
@@ -376,12 +375,10 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
                                 ignoreThisMessage = true;
                                 countOfFilteredMessages++;
                             }
-                            if(currentMessage == null) {
-                                if(isAuditEnable) {
-                                    RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                            configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSNOCHANGE, existingMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
-                                            this.tableName, 1L);
-                                }
+                            if (currentMessage == null && isAuditEnable) {
+                                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                                        configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSNOCHANGE, existingMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
+                                        this.tableName, 1L);
                             }
                         } else {
                             long startTimeMerge = System.currentTimeMillis();
@@ -409,11 +406,11 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
                     if (!DELETE.equalsIgnoreCase(currentMessageOperation)) {
                         insertDataIntoDatabase(completionStage, scyllaQueryGeneratorHolder, currentMessage, existingMessage, rowKey,
                                 dataBaseTimeStamp, updatedForeignKeys, resultSets, messageCountArr);
-                            if(isAuditEnable) {
-                                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                        configurationRow.getEntityStore().getSchemaStoreKey().replace("PublisherStore", ""), CounterType.RECORDSSTORED, currentMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
-                                        this.tableName, 1L);
-                            }
+                        if (isAuditEnable) {
+                            RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                                    configurationRow.getEntityStore().getSchemaStoreKey().replace("PublisherStore", ""), CounterType.RECORDSSTORED, currentMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
+                                    this.tableName, 1L);
+                        }
                     } else {
                         if (existingMessageTsVersion == null) {
                             if (LOGGER.isDebugEnabled()) {
@@ -424,7 +421,7 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
                         if (deletedRowInfos == null) {
                             insertDataIntoDatabaseWithTTL(completionStage, scyllaQueryGeneratorHolder, currentMessage, rowKey,
                                     dataBaseTimeStamp, existingMessageTsVersion, resultSets, messageCountArr);
-                            if(isAuditEnable) {
+                            if (isAuditEnable) {
                                 RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
                                         configurationRow.getEntityStore().getSchemaStoreKey().replace("PublisherStore", ""), CounterType.RECORDSDELETED, currentMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
                                         this.tableName, 1L);
@@ -687,14 +684,14 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
 
     @Override
     public Map<KeyColumn, List<KeyColumn>> queryListChildData(String mainTable, Collection<KeyColumn> rowKeys, String contextName,
-                                              String relType, String relationTable, Long batchProcessingTimestamp) {
+                                                              String relType, String relationTable, Long batchProcessingTimestamp) {
         final CompletionStage<CqlSession> completionStage = ScyllaConnection.getCompletionStage();
         final Map<KeyColumn, List<KeyColumn>> matches = new HashMap<>();
         final Map<KeyColumn, CompletionStage<AsyncResultSet>> resultSets = new LinkedHashMap<>();
         final ScyllaQueryGenerator qGen = (ScyllaQueryGenerator) ScyllaQueryGeneratorHolder.getInstance().getQueryGenerator(configurationRow.getEntityStore().getSchemaStoreKey());
         try {
             rowKeys.forEach(rowKey -> {
-                if(KeyColumn.isEmpty(rowKey)) {
+                if (KeyColumn.isEmpty(rowKey)) {
                     String strRowKey = buildDataBaseRowKey(rowKey.getIds());
                     PreparedStatement ps1 = qGen.getPsForSelect();
                     resultSets.put(rowKey, completionStage.thenCompose(s -> s.executeAsync(ps1.bind(mainTable, strRowKey, contextName,
@@ -703,7 +700,7 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
             });
             if (!resultSets.isEmpty()) {
                 extractKeyColumnsFromResultSet(resultSets, matches, batchProcessingTimestamp);
-                if(RealtimeDataPublisherCounterManager.INSTANCE!=null) {
+                if (RealtimeDataPublisherCounterManager.INSTANCE != null) {
                     RealtimeDataPublisherCounterManager.INSTANCE.getRecordsAccumulator().
                             addCounter(CounterType.REPLICATOR, CounterType.UPSERTREADCOMPLETED, configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, EMPTY),
                                     Long.parseLong(resultSets.size() + EMPTY));
@@ -737,7 +734,7 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
             });
             if (!resultSets.isEmpty()) {
                 extractKeyColumnsFromResultSetWithTTLAndWriteTimeChecked(resultSets, matches, batchProcessingTimestamp);
-                if(RealtimeDataPublisherCounterManager.INSTANCE!=null) {
+                if (RealtimeDataPublisherCounterManager.INSTANCE != null) {
                     RealtimeDataPublisherCounterManager.INSTANCE.getRecordsAccumulator().
                             addCounter(CounterType.REPLICATOR, CounterType.UPSERTREADCOMPLETED, configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, EMPTY),
                                     Long.parseLong(resultSets.size() + EMPTY));
@@ -879,17 +876,17 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
         }
     }
 
-    private void processRows(final AsyncResultSet rs, final List<RepeatedMessage> matches, Long batchProcessingTimestamp, double selectedVersion, Row selectedRow ) {
+    private void processRows(final AsyncResultSet rs, final List<RepeatedMessage> matches, Long batchProcessingTimestamp, double selectedVersion, Row selectedRow) {
         for (final Row row : rs.currentPage()) {
             final double tsVersion = row.getDouble(1);
-            if(tsVersion <= batchProcessingTimestamp && tsVersion > selectedVersion){
+            if (tsVersion <= batchProcessingTimestamp && tsVersion > selectedVersion) {
                 selectedVersion = tsVersion;
                 selectedRow = row;
             }
         }
         if (rs.hasMorePages()) {
             processRows(rs.fetchNextPage().toCompletableFuture().join(), matches, batchProcessingTimestamp, selectedVersion, selectedRow);
-        }else if(selectedRow != null) {
+        } else if (selectedRow != null) {
             matches.add(deserialize(selectedRow.getString(0)));
         }
     }
@@ -901,17 +898,17 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
         }
     }
 
-    private void processRowsForRepeatedMessageWithTTLAndWriteTimeChecked(final AsyncResultSet rs, final List<RepeatedMessage> matches, Long batchProcessingTimestamp, double selectedVersion, Row selectedRow ) {
+    private void processRowsForRepeatedMessageWithTTLAndWriteTimeChecked(final AsyncResultSet rs, final List<RepeatedMessage> matches, Long batchProcessingTimestamp, double selectedVersion, Row selectedRow) {
         for (final Row row : rs.currentPage()) {
             final double tsVersion = row.getDouble(1);
-            if(tsVersion <= batchProcessingTimestamp && tsVersion > selectedVersion){
+            if (tsVersion <= batchProcessingTimestamp && tsVersion > selectedVersion) {
                 selectedVersion = tsVersion;
                 selectedRow = row;
             }
         }
         if (rs.hasMorePages()) {
             processRowsForRepeatedMessageWithTTLAndWriteTimeChecked(rs.fetchNextPage().toCompletableFuture().join(), matches, batchProcessingTimestamp, selectedVersion, selectedRow);
-        }else if(selectedRow != null) {
+        } else if (selectedRow != null) {
             final Object ttl = selectedRow.getObject(2);
             final Object writeTime = selectedRow.getObject(3);
             if (ttl == null || Long.parseLong(writeTime.toString()) >= Long.parseLong(batchProcessingTimestamp + MICRO_POSTFIX)) {
@@ -950,7 +947,7 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
             long futuresStartTime = System.currentTimeMillis();
             extractRepeatedMessagesPairFromResultSet(batchProcessingTimestamp, matchesList, resultSets);
             counter += matchesList.size();
-            if(RealtimeDataPublisherCounterManager.INSTANCE!=null) {
+            if (RealtimeDataPublisherCounterManager.INSTANCE != null) {
                 RealtimeDataPublisherCounterManager.INSTANCE.getRecordsAccumulator().
                         addCounter(CounterType.REPLICATOR, CounterType.UPSERTREADCOMPLETED, configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, EMPTY),
                                 Long.parseLong(resultSets.size() + EMPTY));
@@ -980,17 +977,17 @@ public class ScyllaDBRandomAccessTable implements RandomAccessTable, Serializabl
         }
     }
 
-    private void processRowsForRepeatedMessagePair(final AsyncResultSet rs, final List<Pair<RepeatedMessage, Double>> matches, Long batchProcessingTimestamp, double selectedVersion, Row selectedRow ) {
+    private void processRowsForRepeatedMessagePair(final AsyncResultSet rs, final List<Pair<RepeatedMessage, Double>> matches, Long batchProcessingTimestamp, double selectedVersion, Row selectedRow) {
         for (final Row row : rs.currentPage()) {
             final double tsVersion = row.getDouble(1);
-            if(tsVersion <= batchProcessingTimestamp && tsVersion > selectedVersion){
+            if (tsVersion <= batchProcessingTimestamp && tsVersion > selectedVersion) {
                 selectedVersion = tsVersion;
                 selectedRow = row;
             }
         }
         if (rs.hasMorePages()) {
             processRowsForRepeatedMessagePair(rs.fetchNextPage().toCompletableFuture().join(), matches, batchProcessingTimestamp, selectedVersion, selectedRow);
-        }else if(selectedRow != null) {
+        } else if (selectedRow != null) {
             matches.add(new ImmutablePair(deserialize(selectedRow.getString(0)), selectedVersion));
         }
     }

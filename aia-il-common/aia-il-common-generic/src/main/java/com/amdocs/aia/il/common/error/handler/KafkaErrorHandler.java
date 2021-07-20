@@ -290,7 +290,7 @@ public class KafkaErrorHandler implements Handler {
         return msgCount;
     }
 
-    private int getComputeLeadingKeyRepeatedMsgCount(ComputeLeadingProducerRecord computeLeadingProducerRecord) {
+    private static int getComputeLeadingKeyRepeatedMsgCount(ComputeLeadingProducerRecord computeLeadingProducerRecord) {
         return (computeLeadingProducerRecord.getKafkaBulkPublishTransaction().getLeadingEntityKeys().size());
     }
 
@@ -400,10 +400,10 @@ public class KafkaErrorHandler implements Handler {
         }
     }
 
-    private static byte[] getKafkaPublishTransactionByteArray(Object KafkaObject) throws IOException {
+    private static byte[] getKafkaPublishTransactionByteArray(Object kafkaObject) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ObjectOutputStream objectWriter = new ObjectOutputStream(os);
-        objectWriter.writeObject(KafkaObject);
+        objectWriter.writeObject(kafkaObject);
         return os.toByteArray();
     }
 

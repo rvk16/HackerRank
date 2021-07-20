@@ -97,8 +97,7 @@ public class ScyllaErrorHandler implements Handler {
         String threadName;
         if(checkpoint.getThreadName().substring(checkpoint.getThreadName().length() - 1).matches(".*\\d.*")) {
             threadName = checkpoint.getThreadName().substring(0, checkpoint.getThreadName().length() - 1);
-        }
-        else {
+        } else {
             threadName = checkpoint.getThreadName();
         }
         if (checkpoint.isErrorFlag()) {

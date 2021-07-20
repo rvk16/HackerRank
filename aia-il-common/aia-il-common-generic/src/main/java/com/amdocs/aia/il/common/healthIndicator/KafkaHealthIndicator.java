@@ -1,4 +1,4 @@
-package com.amdocs.aia.il.common.healthIndicator;
+package com.amdocs.aia.il.common.healthIndicator; //NOSONAR
 
 import com.amdocs.aia.il.common.model.configuration.properties.KafkaConfiguration;
 import com.amdocs.aia.il.common.utils.KafkaUtils;

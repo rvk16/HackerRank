@@ -163,7 +163,7 @@ public class TransformationAttributeConfigurationServiceImpl<L extends Transform
             .isRequired(attributeStore.getIsRequired());
 
         dto.doReferencialIntegrity(relation != null);
-        if(dto.isDoReferencialIntegrity() && relation != null){
+        if(Boolean.TRUE.equals(dto.isDoReferencialIntegrity()) && relation != null){
             dto.parentSchemaKey(relation.getParentSchemaKey())
                .parentEntityKey(relation.getParentEntityKey())
                .parentAttributeKey(relation.getParentAttributeKey());

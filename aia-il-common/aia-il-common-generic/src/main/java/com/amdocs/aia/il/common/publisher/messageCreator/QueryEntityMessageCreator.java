@@ -174,7 +174,7 @@ public class QueryEntityMessageCreator {
             Path filenamePath = null;
             while (!fileFound) {
                 filenamePath = Paths.get(errorDir + File.separator + (config != null ? this.config.getJobName() : referenceStorePublisherConfigurations.getSharedStoragePath()) + '_' + index + ".error");
-                if (Files.exists(filenamePath)) {
+                if (Files.exists(filenamePath)) {//NOSONAR
                     fin = new FileInputStream(filenamePath.toFile()); //NOSONAR
                     reader = new BufferedReader(new InputStreamReader(fin)); //NOSONAR
                     long count = reader.lines().count();
