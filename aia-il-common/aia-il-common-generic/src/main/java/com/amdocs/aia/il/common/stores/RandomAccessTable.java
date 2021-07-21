@@ -40,7 +40,7 @@ public interface RandomAccessTable {
      * @param counterType
      * @return Set of IDs of the failed messages which failed to insert either to main table or one of the FKs tables
      */
-    double[] asyncUpsert(String tableName , List<UpsertData> upsertDataList, List<RowKeysPerTransactionID> rowKeysPerTableInfoListToBeUpserted, List<RowKeysPerTransactionID> rowKeysPerTransactionIDList, boolean dayLightSaving , boolean incrementalUpsert, Map<Long, List<DeletedRowInfo>> deletedRowInfosPerBatch, CounterType counterType, boolean isAuditEnable);
+    double[] asyncUpsert(String tableName , List<UpsertData> upsertDataList, List<RowKeysPerTransactionID> rowKeysPerTableInfoListToBeUpserted, List<RowKeysPerTransactionID> rowKeysPerTransactionIDList, boolean dayLightSaving , boolean incrementalUpsert, Map<Long, List<DeletedRowInfo>> deletedRowInfosPerBatch, CounterType counterType, boolean isAuditEnable);//NOSONAR
 
     /** Method for working with incremental updates in HBASE
      *
@@ -61,7 +61,7 @@ public interface RandomAccessTable {
      * @param rowKeysPerTransactionIDList
      * @return Set of IDs of the failed messages which failed to insert either to main table or one of the FKs tables
      */
-    double[] asyncUpsert(String tableName , List<RepeatedMessage> repeatedMessages, Long batchProcessingTimestamp, List<RowKeysPerTransactionID> rowKeysPerTableInfoListToBeUpserted, List<RowKeysPerTransactionID> rowKeysPerTransactionIDList, boolean dayLightSaving , boolean incrementalUpsert, List<DeletedRowInfo> deletedRowInfos, CounterType counterType, boolean isAuditEnable);
+    double[] asyncUpsert(String tableName , List<RepeatedMessage> repeatedMessages, Long batchProcessingTimestamp, List<RowKeysPerTransactionID> rowKeysPerTableInfoListToBeUpserted, List<RowKeysPerTransactionID> rowKeysPerTransactionIDList, boolean dayLightSaving , boolean incrementalUpsert, List<DeletedRowInfo> deletedRowInfos, CounterType counterType, boolean isAuditEnable);//NOSONAR
     /**
      * Query rows according to their RowId values and return a List of GeneratedMessage results
      * @param indexName - table name to query

@@ -182,8 +182,7 @@ public class LeadingKeyCounter implements AuditCounter {
         return auditMsgs;
     }
 
-    public Boolean checkDroppedCounter(String correlationId, String context, String entity)
-    {
+    public Boolean checkDroppedCounter(String correlationId, String context, String entity) {
         return recordsDropped.containsKey(correlationId)
                 && recordsDropped.get(correlationId).containsKey(context)
                 && recordsDropped.get(correlationId).get(context).containsKey(entity);

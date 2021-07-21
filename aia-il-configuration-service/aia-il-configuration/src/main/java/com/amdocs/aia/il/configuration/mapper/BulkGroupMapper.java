@@ -8,8 +8,6 @@ import com.amdocs.aia.il.common.model.bulk.GroupFilter;
 import com.amdocs.aia.il.configuration.dto.BulkGroupDTO;
 import com.amdocs.aia.il.configuration.dto.EntityFilterRefDTO;
 import com.amdocs.aia.il.configuration.dto.GroupFilterDTO;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -18,7 +16,6 @@ import java.util.stream.Collectors;
 
 @Component
 public class BulkGroupMapper implements ModelDtoMapper<BulkGroup, BulkGroupDTO> {
-    private static final Logger LOGGER = LoggerFactory.getLogger(BulkGroupMapper.class);
     @Override
     public BulkGroup toModel(String projectKey, BulkGroupDTO dto) {
         final BulkGroup model = new BulkGroup();
@@ -36,7 +33,6 @@ public class BulkGroupMapper implements ModelDtoMapper<BulkGroup, BulkGroupDTO> 
     @Override
     public List<BulkGroup> toModel(String projectKey, List<BulkGroupDTO> dtos) {
         return dtos.stream()
-                .peek(dto->  LOGGER.info("BulkGroup toModel: {}", dto.getBulkGroupKey() ))
                 .map( group -> toModel(projectKey,group))
                 .collect(Collectors.toList());
     }
@@ -47,10 +43,10 @@ public class BulkGroupMapper implements ModelDtoMapper<BulkGroup, BulkGroupDTO> 
         dto.bulkGroupKey(model.getKey())
                 .schemaKey(model.getSchemaKey())
                 .bulkGroupName(model.getName())
-                .groupFilter(toDto(model.getGroupFilter()))
+                .groupFilter(toDtoForGroup(model.getGroupFilter()))
                 .originProcess(model.getOriginProcess() == null? null : model.getOriginProcess().toString())
                 .entityFilters(model.getEntityFilters() == null? Collections.emptyList() :
-                        model.getEntityFilters().stream().map(this::toDto).collect(Collectors.toList()));
+                        model.getEntityFilters().stream().map(this::toDtoForModel).collect(Collectors.toList()));
 
         return dto;
     }
@@ -62,7 +58,7 @@ public class BulkGroupMapper implements ModelDtoMapper<BulkGroup, BulkGroupDTO> 
         return new EntityFilterRef(dto.getEntityFilterKey(),dto.getEntityKey());
     }
 
-    public EntityFilterRefDTO toDto(EntityFilterRef model){
+    public EntityFilterRefDTO toDtoForModel(EntityFilterRef model){
         if (model == null){
             return null;
         }
@@ -80,7 +76,7 @@ public class BulkGroupMapper implements ModelDtoMapper<BulkGroup, BulkGroupDTO> 
         return gf;
     }
 
-    public GroupFilterDTO toDto(GroupFilter model){
+    public GroupFilterDTO toDtoForGroup(GroupFilter model){
         if (model == null){
             return null;
         }

@@ -44,11 +44,12 @@ public class KafkaConsumerRebalancer {
                 synchronized (consumer) {
                     consumer.enforceRebalance();
                 }
-            }else {
-                LOGGER.info(SCHEDULED_REBALANCING_NOT_TRIGGERED, (consumer != null? consumer.groupMetadata().memberId() : BLANK));
+            } else {
+                LOGGER.info(SCHEDULED_REBALANCING_NOT_TRIGGERED, (consumer != null ? consumer.groupMetadata().memberId() : BLANK));
             }
-        }catch (Exception e){
-            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();//NOSONAR
+            LOGGER.error("Exception in rebalance {}", e.getMessage());
         }
     }
 

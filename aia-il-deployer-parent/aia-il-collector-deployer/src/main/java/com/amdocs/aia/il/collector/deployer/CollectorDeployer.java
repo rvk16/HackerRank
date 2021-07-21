@@ -131,6 +131,7 @@ public class CollectorDeployer {
                     .replace(SERVICE_NAME, serviceName)
                     .replace(IMAGE_REPOSITORY, deployerConfiguration.getImageRepository())
                     .replace(DOCKER_IMAGE_NAME, dockerImageName)
+                    .replace(TAG_NAME, deployerConfiguration.getTagName())
                     .replace(APPLICATION_PROPERTY_FILE, applicationPropertyFile)
                     .replace(INIT_CONTAINER_IMAGE, deployerConfiguration.getInitContainerImage())
                     .replace(KAFKA_SECRET, deployerConfiguration.getKafkaSecret());
@@ -140,6 +141,7 @@ public class CollectorDeployer {
                     .replace(SERVICE_NAME, serviceName)
                     .replace(IMAGE_REPOSITORY, deployerConfiguration.getImageRepository())
                     .replace(DOCKER_IMAGE_NAME, dockerImageName)
+                    .replace(TAG_NAME, deployerConfiguration.getTagName())
                     .replace(APPLICATION_PROPERTY_FILE, applicationPropertyFile)
                     .replace(INIT_CONTAINER_IMAGE, deployerConfiguration.getInitContainerImage());
         }

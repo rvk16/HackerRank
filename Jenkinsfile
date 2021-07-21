@@ -286,6 +286,48 @@ booleanParam(name: 'run_cleanup',          defaultValue: true,                  
         }
       }
     }
+            stage("push-rest-invoker-job-image") {
+              when { expression { params.pipeline_type != 'RELEASE' } }
+              steps {
+                script {
+                  env.PHASE='push-rest-invoker-job'
+                }
+                sh '''
+                  export
+                    BRANCH=$GIT_BRANCH
+                    if [[ "$BRANCH" == "master" ]]
+                    then
+                     BRANCH=""
+                      export REG="-Ddocker.push.registry=10.232.52.103:5000/artifactory/docker/temp/aiail"
+                    else
+                     BRANCH="$BRANCH-"
+                      export REG=""
+                    fi
+                  cd aia-il-rest-invoker/aia-il-rest-invoker-job
+                  mvn deploy -B -Dbranch=$BRANCH -Pdocker -DskipTests $REG
+                '''
+              }
+            }
+            stage("push-rest-invoker-job-image-release") {
+              when { expression { params.pipeline_type == 'RELEASE' } }
+              steps {
+                script {
+                  env.PHASE='push-rest-invoker-job-release'
+                }
+                sh '''
+                  export
+                    BRANCH=$GIT_BRANCH
+                    if [[ "$BRANCH" == "master" ]]
+                    then
+                     BRANCH=""
+                    else
+                     BRANCH="$BRANCH-"
+                    fi
+                  cd aia-il-rest-invoker/aia-il-rest-invoker-job
+                  mvn deploy -B -Dbranch=$BRANCH -Pdocker -Prelease -DskipTests
+                '''
+              }
+            }
     stage ('Run IT and Sonar') {
         parallel {
           stage ('Run IT') {

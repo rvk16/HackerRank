@@ -7,7 +7,6 @@ import com.amdocs.aia.common.serialization.messages.RepeatedMessage;
 import com.amdocs.aia.il.common.audit.RealtimeAuditDataPublisherManager;
 import com.amdocs.aia.il.common.constant.RTPConstants;
 import com.amdocs.aia.il.common.model.configuration.entity.DeletedRowInfo;
-import com.amdocs.aia.il.common.model.configuration.properties.BulkReplicatorConfiguration;
 import com.amdocs.aia.il.common.model.configuration.tables.ColumnConfiguration;
 import com.amdocs.aia.il.common.model.configuration.tables.ConfigurationRow;
 import com.amdocs.aia.il.common.publisher.CounterType;
@@ -38,7 +37,6 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
     private final List<String> counterTables;
     private final List<Boolean> isMTM;
     private final QueryGenerator queryGenerator;
-    public static BulkReplicatorConfiguration bulkReplicatorConfiguration = new BulkReplicatorConfiguration();
 
     private final ConfigurationRow configurationRow;
     private final JsonRepeatedMessageFormatter jsonRepeatedMessageFormatter;
@@ -103,7 +101,7 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
         long starttime = System.currentTimeMillis();
         long queryTime = System.currentTimeMillis() - starttime;
         double[] messageCountArr = upsertResultList(repeatedMessages, idList, updateTimeList, currentList, dbTimestampList, rowKeysPerTableInfoListToBeUpserted, incrementalUpsert, dayLightSaving, counterType, isAuditEnable);
-        messageCountArr[4] = currentList.isEmpty() ? 0L : queryTime / currentList.size();
+        messageCountArr[4] = currentList.isEmpty() ? 0L : (double) queryTime / currentList.size();
         //Index wise description - 0)main data count , 1) relational data count , 2) failed message count , 3) filtered message count, 4)Avg query time, 5) Avg merge time 6) Avg Upsert time
         return messageCountArr;
     }
@@ -387,12 +385,10 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
                                 countOfFilteredMessages++;
 
                             }
-                            if (repeatedMessage == null) {
-                                if (isAuditEnable) {
-                                    RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                            configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSNOCHANGE, existingMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
-                                            this.tableName, 1L);
-                                }
+                            if (repeatedMessage == null && isAuditEnable) {
+                                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                                        configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSNOCHANGE, existingMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
+                                        this.tableName, 1L);
                             }
                         } else {
                             startTimeMerge = System.currentTimeMillis();
@@ -413,30 +409,15 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
                 if (!ignoreThisMessage) {
                     startTimeUpsert = System.currentTimeMillis();
                     Long dataBaseTimestamp = dataBaseTimestampList.get(i);
-                    if (repeatedMessage != null) {
-                            if (((EnumValue) repeatedMessage.getValue(OPERATION)).getValueName().equalsIgnoreCase(DELETE) && !REPLICATOR_LOAD_COUNTER.equals(counterType.name())) {
-                                if (isAuditEnable) {
-                                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                        configurationRow.getEntityStore().getSchemaStoreKey().replace("PublisherStore", ""), CounterType.RECORDSDELETED, repeatedMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
-                                        this.tableName, 1L);
-                            }
-                        }
-
-                        if (!((EnumValue) repeatedMessage.getValue(OPERATION)).getValueName().equalsIgnoreCase(DELETE)) {
-                            failedMessageCount = insertDataIntoDataBase(repeatedMessage, existingMessage, rowKey, dataBaseTimestamp, failedMessageCount, updatedForeignKeys, messageCountArr);
-                            if (isAuditEnable) {
-                                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                        configurationRow.getEntityStore().getSchemaStoreKey().replace("PublisherStore", ""), CounterType.RECORDSSTORED, repeatedMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
-                                        this.tableName, 1L);
-                            }
-                        }
+                    if (repeatedMessage != null) {//NOSONAR
+                        failedMessageCount = getFailedMessageCount(counterType, isAuditEnable, failedMessageCount, messageCountArr, existingMessage, repeatedMessage, rowKey, updatedForeignKeys, dataBaseTimestamp);
                     }
                     totalUpsertTime += System.currentTimeMillis() - startTimeUpsert;
 
                 }
             }
             messageCountArr[3] = countOfFilteredMessages;
-            messageCountArr[5] = mergeMessageCount == 0 ? 0L : (totalMergeTime / mergeMessageCount);
+            messageCountArr[5] = mergeMessageCount == 0 ? 0L : ((double) totalMergeTime / mergeMessageCount);
             messageCountArr[6] = (messageCountArr[0] + messageCountArr[1]) != 0 ? totalUpsertTime / (messageCountArr[0] + messageCountArr[1]) : 0;
         } catch (SQLException e) {
             LOGGER.error("SQL error", e);
@@ -448,6 +429,26 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
                     this.tableName, repeatedMessages.size(), indexedFks.size(), statements.size(), (repeatedMessages.size() - statements.size()), (System.currentTimeMillis() - startTime));
         }
         return messageCountArr;
+    }
+
+    private int getFailedMessageCount(CounterType counterType, boolean isAuditEnable, int failedMessageCount, double[] messageCountArr, RepeatedMessage existingMessage, RepeatedMessage repeatedMessage, String rowKey, Map<Integer, KeyColumnDescriptor> updatedForeignKeys, Long dataBaseTimestamp) throws SQLException {
+        if (((EnumValue) repeatedMessage.getValue(OPERATION)).getValueName().equalsIgnoreCase(DELETE) && !REPLICATOR_LOAD_COUNTER.equals(counterType.name())) {
+            if (isAuditEnable) {//NOSONAR
+                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                        configurationRow.getEntityStore().getSchemaStoreKey().replace("PublisherStore", ""), CounterType.RECORDSDELETED, repeatedMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
+                        this.tableName, 1L);
+            }
+        }
+
+        if (!((EnumValue) repeatedMessage.getValue(OPERATION)).getValueName().equalsIgnoreCase(DELETE)) {
+            failedMessageCount = insertDataIntoDataBase(repeatedMessage, existingMessage, rowKey, dataBaseTimestamp, failedMessageCount, updatedForeignKeys, messageCountArr);
+            if (isAuditEnable) {
+                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                        configurationRow.getEntityStore().getSchemaStoreKey().replace("PublisherStore", ""), CounterType.RECORDSSTORED, repeatedMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME),
+                        this.tableName, 1L);
+            }
+        }
+        return failedMessageCount;
     }
 
     private static boolean isUpdateTimeGreaterThanExistingTime(long updateTime, long existingUpdateTime, boolean dayLightSaving) {
@@ -583,7 +584,7 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
 
     @Override
     public Map<KeyColumn, List<KeyColumn>> queryListChildData(String mainTable, Collection<KeyColumn> rowKeys, String contextName,
-                                              String relType, String relationTable, Long batchProcessingTimestamp) {
+                                                              String relType, String relationTable, Long batchProcessingTimestamp) {
         final long startTime = System.currentTimeMillis();
         Map<KeyColumn, List<KeyColumn>> matches = new HashMap<>();
         Map<KeyColumn, PreparedStatement> statements = new HashMap<>();
@@ -591,7 +592,7 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
 
         try {
             rowKeys.forEach(rowKey -> {
-                if(KeyColumn.isEmpty(rowKey)) {
+                if (KeyColumn.isEmpty(rowKey)) {
                     String strRowKey = buildDataBaseRowKey(rowKey.getIds());
                     try {
                         PreparedStatement ps1 = InMemoryDBConnection.getConnection().prepareStatement(queryGenerator.getPsForSelectQueryString());
@@ -726,6 +727,7 @@ public class InMemoryDBRandomAccessTable implements RandomAccessTable, Serializa
         }
         return allRelationKey.toString();
     }
+
     private static String extractKeyColumnsFromResultSet(Map<KeyColumn, PreparedStatement> statements, Map<KeyColumn, List<KeyColumn>> matches) throws SQLException {
         StringBuilder allRelationKey = new StringBuilder();
         for (Map.Entry<KeyColumn, PreparedStatement> statement : statements.entrySet()) {

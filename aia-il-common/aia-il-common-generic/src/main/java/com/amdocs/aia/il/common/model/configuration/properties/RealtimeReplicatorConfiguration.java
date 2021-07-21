@@ -1,14 +1,12 @@
 package com.amdocs.aia.il.common.model.configuration.properties;
 
-import com.amdocs.aia.il.common.log.LogMsg;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.util.Optional;
 
 @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "aia.il.replicator")
 @Component
-public class RealtimeReplicatorConfiguration implements Serializable {
+public class RealtimeReplicatorConfiguration implements Serializable {//NOSONAR
     private static final long serialVersionUID = 6545740109606139678L;
 
     private String datachannels = "";
