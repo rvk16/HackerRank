@@ -69,7 +69,7 @@ spec:
       containers:
         - name: $SERVICE_NAME
           # The Docker image to use
-          image: "$IMAGE_REPOSITORY/$DOCKER_IMAGE_NAME:master-TRUNK-SNAPSHOT"
+          image: "$IMAGE_REPOSITORY/$DOCKER_IMAGE_NAME:$TAG_NAME"
           imagePullPolicy: Always
           readinessProbe:
             httpGet:
