@@ -12,6 +12,7 @@ public class DeployerConfiguration {
     private String initContainerImage;
     private String kafkaSecret;
     private String kafkaSecurityProtocol;
+    private String tagName;
 
     public String getNamespace() {
         return namespace;
@@ -75,5 +76,13 @@ public class DeployerConfiguration {
 
     public void setKafkaSecurityProtocol(String kafkaSecurityProtocol) {
         this.kafkaSecurityProtocol = kafkaSecurityProtocol;
+    }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
     }
 }
