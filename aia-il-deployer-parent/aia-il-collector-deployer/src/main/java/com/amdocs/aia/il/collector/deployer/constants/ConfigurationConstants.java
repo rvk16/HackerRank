@@ -14,6 +14,7 @@ public final class ConfigurationConstants {
     public static final String SERVICE_NAME = "$SERVICE_NAME";
     public static final String IMAGE_REPOSITORY = "$IMAGE_REPOSITORY";
     public static final String DOCKER_IMAGE_NAME = "$DOCKER_IMAGE_NAME";
+    public static final String TAG_NAME = "$TAG_NAME";
     public static final String APPLICATION_PROPERTY_FILE = "$APPLICATION_PROPERTY_FILE";
     public static final String INIT_CONTAINER_IMAGE = "$INIT_CONTAINER_IMAGE";
     public static final String KAFKA_SECRET = "$KAFKA_SECRET";
