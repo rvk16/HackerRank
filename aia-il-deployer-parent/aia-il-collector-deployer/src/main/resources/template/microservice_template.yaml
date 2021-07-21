@@ -50,13 +50,7 @@ spec:
     metadata:
       labels:
         app: $SERVICE_NAME
-        monitored: prometheus
         service-type: runtime
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/probe: "true"
-        prometheus.io/port: "8081"
-        prometheus.io/path: "/actuator/prometheus"
     spec:
       strategy:
         type: RollingUpdate
