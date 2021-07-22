@@ -23,7 +23,7 @@ public interface ExportApi extends ApiClient.Api {
    */
   @RequestLine("GET /projects/{projectKey}/configuration/export-transformations-scripts")
   @Headers({
-    "Accept: application/json",
+    "Accept: application/octet-stream",
   })
   File exportTransformationsScripts(@Param("projectKey") String projectKey);
 }

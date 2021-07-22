@@ -3,21 +3,16 @@ package com.amdocs.aia.il.configuration.service.external;
 import com.amdocs.aia.common.core.web.AiaApiException;
 import com.amdocs.aia.common.core.web.AiaApiMessage;
 import com.amdocs.aia.il.common.model.external.*;
-import com.amdocs.aia.il.common.model.external.csv.ExternalCsvEntityCollectionRules;
-import com.amdocs.aia.il.common.model.external.csv.ExternalCsvEntityStoreInfo;
-import com.amdocs.aia.il.common.model.external.csv.ExternalCsvSchemaCollectionRules;
-import com.amdocs.aia.il.common.model.external.csv.ExternalCsvSchemaStoreInfo;
+import com.amdocs.aia.il.common.model.external.csv.*;
+import com.amdocs.aia.il.common.model.external.kafka.ExternalKafkaAttributeStoreInfo;
 import com.amdocs.aia.il.common.model.external.kafka.ExternalKafkaEntityStoreInfo;
 import com.amdocs.aia.il.common.model.external.kafka.ExternalKafkaSchemaCollectionRules;
 import com.amdocs.aia.il.common.model.external.kafka.ExternalKafkaSchemaStoreInfo;
 import com.amdocs.aia.il.common.model.external.sql.ExternalSqlSchemaStoreInfo;
-import com.amdocs.aia.il.configuration.dto.ExternalCsvAttributeStoreInfoDTO;
-import com.amdocs.aia.il.configuration.dto.ExternalKafkaAttributeStoreInfoDTO;
 import com.amdocs.aia.il.configuration.export.ExternalAttributeExportCSVDTO;
 import com.amdocs.aia.il.configuration.export.ExternalEntityExportCSVDTO;
 import com.amdocs.aia.il.configuration.export.ExternalSchemaExportCSVDTO;
 import com.amdocs.aia.il.configuration.message.AiaApiMessages;
-import com.amdocs.aia.il.configuration.message.MessageHelper;
 import com.amdocs.aia.il.configuration.repository.external.ExternalEntityRepository;
 import com.amdocs.aia.il.configuration.repository.external.ExternalSchemaRepository;
 import com.fasterxml.jackson.databind.ObjectWriter;
@@ -122,10 +117,12 @@ public class BulkServiceImpl implements BulkService {
         switch (externalSchema.getStoreInfo().getType()){
             case ExternalSchemaStoreTypes.SQL:
                 externalSchemaExportCSVDTO.setDatabaseType(((ExternalSqlSchemaStoreInfo)externalSchema.getStoreInfo()).getDatabaseType());
+                break;
             case ExternalSchemaStoreTypes.CSV:
                 externalSchemaExportCSVDTO.setDefaultDateFormat(((ExternalCsvSchemaStoreInfo)externalSchema.getStoreInfo()).getDefaultDateFormat());
                 externalSchemaExportCSVDTO.setDefaultColumnDelimiter(String.valueOf(((ExternalCsvSchemaStoreInfo)externalSchema.getStoreInfo()).getDefaultColumnDelimiter()));
                 externalSchemaExportCSVDTO.setDefaultInvalidFilenameAction(((ExternalCsvSchemaCollectionRules)externalSchema.getCollectionRules()).getDefaultInvalidFilenameAction().toString());
+                break;
             case ExternalSchemaStoreTypes.KAFKA:
                 externalSchemaExportCSVDTO.setDefaultDateFormat(((ExternalKafkaSchemaStoreInfo)externalSchema.getStoreInfo()).getDefaultDateFormat());
                 externalSchemaExportCSVDTO.setInputDataChannel(((ExternalKafkaSchemaCollectionRules)externalSchema.getCollectionRules()).getInputDataChannel());
@@ -134,6 +131,7 @@ public class BulkServiceImpl implements BulkService {
                 externalSchemaExportCSVDTO.setDeleteEventOperation(((ExternalKafkaSchemaCollectionRules)externalSchema.getCollectionRules()).getDeleteEventOperation());
                 externalSchemaExportCSVDTO.setImplicitHandlerPreviousNode(((ExternalKafkaSchemaCollectionRules)externalSchema.getCollectionRules()).getImplicitHandlerPreviousNode());
                 externalSchemaExportCSVDTO.setImplicitHandlerCurrentNode(((ExternalKafkaSchemaCollectionRules)externalSchema.getCollectionRules()).getImplicitHandlerCurrentNode());
+                break;
 
         }
         return externalSchemaExportCSVDTO;
@@ -180,11 +178,13 @@ public class BulkServiceImpl implements BulkService {
                 externalEntityExportCSVDTO.setDateFormat(((ExternalCsvEntityStoreInfo)externalEntity.getStoreInfo()).getDateFormat());
                 externalEntityExportCSVDTO.setColumnDelimiter(String.valueOf(((ExternalCsvEntityStoreInfo)externalEntity.getStoreInfo()).getColumnDelimiter()));
                 externalEntityExportCSVDTO.setInvalidFilenameAction(((ExternalCsvEntityCollectionRules)externalEntity.getStoreInfo()).getFileInvalidNameAction().name());
+                break;
           case ExternalSchemaStoreTypes.KAFKA:
                 externalEntityExportCSVDTO.setJsonTypeValue(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getJsonTypeValue());
                 externalEntityExportCSVDTO.setJsonTypePath(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getJsonTypePath());
                 externalEntityExportCSVDTO.setRelativePaths(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getRelativePaths());
                 externalEntityExportCSVDTO.setMergedNodes(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getMergedNodes());
+                break;
 
         }
         return externalEntityExportCSVDTO;
@@ -203,10 +203,7 @@ public class BulkServiceImpl implements BulkService {
 
         final List<ExternalAttributeExportCSVDTO> externalAttributeExportCSVDTOS = externalEntities.stream()
                 .flatMap(externalEntity -> externalEntity.getAttributes().stream()
-                        .map(att ->createExternalAttributeExportCSVDTO(att,externalEntity.getEntityKey()))).collect(Collectors.toList());
-
-
-
+                        .map(att ->createExternalAttributeExportCSVDTO(att,externalEntity.getEntityKey(),externalEntity.getStoreInfo().getType()))).collect(Collectors.toList());
         try {
             final ObjectWriter writer = mapper.writer(schema);
             writer.without(com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET).writeValue(out,externalAttributeExportCSVDTOS);
@@ -222,7 +219,7 @@ public class BulkServiceImpl implements BulkService {
 
     }
 
-    private ExternalAttributeExportCSVDTO createExternalAttributeExportCSVDTO(ExternalAttribute externalAttribute,String entityKey) {
+    private ExternalAttributeExportCSVDTO createExternalAttributeExportCSVDTO(ExternalAttribute externalAttribute,String entityKey, String entityType) {
         ExternalAttributeExportCSVDTO externalAttributeExportCSVDTO = new ExternalAttributeExportCSVDTO();
         externalAttributeExportCSVDTO.setEntityKey(entityKey);
         externalAttributeExportCSVDTO.setAttributeKey(externalAttribute.getAttributeKey());
@@ -236,12 +233,14 @@ public class BulkServiceImpl implements BulkService {
         externalAttributeExportCSVDTO.setRequired(externalAttribute.isRequired());
         externalAttributeExportCSVDTO.setDefaultValue(externalAttribute.getDefaultValue());
         externalAttributeExportCSVDTO.setValidationRegex(externalAttribute.getValidationRegex());
-        switch (externalAttribute.getStoreInfo().getType()) {
+        switch (entityType) {
             case ExternalSchemaStoreTypes.KAFKA:
-                externalAttributeExportCSVDTO.setDateFormat(((ExternalKafkaAttributeStoreInfoDTO) externalAttribute.getStoreInfo()).getDateFormat());
-                externalAttributeExportCSVDTO.setJsonPath(((ExternalKafkaAttributeStoreInfoDTO) externalAttribute.getStoreInfo()).getJsonPath());
+                externalAttributeExportCSVDTO.setDateFormat(((ExternalKafkaAttributeStoreInfo) externalAttribute.getStoreInfo()).getDateFormat());
+                externalAttributeExportCSVDTO.setJsonPath(((ExternalKafkaAttributeStoreInfo) externalAttribute.getStoreInfo()).getJsonPath());
+                break;
             case ExternalSchemaStoreTypes.CSV:
-                externalAttributeExportCSVDTO.setDateFormat(((ExternalCsvAttributeStoreInfoDTO) externalAttribute.getStoreInfo()).getDateFormat());
+                externalAttributeExportCSVDTO.setDateFormat(((ExternalCsvAttributeStoreInfo) externalAttribute.getStoreInfo()).getDateFormat());
+                break;
         }
         return externalAttributeExportCSVDTO;
     }

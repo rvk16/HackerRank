@@ -31,7 +31,7 @@ public class BulkApiController implements BulkApi {
     }
 
     @Override
-    @PreAuthorize("hasAnyAuthority(@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleexportExternalSchemasMethod'),@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleGateway'))")
+   @PreAuthorize("hasAnyAuthority(@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleExportExternalSchemasMethod'),@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleGateway'))")
     public ResponseEntity<Resource> exportExternalSchemas(@ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
