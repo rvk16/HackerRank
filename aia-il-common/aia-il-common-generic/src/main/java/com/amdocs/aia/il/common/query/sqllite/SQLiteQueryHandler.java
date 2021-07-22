@@ -15,7 +15,6 @@ import com.amdocs.aia.il.common.stores.RandomAccessTable;
 import com.amdocs.aia.il.common.utils.RTPUtils;
 import com.amdocs.aia.il.common.utils.SharedPathUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

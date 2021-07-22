@@ -3,6 +3,9 @@ info:
   title: Integration Layer Configuration API
   description: This is a REST API specification for Integration Layer Configuration application.
   version: "TRUNK-SNAPSHOT"
+  x-amdocs:
+    service-principals:
+      - aia-il-configuration-authoring
 schemes:
   - http
   - https

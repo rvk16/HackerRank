@@ -1,4 +1,4 @@
-package com.amdocs.aia.il.common.healthIndicator;
+package com.amdocs.aia.il.common.healthIndicator;//NOSONAR
 
 import com.amdocs.aia.il.common.stores.scylla.ScyllaConnection;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
@@ -22,6 +22,7 @@ public class CassandraHealthIndicator extends AbstractHealthIndicator {
     protected void doHealthCheck(Builder builder) {
         try {
             ResultSet execute = ScyllaConnection.getSession().execute("SELECT now() FROM system.local");
+            LOGGER.debug("Connecting scylla DB at Custom Health Indicator:: {}", execute);
             Map<UUID, Node> nodes = ScyllaConnection.getSession().getMetadata().getNodes();
             LOGGER.debug("Node Size::{} ", nodes.size());
             for (Node node : nodes.values()) {
@@ -31,7 +32,6 @@ public class CassandraHealthIndicator extends AbstractHealthIndicator {
                     throw new RuntimeException("One of node is down");//NOSONAR
                 }
             }
-            LOGGER.debug("Connecting scylla DB at Custom Health Indicator:: {}", execute);
             builder.up().build();
         } catch (Exception ex) {
             LOGGER.error("Facing issue while connecting scylla DB at Custom Health Indicator:: {}", ex.getMessage());

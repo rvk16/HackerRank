@@ -221,7 +221,7 @@ public class SQLiteQueryHandlerForConflicting extends SQLiteQueryHandler {
      * @param sqlQueryHandlerConnection - connection to use
      * @return same as {#link Statement#executeUpdate(String)}
      */
-    private int executeUpdateForConflicting(String query, SQLQueryHandlerConnection sqlQueryHandlerConnection) {
+    private static int executeUpdateForConflicting(String query, SQLQueryHandlerConnection sqlQueryHandlerConnection) {
         LOGGER.debug("Executing update query :{}", query);
         try {
             if (!StringUtils.isEmpty(query)) {

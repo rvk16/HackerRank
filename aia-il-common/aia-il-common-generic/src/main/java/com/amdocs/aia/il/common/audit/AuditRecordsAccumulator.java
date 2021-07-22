@@ -19,7 +19,7 @@ public class AuditRecordsAccumulator implements Runnable{
 
     LinkedBlockingQueue<AuditCounterTypeAndParams> counterTypeAndParamsQueue;
     boolean isRunning;
-    Lock lock = null;
+    Lock lock;
 
     //counters per dataChannel per service
     Map<CounterType, Map<String, AuditCounter>> counters;
@@ -47,7 +47,7 @@ public class AuditRecordsAccumulator implements Runnable{
     public void addCounter(CounterType counterType, String dataChannel, Object... args) {
         try {
             Boolean offerValue=this.counterTypeAndParamsQueue.offer(new AuditCounterTypeAndParams(counterType, dataChannel, args), 2, TimeUnit.SECONDS);
-            LOGGER.debug("OFFER VALUE", offerValue);
+            LOGGER.debug("OFFER VALUE {}", offerValue);
         } catch (Exception e) {
             LOGGER.warn("Problem in Accumulator counter while adding to queue new message", e);
         }

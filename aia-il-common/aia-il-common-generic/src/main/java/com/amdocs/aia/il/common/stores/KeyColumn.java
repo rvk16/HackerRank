@@ -70,8 +70,9 @@ public class KeyColumn implements Serializable {
 
     public static boolean isEmpty(KeyColumn keyColumn){
         for(Object k: keyColumn.getIds()){
-            if(k!=null && !k.equals(""))
+            if(k!=null && !"".equals(k)) {
                 return true;
+            }
         }
         return false;
     }
