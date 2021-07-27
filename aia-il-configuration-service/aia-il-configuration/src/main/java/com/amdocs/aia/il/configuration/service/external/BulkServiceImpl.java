@@ -177,7 +177,7 @@ public class BulkServiceImpl implements BulkService {
                 externalEntityExportCSVDTO.setFileNameFormat(((ExternalCsvEntityStoreInfo)externalEntity.getStoreInfo()).getFileNameFormat());
                 externalEntityExportCSVDTO.setDateFormat(((ExternalCsvEntityStoreInfo)externalEntity.getStoreInfo()).getDateFormat());
                 externalEntityExportCSVDTO.setColumnDelimiter(String.valueOf(((ExternalCsvEntityStoreInfo)externalEntity.getStoreInfo()).getColumnDelimiter()));
-                externalEntityExportCSVDTO.setInvalidFilenameAction(((ExternalCsvEntityCollectionRules)externalEntity.getStoreInfo()).getFileInvalidNameAction().name());
+                externalEntityExportCSVDTO.setInvalidFilenameAction(((ExternalCsvEntityCollectionRules)externalEntity.getCollectionRules()).getFileInvalidNameAction().name());
                 break;
           case ExternalSchemaStoreTypes.KAFKA:
                 externalEntityExportCSVDTO.setJsonTypeValue(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getJsonTypeValue());
