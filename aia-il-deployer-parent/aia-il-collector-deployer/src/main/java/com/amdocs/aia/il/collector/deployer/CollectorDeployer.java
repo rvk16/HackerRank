@@ -181,7 +181,7 @@ public class CollectorDeployer {
     private String getServiceName(String schemaName, String mode, String schemaTypeAlias) {
         String serviceName = null;
         for(String configMap : configMapNamesList){
-            if(configMap.contains(schemaTypeAlias + "-" + mode + "-" + removeSpecialCharacter(schemaName.toLowerCase()))) {
+            if(configMap.equals("aia-il-" + schemaTypeAlias + "-" + mode + "-" + removeSpecialCharacter(schemaName.toLowerCase())+ "-configmap")) {
                 serviceName = configMap.replace("-configmap", "");
             }
         }
