@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
@@ -15,9 +16,10 @@ import java.util.Set;
 
 
 @Component
-public class ScyllaErrorHandler implements Handler {
+public class ScyllaErrorHandler implements Handler, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScyllaErrorHandler.class);
+    private static final long serialVersionUID = 6311749959147264275L;
 
     private static Set<String> allowedScyllaExceptionTypes;
     private ErrorHandler errorHandler;
