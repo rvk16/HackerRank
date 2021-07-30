@@ -147,6 +147,7 @@ public class CollectorDeployer {
         }
 
         saveDataToFile(TEMP_DIR + deploymentFileName, deploymentYaml);
+        LOGGER.info(deploymentFileName + deploymentYaml);
 
         try {
             Map<String, Object> deploymentResult = kubernetesClient.customResource(getMilcyCRDContext(kubernetesClient)).load(stringToInputStream(deploymentYaml));
