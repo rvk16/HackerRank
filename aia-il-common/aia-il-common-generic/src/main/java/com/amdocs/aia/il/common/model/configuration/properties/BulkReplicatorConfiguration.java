@@ -34,6 +34,15 @@ public class BulkReplicatorConfiguration implements Serializable {
     private String auditTopicSuffix;
     private String auditEnable;
     private boolean errorHandlerEnabled;
+    private long delayBeforejobEnd = 30000;
+
+    public long getDelayBeforejobEnd() {
+        return delayBeforejobEnd;
+    }
+
+    public void setDelayBeforejobEnd(long delayBeforejobEnd) {
+        this.delayBeforejobEnd = delayBeforejobEnd;
+    }
 
     public String getAuditEnable() {
         return auditEnable;
