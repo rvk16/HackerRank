@@ -24,6 +24,15 @@ public class ReferenceStorePublisherConfigurations extends RealtimeTransformerCo
     private String notifyTransformerState;
     private String outputFormat;
     private boolean createErrorFile;
+    private boolean errorHandlerEnabled;
+
+    public boolean isErrorHandlerEnabled() {
+        return errorHandlerEnabled;
+    }
+
+    public void setErrorHandlerEnabled(boolean errorHandlerEnabled) {
+        this.errorHandlerEnabled = errorHandlerEnabled;
+    }
 
     public int getParallelThreads() {
         return parallelThreads;
