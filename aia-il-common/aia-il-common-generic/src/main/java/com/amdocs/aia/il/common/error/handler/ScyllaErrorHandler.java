@@ -96,27 +96,31 @@ public class ScyllaErrorHandler implements Handler, Serializable {
     }
 
     private <T> void setErrorMetricFlag(Checkpoint<T> checkpoint) {
-        String threadName;
-        if(checkpoint.getThreadName().substring(checkpoint.getThreadName().length() - 1).matches(".*\\d.*")) {
-            threadName = checkpoint.getThreadName().substring(0, checkpoint.getThreadName().length() - 1);
-        } else {
-            threadName = checkpoint.getThreadName();
-        }
-        if (checkpoint.isErrorFlag()) {
-            if (checkpoint.getRetryCounter() == 0) {
-                errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(1, threadName);
+        if (errorHandler.getMetrics() != null) {
+            String threadName;
+            if (checkpoint.getThreadName().substring(checkpoint.getThreadName().length() - 1).matches(".*\\d.*")) {
+                threadName = checkpoint.getThreadName().substring(0, checkpoint.getThreadName().length() - 1);
+            } else {
+                threadName = checkpoint.getThreadName();
             }
-        } else {
-            errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(0, threadName);
+            if (checkpoint.isErrorFlag()) {
+                if (checkpoint.getRetryCounter() == 0) {
+                    errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(1, threadName);
+                }
+            } else {
+                errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(0, threadName);
+            }
         }
     }
 
     private <T> void setExceptionMetricCounter(Checkpoint<T> checkpoint) {
-        Optional<ExecutionState> executionState = checkpoint.getExecutionStates().entrySet().stream().map(Map.Entry::getValue).findFirst();
-        if (executionState.isPresent()) {
-            for (Map.Entry<Object, ErrorType> failedTaskMap : executionState.get().getFailedTasks().entrySet()) {
-                errorHandler.getMetrics().incrementCounterPerScyllaExceptionType(1, failedTaskMap.getValue().getExceptionType().getSimpleName());
-                break; //NOSONAR
+        if (errorHandler.getMetrics() != null) {
+            Optional<ExecutionState> executionState = checkpoint.getExecutionStates().entrySet().stream().map(Map.Entry::getValue).findFirst();
+            if (executionState.isPresent()) {
+                for (Map.Entry<Object, ErrorType> failedTaskMap : executionState.get().getFailedTasks().entrySet()) {
+                    errorHandler.getMetrics().incrementCounterPerScyllaExceptionType(1, failedTaskMap.getValue().getExceptionType().getSimpleName());
+                    break; //NOSONAR
+                }
             }
         }
     }
