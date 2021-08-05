@@ -53,7 +53,11 @@ public class ExternalEntityToSqlStoreConverter extends AbstractExternalEntityPhy
     }
 
     private IncrementalColumn convertIncrementalColumn(ExternalAttributeIncrementalAttribute incrementalAttribute) {
-        return new IncrementalColumn(incrementalAttribute.getKey(), IncrementalColumn.Type.valueOf(incrementalAttribute.getType().name()));
+        if (null != incrementalAttribute) {
+            return new IncrementalColumn(incrementalAttribute.getKey(), IncrementalColumn.Type.valueOf(incrementalAttribute.getType().name()));
+        }
+
+        return null;
     }
 
 }
