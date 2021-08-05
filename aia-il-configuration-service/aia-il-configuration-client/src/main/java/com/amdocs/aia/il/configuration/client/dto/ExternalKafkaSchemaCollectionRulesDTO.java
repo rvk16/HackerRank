@@ -54,7 +54,7 @@ public class ExternalKafkaSchemaCollectionRulesDTO extends ExternalSchemaCollect
    * Input Data Channel
    * @return inputDataChannel
   **/
-  @ApiModelProperty(required = true, value = "Input Data Channel")
+  @ApiModelProperty(value = "Input Data Channel")
   public String getInputDataChannel() {
     return inputDataChannel;
   }

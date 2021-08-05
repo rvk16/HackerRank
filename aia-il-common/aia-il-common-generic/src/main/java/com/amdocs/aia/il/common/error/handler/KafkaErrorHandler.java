@@ -19,14 +19,16 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Future;
 
 @Component
-public class KafkaErrorHandler implements Handler {
+public class KafkaErrorHandler implements Handler, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaErrorHandler.class);
+    private static final long serialVersionUID = -3244715798905603773L;
 
     private static Set<String> allowedKafkaExceptionTypes;
     private ErrorHandler errorHandler;

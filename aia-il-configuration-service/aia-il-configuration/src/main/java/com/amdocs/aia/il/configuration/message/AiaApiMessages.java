@@ -64,6 +64,10 @@ public final class AiaApiMessages {
         public static final AIAAPIMessageTemplate INVALID_LEAD_CONTEXT_ENTITY =
                 new AIAAPIMessageTemplate(50, "general.invalid.lead.context.entity", AIAAPIMessageTemplate.MessageType.ERROR);
 
+        public static final AIAAPIMessageTemplate EXPORT_TO_ZIP_ERROR =
+                new AIAAPIMessageTemplate(51, "general.export.to.zip.error", AIAAPIMessageTemplate.MessageType.ERROR);
+        public static final AIAAPIMessageTemplate EXPORT_JACKSON_ERROR =
+                new AIAAPIMessageTemplate(52, "general.export.jackson.error", AIAAPIMessageTemplate.MessageType.ERROR);
 
 
         private GENERAL() {

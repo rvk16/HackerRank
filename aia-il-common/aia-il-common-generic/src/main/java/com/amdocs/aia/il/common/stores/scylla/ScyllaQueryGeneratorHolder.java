@@ -68,7 +68,9 @@ public class ScyllaQueryGeneratorHolder {
      * @param queryProvider
      */
     public static void recreateInstanceForSparkExecutor(QueryProvider queryProvider) {
-        instance = new ScyllaQueryGeneratorHolder(queryProvider);
+        if (instance == null) {
+            instance = new ScyllaQueryGeneratorHolder(queryProvider);
+        }
     }
 
     public void populateQueryGenerators(String schemaStoreKey, QueryGenerator qGen) {

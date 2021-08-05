@@ -6,6 +6,7 @@ import com.amdocs.aia.common.model.repo.annotations.RepoSearchable;
 import com.amdocs.aia.common.model.repo.annotations.RepoTransient;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +14,11 @@ import java.util.List;
 public class EntityReferentialIntegrity extends ProjectElement {
 
     private static final long serialVersionUID = -5947208761659372401L;
+
+    @RepoSearchable
+    @NotNull
+    @Pattern(regexp = "^[a-zA-Z_0-9]+$")
+    private String elementKey;
 
     @NotNull
     @RepoSearchable

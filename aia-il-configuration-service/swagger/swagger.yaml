@@ -695,8 +695,35 @@ paths:
             $ref: '#/definitions/SaveElementsResponse'
         '405':
           description: Invalid input
-
-
+  /projects/{projectKey}/configuration/external-schemas/export:
+    get:
+      tags:
+        - "Bulk"
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_exportExternalSchemas
+        private-roles:
+          - aia_il_configuration_authoring_exportExternalSchemas
+      summary: "Export External Schemas"
+      description: ""
+      operationId: "exportExternalSchemas"
+      produces:
+        - "application/octet-stream"
+      parameters:
+        - name: "projectKey"
+          in: "path"
+          description: "The project key"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: file
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
   '/projects/{projectKey}/configuration/external-schemas/{externalSchemaKey}':
     get:
       x-amdocs:

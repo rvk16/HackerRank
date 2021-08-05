@@ -5,6 +5,7 @@ import com.amdocs.aia.il.configuration.client.EncodingUtils;
 
 import com.amdocs.aia.il.configuration.client.dto.BulkGroupDTO;
 import com.amdocs.aia.il.configuration.client.dto.SaveElementsResponseDTO;
+import com.amdocs.aia.il.configuration.client.dto.SetFiltersRequestDTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -100,4 +101,20 @@ public interface BulkGroupsApi extends ApiClient.Api {
     "Accept: application/json",
   })
   BulkGroupDTO updateBulkGroup(@Param("projectKey") String projectKey, @Param("schemaStoreKey") String schemaStoreKey, @Param("bulkGroupKey") String bulkGroupKey, BulkGroupDTO bulkGroup);
+
+  /**
+   * Update an existing bulk group with entity filters
+   * 
+    * @param projectKey The project key (required)
+    * @param schemaStoreKey Schema Store Key (required)
+    * @param bulkGroupKey Bulk Group Key (required)
+    * @param setFiltersRequest Request containing all entities with filters and the bulk group with list of filter references (required)
+   * @return SetFiltersRequestDTO
+   */
+  @RequestLine("PUT /projects/{projectKey}/schemas/{schemaStoreKey}/bulk-groups/{bulkGroupKey}/set-entity-filters")
+  @Headers({
+    "Content-Type: application/json",
+    "Accept: application/json",
+  })
+  SetFiltersRequestDTO updateBulkGroupEntityFilters(@Param("projectKey") String projectKey, @Param("schemaStoreKey") String schemaStoreKey, @Param("bulkGroupKey") String bulkGroupKey, SetFiltersRequestDTO setFiltersRequest);
 }

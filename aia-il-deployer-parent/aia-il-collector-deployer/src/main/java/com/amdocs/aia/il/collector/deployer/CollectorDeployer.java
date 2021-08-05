@@ -131,6 +131,7 @@ public class CollectorDeployer {
                     .replace(SERVICE_NAME, serviceName)
                     .replace(IMAGE_REPOSITORY, deployerConfiguration.getImageRepository())
                     .replace(DOCKER_IMAGE_NAME, dockerImageName)
+                    .replace(TAG_NAME, deployerConfiguration.getTagName())
                     .replace(APPLICATION_PROPERTY_FILE, applicationPropertyFile)
                     .replace(INIT_CONTAINER_IMAGE, deployerConfiguration.getInitContainerImage())
                     .replace(KAFKA_SECRET, deployerConfiguration.getKafkaSecret());
@@ -140,11 +141,13 @@ public class CollectorDeployer {
                     .replace(SERVICE_NAME, serviceName)
                     .replace(IMAGE_REPOSITORY, deployerConfiguration.getImageRepository())
                     .replace(DOCKER_IMAGE_NAME, dockerImageName)
+                    .replace(TAG_NAME, deployerConfiguration.getTagName())
                     .replace(APPLICATION_PROPERTY_FILE, applicationPropertyFile)
                     .replace(INIT_CONTAINER_IMAGE, deployerConfiguration.getInitContainerImage());
         }
 
         saveDataToFile(TEMP_DIR + deploymentFileName, deploymentYaml);
+        LOGGER.info(deploymentFileName + deploymentYaml);
 
         try {
             Map<String, Object> deploymentResult = kubernetesClient.customResource(getMilcyCRDContext(kubernetesClient)).load(stringToInputStream(deploymentYaml));
@@ -179,7 +182,7 @@ public class CollectorDeployer {
     private String getServiceName(String schemaName, String mode, String schemaTypeAlias) {
         String serviceName = null;
         for(String configMap : configMapNamesList){
-            if(configMap.contains(schemaTypeAlias + "-" + mode + "-" + removeSpecialCharacter(schemaName.toLowerCase()))) {
+            if(configMap.equals("aia-il-" + schemaTypeAlias + "-" + mode + "-" + removeSpecialCharacter(schemaName.toLowerCase())+ "-configmap")) {
                 serviceName = configMap.replace("-configmap", "");
             }
         }

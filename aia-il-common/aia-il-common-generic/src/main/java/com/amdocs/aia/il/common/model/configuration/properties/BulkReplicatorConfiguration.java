@@ -34,6 +34,15 @@ public class BulkReplicatorConfiguration implements Serializable {
     private String auditTopicSuffix;
     private String auditEnable;
     private boolean errorHandlerEnabled;
+    private long waitDurationToConsumeRecordsMillis = 30000;
+
+    public long getWaitDurationToConsumeRecordsMillis() {
+        return waitDurationToConsumeRecordsMillis;
+    }
+
+    public void setWaitDurationToConsumeRecordsMillis(long waitDurationToConsumeRecordsMillis) {
+        this.waitDurationToConsumeRecordsMillis = waitDurationToConsumeRecordsMillis;
+    }
 
     public String getAuditEnable() {
         return auditEnable;
@@ -249,6 +258,7 @@ public class BulkReplicatorConfiguration implements Serializable {
                 ", incrementalUpsert=" + incrementalUpsert +
                 ", timeToLive=" + timeToLive +
                 ", waitTime=" + waitTime +
+                ", waitDurationToConsumeRecordsMillis=" + waitDurationToConsumeRecordsMillis +
                 ", threadPerRecord=" + threadPerRecord +
                 ", parallelThreadsToProcessRecords=" + parallelThreadsToProcessRecords +
                 ", metricsSchedulerTimeInMS=" + metricsSchedulerTimeInMS +

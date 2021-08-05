@@ -323,7 +323,7 @@ public class DatabaseConfigurationProperties implements Serializable {
         return "DatabaseConfigurationProperties{" +
                 "url='" + url + '\'' +
                 ", user='" + user + '\'' +
-                ", password='" + password + '\'' +
+                ", password='" + "******" + '\'' +
                 ", connStrings='" + connStrings + '\'' +
                 ", port=" + port +
                 ", keyspace='" + keyspace + '\'' +

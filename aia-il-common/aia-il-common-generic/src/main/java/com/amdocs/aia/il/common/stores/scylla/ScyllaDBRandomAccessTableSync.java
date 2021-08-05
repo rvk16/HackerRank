@@ -109,7 +109,7 @@ public class ScyllaDBRandomAccessTableSync implements RandomAccessTable, Seriali
 
         double[] messageCountArrQuery = new double[1];
         List<List<Pair<RepeatedMessage, Double>>> currentList = queryList(idList, batchProcessingTimestamp, messageCountArrQuery);
-        double[] messageCountArr = upsertResultList(tableName, repeatedMessages, idList, updateTimeList, currentList, dbTimestampList, rowKeysPerTableInfoListToBeUpserted, incrementalUpsert, dayLightSaving, deletedRowInfos, counterType);
+        double[] messageCountArr = upsertResultList(tableName, repeatedMessages, idList, updateTimeList, currentList, dbTimestampList, rowKeysPerTableInfoListToBeUpserted, incrementalUpsert, dayLightSaving, deletedRowInfos, counterType, isAuditEnable);
         messageCountArr[4] = messageCountArrQuery[0];
         //Index wise description - 0)main data count , 1) relational data count , 2) failed message count , 3) filtered message count, 4)Avg query time, 5) Avg merge time 6) Avg Upsert time
         return messageCountArr;
@@ -324,7 +324,7 @@ public class ScyllaDBRandomAccessTableSync implements RandomAccessTable, Seriali
         return buildDataBaseRowKey(KeyColumn.getIds(repeatedMessage, ids));
     }
 
-    private double[] upsertResultList(String tableName, List<RepeatedMessage> repeatedMessages, List<String> rowKeys, List<Long> updateTimes, List<List<Pair<RepeatedMessage, Double>>> currentList, List<Long> databaseTimestampList, List<RowKeysPerTransactionID> rowKeysPerTableInfoListToBeUpserted, boolean incrementalUpdate, boolean dayLightSaving, List<DeletedRowInfo> deletedRowInfos, CounterType counterType) { // NOSONAR
+    private double[] upsertResultList(String tableName, List<RepeatedMessage> repeatedMessages, List<String> rowKeys, List<Long> updateTimes, List<List<Pair<RepeatedMessage, Double>>> currentList, List<Long> databaseTimestampList, List<RowKeysPerTransactionID> rowKeysPerTableInfoListToBeUpserted, boolean incrementalUpdate, boolean dayLightSaving, List<DeletedRowInfo> deletedRowInfos, CounterType counterType, boolean isAuditEnable) { // NOSONAR
         final List<ResultSet> resultSets = new ArrayList<>();
         long startTime = System.currentTimeMillis();
         final CqlSession session = ScyllaConnection.getSession();
@@ -366,9 +366,11 @@ public class ScyllaDBRandomAccessTableSync implements RandomAccessTable, Seriali
                                 countOfFilteredMessages++;
                             }
                             if(currentMessage == null) {
-                                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                        configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSNOCHANGE, String.valueOf(existingMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME)),
-                                        this.tableName, 1L);
+                                if(isAuditEnable) {
+                                    RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                                            configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSNOCHANGE, String.valueOf(existingMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME)),
+                                            this.tableName, 1L);
+                                }
                             }
                         } else {
                             long startTimeMerge = System.currentTimeMillis();
@@ -396,9 +398,11 @@ public class ScyllaDBRandomAccessTableSync implements RandomAccessTable, Seriali
                     if (!DELETE.equalsIgnoreCase(currentMessageOperation)) {
                         insertDataIntoDatabase(session, scyllaQueryGeneratorHolder, currentMessage, existingMessage, rowKey,
                                 dataBaseTimeStamp, updatedForeignKeys, resultSets, messageCountArr);
-                        RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""),CounterType.RECORDSSTORED, String.valueOf(currentMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME)),
-                                this.tableName, 1L);
+                      if(isAuditEnable) {
+                          RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                                  configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSSTORED, String.valueOf(currentMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME)),
+                                  this.tableName, 1L);
+                      }
                     } else {
                         if (existingMessageTsVersion == null) {
                             if (LOGGER.isDebugEnabled()) {
@@ -409,9 +413,11 @@ public class ScyllaDBRandomAccessTableSync implements RandomAccessTable, Seriali
                         if (deletedRowInfos == null) {
                             insertDataIntoDatabaseWithTTL(session, scyllaQueryGeneratorHolder, currentMessage, rowKey,
                                     dataBaseTimeStamp, existingMessageTsVersion, resultSets, messageCountArr);
-                            RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
-                                    configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""),CounterType.RECORDSDELETED, String.valueOf(currentMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME)),
-                                    this.tableName, 1L);
+                            if(isAuditEnable) {
+                                RealtimeAuditDataPublisherManager.getInstance().getAuditRecordsAccumulator().addCounter(counterType,
+                                        configurationRow.getEntityStore().getSchemaStoreKey().replace(PUBLISHER_STORE, ""), CounterType.RECORDSDELETED, String.valueOf(currentMessage.getValue(Constants.MESSAGE_HEADER_CORRELATION_ID_FIELD_NAME)),
+                                        this.tableName, 1L);
+                            }
 
                         } else {
                             deletedRowInfos.add(new DeletedRowInfo(currentMessage, rowKey, dataBaseTimeStamp, existingMessageTsVersion));
