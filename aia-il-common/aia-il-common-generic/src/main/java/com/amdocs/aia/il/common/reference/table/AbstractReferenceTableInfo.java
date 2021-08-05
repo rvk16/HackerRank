@@ -15,7 +15,7 @@ import java.util.Map;
 public abstract class AbstractReferenceTableInfo extends AbstractRTPEntity {
 
     private static final long serialVersionUID = -6989114073653973205L;
-    protected final Map<String, RandomAccessTable> tableAccessTableInfos;
+    protected Map<String, RandomAccessTable> tableAccessTableInfos;
     protected final Map<String, ConfigurationRow> tableInfos;
     protected final TargetEntity targetEntity;
     protected final boolean isPublished;
@@ -35,6 +35,10 @@ public abstract class AbstractReferenceTableInfo extends AbstractRTPEntity {
 
     public Map<String, RandomAccessTable> getAccessTableInfos() {
         return tableAccessTableInfos;
+    }
+
+    public void setAccessTableInfos(Map<String, RandomAccessTable> tableAccessTableInfos) {
+        this.tableAccessTableInfos = tableAccessTableInfos;
     }
 
     public Map<String, ConfigurationRow> getTableInfos() {
