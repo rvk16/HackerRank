@@ -87,7 +87,7 @@ public interface BulkApi {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
             if (getAcceptHeader().get().contains("application/json")) {
                 try {
-                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"totalSchemasCount\" : 0,  \"newSchemasCount\" : 1,  \"deletedEntitiesCount\" : 9,  \"totalEntitiesCount\" : 6,  \"modifiedEntitiesCount\" : 2,  \"modifiedSchemasCount\" : 5,  \"deletedSchemasCount\" : 7,  \"newEntitiesCount\" : 5}", BulkImportResponseDTO.class), HttpStatus.NOT_IMPLEMENTED);
+                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"newSchemasCount\" : 0,  \"deletedEntitiesCount\" : 2,  \"modifiedEntitiesCount\" : 5,  \"modifiedSchemasCount\" : 1,  \"deletedSchemasCount\" : 5,  \"newEntitiesCount\" : 6}", BulkImportResponseDTO.class), HttpStatus.NOT_IMPLEMENTED);
                 } catch (IOException e) {
                     log.error("Couldn't serialize response for content type application/json", e);
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

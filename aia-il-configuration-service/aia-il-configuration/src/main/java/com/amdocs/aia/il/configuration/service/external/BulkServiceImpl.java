@@ -277,9 +277,9 @@ public class BulkServiceImpl implements BulkService {
         externalSchemaExportCSVDTO.setAvailability(externalSchema.getAvailability().toString());
         externalSchemaExportCSVDTO.setSubjectAreaName(externalSchema.getSubjectAreaName());
 
-        externalSchemaExportCSVDTO.setOngoingChannel(externalSchema.getCollectionRules().getOngoingChannel().name());
-        externalSchemaExportCSVDTO.setInitialLoadChannel(externalSchema.getCollectionRules().getInitialLoadChannel().name());
-        externalSchemaExportCSVDTO.setReplayChannel(externalSchema.getCollectionRules().getReplayChannel().name());
+        externalSchemaExportCSVDTO.setOngoingChannel(externalSchema.getCollectionRules().getOngoingChannel()!= null?externalSchema.getCollectionRules().getOngoingChannel().name():null);
+        externalSchemaExportCSVDTO.setInitialLoadChannel(externalSchema.getCollectionRules().getInitialLoadChannel()!= null? externalSchema.getCollectionRules().getInitialLoadChannel().name():null);
+        externalSchemaExportCSVDTO.setReplayChannel(externalSchema.getCollectionRules().getReplayChannel() != null?externalSchema.getCollectionRules().getReplayChannel().name():null);
         externalSchemaExportCSVDTO.setInitialLoadRelativeURL(externalSchema.getCollectionRules().getInitialLoadRelativeURL());
         externalSchemaExportCSVDTO.setPartialLoadRelativeURL(externalSchema.getCollectionRules().getPartialLoadRelativeURL());
 
