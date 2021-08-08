@@ -63,6 +63,9 @@ public class ExternalEntityExportCSVDTO implements Serializable {
     @JsonProperty("invalidFilenameAction  (csv)")
     private String invalidFilenameAction = null;
 
+    @JsonProperty("toDelete")
+    private Boolean toDelete = Boolean.FALSE;
+
 
     public ExternalEntityExportCSVDTO() {
     }
@@ -70,7 +73,7 @@ public class ExternalEntityExportCSVDTO implements Serializable {
     public ExternalEntityExportCSVDTO(String schemaKey, String entityKey, Boolean isActive, String entityName, String description,
                                       Integer serializationId, Boolean isTransient, Boolean isTransaction, String jsonTypeValue,
                                       String jsonTypePath, String relativePaths, String mergedNodes, Boolean fileHeader, String fileNameFormat,
-                                      String dateFormat, String columnDelimiter, String invalidFilenameAction) {
+                                      String dateFormat, String columnDelimiter, String invalidFilenameAction, Boolean toDelete) {
         this.schemaKey = schemaKey;
         this.entityKey = entityKey;
         this.isActive = isActive;
@@ -88,6 +91,7 @@ public class ExternalEntityExportCSVDTO implements Serializable {
         this.dateFormat = dateFormat;
         this.columnDelimiter = columnDelimiter;
         this.invalidFilenameAction = invalidFilenameAction;
+        this.toDelete = toDelete;
     }
 
     public String getSchemaKey() {
@@ -224,5 +228,13 @@ public class ExternalEntityExportCSVDTO implements Serializable {
 
     public void setInvalidFilenameAction(String invalidFilenameAction) {
         this.invalidFilenameAction = invalidFilenameAction;
+    }
+
+    public Boolean getToDelete() {
+        return toDelete;
+    }
+
+    public void setToDelete(Boolean toDelete) {
+        this.toDelete = toDelete;
     }
 }

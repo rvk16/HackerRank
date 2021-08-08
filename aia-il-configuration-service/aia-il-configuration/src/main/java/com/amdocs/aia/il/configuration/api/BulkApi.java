@@ -5,6 +5,7 @@
  */
 package com.amdocs.aia.il.configuration.api;
 
+import com.amdocs.aia.il.configuration.dto.BulkImportResponseDTO;
 import org.springframework.core.io.Resource;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.*;
@@ -63,6 +64,32 @@ public interface BulkApi {
                     return new ResponseEntity<>(getObjectMapper().get().readValue("", Resource.class), HttpStatus.NOT_IMPLEMENTED);
                 } catch (IOException e) {
                     log.error("Couldn't serialize response for content type ", e);
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+        } else {
+            log.warn("ObjectMapper or HttpServletRequest not configured in default BulkApi interface so no example is generated");
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+
+    @ApiOperation(value = "Import External Schemas ", nickname = "importExternalSchemas", notes = "", response = BulkImportResponseDTO.class, tags={ "Bulk", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "successful operation", response = BulkImportResponseDTO.class),
+        @ApiResponse(code = 400, message = "Bad Request"),
+        @ApiResponse(code = 500, message = "Internal Server Error") })
+    @RequestMapping(value = "/projects/{projectKey}/configuration/external-schemas/import",
+        produces = { "application/json" }, 
+        consumes = { "multipart/form-data" },
+        method = RequestMethod.POST)
+    default ResponseEntity<BulkImportResponseDTO> importExternalSchemas(@ApiParam(value = "") @Valid @RequestPart(value="file", required=true) MultipartFile file,@ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey) {
+        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+            if (getAcceptHeader().get().contains("application/json")) {
+                try {
+                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"totalSchemasCount\" : 0,  \"newSchemasCount\" : 1,  \"deletedEntitiesCount\" : 9,  \"totalEntitiesCount\" : 6,  \"modifiedEntitiesCount\" : 2,  \"modifiedSchemasCount\" : 5,  \"deletedSchemasCount\" : 7,  \"newEntitiesCount\" : 5}", BulkImportResponseDTO.class), HttpStatus.NOT_IMPLEMENTED);
+                } catch (IOException e) {
+                    log.error("Couldn't serialize response for content type application/json", e);
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }

@@ -3,12 +3,17 @@ package com.amdocs.aia.il.configuration.export;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.springframework.integration.annotation.Default;
 
 import java.io.Serializable;
 
-@JsonPropertyOrder(value = { "entityKey","attributeKey","attributeName", "description", "datatype","logicalDatatype (read only)", "keyPosition",
-        "isUpdateTime","isLogicalTime" , "isRequired", "defaultValue","validationRegex","dateFormat (csv, kafka)","jsonPath (kafka)"})
+@JsonPropertyOrder(value = { "schemaKey","entityKey","attributeKey","attributeName", "description", "datatype","logicalDatatype (read only)", "keyPosition",
+        "isUpdateTime","isLogicalTime" , "isRequired", "defaultValue","validationRegex","dateFormat (csv, kafka)","jsonPath (kafka)",
+        "serializationId (read only)","toDelete", })
 public class ExternalAttributeExportCSVDTO implements Serializable {
+
+    @JsonProperty("schemaKey")
+    private String schemaKey = null;
 
     @JsonProperty("entityKey")
     private String entityKey = null;
@@ -52,28 +57,22 @@ public class ExternalAttributeExportCSVDTO implements Serializable {
     @JsonProperty("jsonPath (kafka)")
     private String jsonPath = null;
 
+    @JsonProperty("serializationId (read only)")
+    private Integer serializationId = null;
+
+    @JsonProperty("toDelete")
+    private Boolean toDelete = Boolean.FALSE;
+
 
     public ExternalAttributeExportCSVDTO() {
     }
 
-    public ExternalAttributeExportCSVDTO(String entityKey,String attributeKey, String attributeName, String description, String datatype,
-                                         String logicalDatatype, Integer keyPosition, Boolean isUpdateTime, Boolean isLogicalTime,
-                                         Boolean isRequired, String defaultValue, String validationRegex, String dateFormat,
-                                         String jsonPath) {
-        this.entityKey = entityKey;
-        this.attributeKey = attributeKey;
-        this.attributeName = attributeName;
-        this.description = description;
-        this.datatype = datatype;
-        this.logicalDatatype = logicalDatatype;
-        this.keyPosition = keyPosition;
-        this.isUpdateTime = isUpdateTime;
-        this.isLogicalTime = isLogicalTime;
-        this.isRequired = isRequired;
-        this.defaultValue = defaultValue;
-        this.validationRegex = validationRegex;
-        this.dateFormat = dateFormat;
-        this.jsonPath = jsonPath;
+    public String getSchemaKey() {
+        return schemaKey;
+    }
+
+    public void setSchemaKey(String schemaKey) {
+        this.schemaKey = schemaKey;
     }
 
     public String getEntityKey() {
@@ -186,5 +185,24 @@ public class ExternalAttributeExportCSVDTO implements Serializable {
 
     public void setJsonPath(String jsonPath) {
         this.jsonPath = jsonPath;
+    }
+
+    public Boolean getToDelete() {
+        return toDelete;
+    }
+
+    public void setToDelete(Boolean toDelete) {
+        if (toDelete != null) {
+            this.toDelete = toDelete;
+        }
+
+    }
+
+    public Integer getSerializationId() {
+        return serializationId;
+    }
+
+    public void setSerializationId(Integer serializationId) {
+        this.serializationId = serializationId;
     }
 }

@@ -68,6 +68,14 @@ public final class AiaApiMessages {
                 new AIAAPIMessageTemplate(51, "general.export.to.zip.error", AIAAPIMessageTemplate.MessageType.ERROR);
         public static final AIAAPIMessageTemplate EXPORT_JACKSON_ERROR =
                 new AIAAPIMessageTemplate(52, "general.export.jackson.error", AIAAPIMessageTemplate.MessageType.ERROR);
+        public static final AIAAPIMessageTemplate IMPORT_FROM_ZIP_ERROR =
+                new AIAAPIMessageTemplate(9, "general.import.from.zip", AIAAPIMessageTemplate.MessageType.ERROR);
+        public static final AIAAPIMessageTemplate IMPORT_FROM_ZIP_MISSING_CSV_ERROR =
+                new AIAAPIMessageTemplate(10, "general.import.from.zip.missing.csv", AIAAPIMessageTemplate.MessageType.ERROR);
+        public static final AIAAPIMessageTemplate IMPORT_FROM_ZIP_NOT_ZIP_ERROR =
+                new AIAAPIMessageTemplate(11, "general.import.from.zip.not.zip", AIAAPIMessageTemplate.MessageType.ERROR);
+
+
 
 
         private GENERAL() {

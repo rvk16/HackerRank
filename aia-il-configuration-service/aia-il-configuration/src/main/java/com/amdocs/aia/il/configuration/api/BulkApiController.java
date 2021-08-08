@@ -1,5 +1,6 @@
 package com.amdocs.aia.il.configuration.api;
 
+import com.amdocs.aia.il.configuration.dto.BulkImportResponseDTO;
 import com.amdocs.aia.il.configuration.service.external.BulkService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
@@ -12,8 +13,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -30,7 +34,7 @@ public class BulkApiController implements BulkApi {
         this.bulkService = bulkService;
     }
 
-    @Override
+   @Override
    @PreAuthorize("hasAnyAuthority(@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleExportExternalSchemasMethod'),@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleGateway'))")
     public ResponseEntity<Resource> exportExternalSchemas(@ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey) {
         HttpHeaders headers = new HttpHeaders();
@@ -40,5 +44,15 @@ public class BulkApiController implements BulkApi {
         headers.setContentDispositionFormData("attachment", filename);
         InputStreamResource inputStreamResource = bulkService.exportExternalSchemasToZIP(projectKey);
         return new ResponseEntity<>(inputStreamResource, headers, HttpStatus.OK);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority(@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleImportExternalSchemasMethod'),@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleGateway'))")
+    public ResponseEntity<BulkImportResponseDTO> importExternalSchemas(@ApiParam(value = "") @Valid @RequestPart(value="file", required=true) MultipartFile file, @ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey) {
+
+
+        BulkImportResponseDTO result = bulkService.importExternalSchemasFromZIP(projectKey, file);
+        return new ResponseEntity<>(result, HttpStatus.OK);
+
     }
 }

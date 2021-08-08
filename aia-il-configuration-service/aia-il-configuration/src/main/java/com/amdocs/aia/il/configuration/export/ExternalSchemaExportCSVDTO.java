@@ -76,37 +76,28 @@ public class ExternalSchemaExportCSVDTO implements Serializable {
     @JsonProperty("subjectAreaName")
     private String subjectAreaName = null;
 
+    @JsonProperty("ongoingChannel")
+    private String ongoingChannel = null;
+
+    @JsonProperty("initialLoadChannel")
+    private String initialLoadChannel = null;
+
+    @JsonProperty("replayChannel")
+    private String replayChannel = null;
+
+    @JsonProperty("initialLoadRelativeURL")
+    private String initialLoadRelativeURL = null;
+
+    @JsonProperty("partialLoadRelativeURL")
+    private String partialLoadRelativeURL = null;
+
+    @JsonProperty("toDelete")
+    private Boolean toDelete = Boolean.FALSE;
+
+
     public ExternalSchemaExportCSVDTO() {
     }
 
-    public ExternalSchemaExportCSVDTO(String schemaKey, String schemaName, String schemaType, Boolean isActive, String description,
-                                      String typeSystem, Boolean isReference, String storeType, String databaseType, String defaultDateFormat,
-                                      String defaultColumnDelimiter, String defaultInvalidFilenameAction, String inputDataChannel,
-                                      String skipNodeFromParsing, String deleteEventJsonPath, String deleteEventOperation,
-                                      String implicitHandlerPreviousNode, String implicitHandlerCurrentNode, String serializationMethod,
-                                      String availability, String subjectAreaName) {
-        this.schemaKey = schemaKey;
-        this.schemaName = schemaName;
-        this.schemaType = schemaType;
-        this.isActive = isActive;
-        this.description = description;
-        this.typeSystem = typeSystem;
-        this.isReference = isReference;
-        this.storeType = storeType;
-        this.databaseType = databaseType;
-        this.defaultDateFormat = defaultDateFormat;
-        this.defaultColumnDelimiter = defaultColumnDelimiter;
-        this.defaultInvalidFilenameAction = defaultInvalidFilenameAction;
-        this.inputDataChannel = inputDataChannel;
-        this.skipNodeFromParsing = skipNodeFromParsing;
-        this.deleteEventJsonPath = deleteEventJsonPath;
-        this.deleteEventOperation = deleteEventOperation;
-        this.implicitHandlerPreviousNode = implicitHandlerPreviousNode;
-        this.implicitHandlerCurrentNode = implicitHandlerCurrentNode;
-        this.serializationMethod = serializationMethod;
-        this.availability = availability;
-        this.subjectAreaName = subjectAreaName;
-    }
 
     public String getSchemaKey() {
         return schemaKey;
@@ -275,4 +266,53 @@ public class ExternalSchemaExportCSVDTO implements Serializable {
     public void setSubjectAreaName(String subjectAreaName) {
         this.subjectAreaName = subjectAreaName;
     }
+
+    public String getOngoingChannel() {
+        return ongoingChannel;
+    }
+
+    public void setOngoingChannel(String ongoingChannel) {
+        this.ongoingChannel = ongoingChannel;
+    }
+
+    public String getInitialLoadChannel() {
+        return initialLoadChannel;
+    }
+
+    public void setInitialLoadChannel(String initialLoadChannel) {
+        this.initialLoadChannel = initialLoadChannel;
+    }
+
+    public String getReplayChannel() {
+        return replayChannel;
+    }
+
+    public void setReplayChannel(String replayChannel) {
+        this.replayChannel = replayChannel;
+    }
+
+    public String getInitialLoadRelativeURL() {
+        return initialLoadRelativeURL;
+    }
+
+    public void setInitialLoadRelativeURL(String initialLoadRelativeURL) {
+        this.initialLoadRelativeURL = initialLoadRelativeURL;
+    }
+
+    public String getPartialLoadRelativeURL() {
+        return partialLoadRelativeURL;
+    }
+
+    public void setPartialLoadRelativeURL(String partialLoadRelativeURL) {
+        this.partialLoadRelativeURL = partialLoadRelativeURL;
+    }
+
+    public Boolean getToDelete() {
+        return toDelete;
+    }
+
+    public void setToDelete(Boolean toDelete) {
+        this.toDelete = toDelete;
+    }
+
 }

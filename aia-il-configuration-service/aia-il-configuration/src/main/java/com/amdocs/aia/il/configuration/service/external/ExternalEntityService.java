@@ -13,6 +13,8 @@ public interface ExternalEntityService extends ConfigurationService<ExternalEnti
 
     List<ExternalEntityDTO> list(String projectKey, String externalSchemaKey);
 
+    List<ExternalEntityDTO> listAll(String projectKey);
+
     ExternalEntityDTO get(String projectKey, String schemaKey, String entityKey);
 
     ExternalEntityDTO update(String projectKey, String externalSchemaKey, ExternalEntityDTO externalEntityDTO);
