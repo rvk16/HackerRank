@@ -1,4 +1,4 @@
-package com.amdocs.aia.il.configuration.export;
+package com.amdocs.aia.il.configuration.exportimport;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,10 +11,9 @@ import java.io.Serializable;
         "inputDataChannel (kafka)","skipNodeFromParsing (kafka)","deleteEventJsonPath (kafka)","deleteEventOperation (kafka)",
         "implicitHandlerPreviousNode (kafka)","implicitHandlerCurrentNode (kafka)","serializationMethod",
         "availability","subjectAreaName"})
-public class ExternalSchemaExportCSVDTO implements Serializable {
+public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements Serializable {
 
-    @JsonProperty("schemaKey")
-    private String schemaKey = null;
+
 
     @JsonProperty("schemaName")
     private String schemaName = null;
@@ -25,8 +24,8 @@ public class ExternalSchemaExportCSVDTO implements Serializable {
       @JsonProperty("isActive")
     private Boolean isActive = null;
 
-    @JsonProperty("description")
-    private String description = null;
+//    @JsonProperty("description")
+//    private String description = null;
 
     @JsonProperty("typeSystem")
     private String typeSystem = null;
@@ -90,22 +89,22 @@ public class ExternalSchemaExportCSVDTO implements Serializable {
 
     @JsonProperty("partialLoadRelativeURL")
     private String partialLoadRelativeURL = null;
+//
+//    @JsonProperty("toDelete")
+//    private Boolean toDelete = Boolean.FALSE;
 
-    @JsonProperty("toDelete")
-    private Boolean toDelete = Boolean.FALSE;
 
-
-    public ExternalSchemaExportCSVDTO() {
+    public ExternalSchemaExportCSV() {
     }
 
 
-    public String getSchemaKey() {
-        return schemaKey;
-    }
-
-    public void setSchemaKey(String schemaKey) {
-        this.schemaKey = schemaKey;
-    }
+//    public String getSchemaKey() {
+//        return schemaKey;
+//    }
+//
+//    public void setSchemaKey(String schemaKey) {
+//        this.schemaKey = schemaKey;
+//    }
 
     public String getSchemaName() {
         return schemaName;
@@ -130,14 +129,14 @@ public class ExternalSchemaExportCSVDTO implements Serializable {
     public void setActive(Boolean active) {
         isActive = active;
     }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+//
+//    public String getDescription() {
+//        return description;
+//    }
+//
+//    public void setDescription(String description) {
+//        this.description = description;
+//    }
 
     public String getTypeSystem() {
         return typeSystem;
@@ -307,12 +306,12 @@ public class ExternalSchemaExportCSVDTO implements Serializable {
         this.partialLoadRelativeURL = partialLoadRelativeURL;
     }
 
-    public Boolean getToDelete() {
-        return toDelete;
-    }
-
-    public void setToDelete(Boolean toDelete) {
-        this.toDelete = toDelete;
-    }
+//    public Boolean getToDelete() {
+//        return toDelete;
+//    }
+//
+//    public void setToDelete(Boolean toDelete) {
+//        this.toDelete = toDelete;
+//    }
 
 }
