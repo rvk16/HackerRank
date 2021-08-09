@@ -1,4 +1,4 @@
-package com.amdocs.aia.il.configuration.export;
+package com.amdocs.aia.il.configuration.exportimport;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -9,10 +9,10 @@ import java.io.Serializable;
 
 @JsonPropertyOrder(value = { "schemaKey","entityKey","isActive","entityName",  "description", "serializationId (READ ONLY)","isTransient",
         "isTransaction" })
-public class ExternalEntityExportCSVDTO implements Serializable {
+public class ExternalEntityExportCSV extends AbstractCsvExternalModel implements Serializable {
 
-    @JsonProperty("schemaKey")
-    private String schemaKey = null;
+//    @JsonProperty("schemaKey")
+//    private String schemaKey = null;
 
     @JsonProperty("entityKey")
     private String entityKey = null;
@@ -22,9 +22,9 @@ public class ExternalEntityExportCSVDTO implements Serializable {
 
     @JsonProperty("entityName")
     private String entityName = null;
-
-    @JsonProperty("description")
-    private String description = null;
+//
+//    @JsonProperty("description")
+//    private String description = null;
 
     @JsonProperty("serializationId (READ ONLY)")
     private Integer serializationId = null;
@@ -62,41 +62,45 @@ public class ExternalEntityExportCSVDTO implements Serializable {
 
     @JsonProperty("invalidFilenameAction  (csv)")
     private String invalidFilenameAction = null;
+//
+//    @JsonProperty("toDelete")
+//    private Boolean toDelete = Boolean.FALSE;
 
 
-    public ExternalEntityExportCSVDTO() {
+    public ExternalEntityExportCSV() {
     }
 
-    public ExternalEntityExportCSVDTO(String schemaKey, String entityKey, Boolean isActive, String entityName, String description,
-                                      Integer serializationId, Boolean isTransient, Boolean isTransaction, String jsonTypeValue,
-                                      String jsonTypePath, String relativePaths, String mergedNodes, Boolean fileHeader, String fileNameFormat,
-                                      String dateFormat, String columnDelimiter, String invalidFilenameAction) {
-        this.schemaKey = schemaKey;
-        this.entityKey = entityKey;
-        this.isActive = isActive;
-        this.entityName = entityName;
-        this.description = description;
-        this.serializationId = serializationId;
-        this.isTransient = isTransient;
-        this.isTransaction = isTransaction;
-        this.jsonTypeValue = jsonTypeValue;
-        this.jsonTypePath = jsonTypePath;
-        this.relativePaths = relativePaths;
-        this.mergedNodes = mergedNodes;
-        this.fileHeader = fileHeader;
-        this.fileNameFormat = fileNameFormat;
-        this.dateFormat = dateFormat;
-        this.columnDelimiter = columnDelimiter;
-        this.invalidFilenameAction = invalidFilenameAction;
-    }
+//    public ExternalEntityExportCSV(String schemaKey, String entityKey, Boolean isActive, String entityName, String description,
+//                                   Integer serializationId, Boolean isTransient, Boolean isTransaction, String jsonTypeValue,
+//                                   String jsonTypePath, String relativePaths, String mergedNodes, Boolean fileHeader, String fileNameFormat,
+//                                   String dateFormat, String columnDelimiter, String invalidFilenameAction, Boolean toDelete) {
+//        this.schemaKey = schemaKey;
+//        this.entityKey = entityKey;
+//        this.isActive = isActive;
+//        this.entityName = entityName;
+//        this.description = description;
+//        this.serializationId = serializationId;
+//        this.isTransient = isTransient;
+//        this.isTransaction = isTransaction;
+//        this.jsonTypeValue = jsonTypeValue;
+//        this.jsonTypePath = jsonTypePath;
+//        this.relativePaths = relativePaths;
+//        this.mergedNodes = mergedNodes;
+//        this.fileHeader = fileHeader;
+//        this.fileNameFormat = fileNameFormat;
+//        this.dateFormat = dateFormat;
+//        this.columnDelimiter = columnDelimiter;
+//        this.invalidFilenameAction = invalidFilenameAction;
+//        this.toDelete = toDelete;
+//    }
 
-    public String getSchemaKey() {
-        return schemaKey;
-    }
-
-    public void setSchemaKey(String schemaKey) {
-        this.schemaKey = schemaKey;
-    }
+//    public String getSchemaKey() {
+//        return schemaKey;
+//    }
+//
+//    public void setSchemaKey(String schemaKey) {
+//        this.schemaKey = schemaKey;
+//    }
 
     public String getEntityKey() {
         return entityKey;
@@ -122,13 +126,13 @@ public class ExternalEntityExportCSVDTO implements Serializable {
         this.entityName = entityName;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
+//    public String getDescription() {
+//        return description;
+//    }
+//
+//    public void setDescription(String description) {
+//        this.description = description;
+//    }
 
     public Integer getSerializationId() {
         return serializationId;
@@ -225,4 +229,12 @@ public class ExternalEntityExportCSVDTO implements Serializable {
     public void setInvalidFilenameAction(String invalidFilenameAction) {
         this.invalidFilenameAction = invalidFilenameAction;
     }
+
+//    public Boolean getToDelete() {
+//        return toDelete;
+//    }
+//
+//    public void setToDelete(Boolean toDelete) {
+//        this.toDelete = toDelete;
+//    }
 }
