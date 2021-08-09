@@ -18,7 +18,7 @@ public class ReferenceStorePublisherReplicatorCounter implements AuditCounter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceStorePublisherReplicatorCounter.class);
 
-    private static final String SERVICE_NAME = "ReferenceStorePublisherPhase1";
+    private static final String SERVICE_NAME = "ReferenceStorePublisherReplicator";
 
     //Counters
     private Map<String, Map<String, AtomicLong>> recordsLoaded;

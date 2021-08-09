@@ -16,7 +16,7 @@ public class ReferenceStorePublisherTransformerCounter implements AuditCounter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceStorePublisherTransformerCounter.class);
 
-    private static final String SERVICE_NAME = "ReferenceStorePublisherPhase2";
+    private static final String SERVICE_NAME = "ReferenceStorePublisherTransformer";
 
     //Counters
     private Map<String, Map<String, Map<String, AtomicLong>>> recordsLoaded;
