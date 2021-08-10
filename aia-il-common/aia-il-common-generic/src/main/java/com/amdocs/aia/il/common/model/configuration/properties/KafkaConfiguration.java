@@ -186,7 +186,9 @@ public class KafkaConfiguration implements Serializable{
                     ", maxFetchPartitionBytes=" + maxFetchPartitionBytes +
                     ", startingOffsets='" + startingOffsets + '\'' +
                     ", maxOffsetsPerTrigger=" + maxOffsetsPerTrigger +
-                    ", partitionAssignedStrategy=" + partitionAssignedStrategy +
+                    ", partitionAssignedStrategy='" + partitionAssignedStrategy + '\'' +
+                    ", periodicRebalancing=" + periodicRebalancing +
+                    ", periodicRebalancingIntervalInSec=" + periodicRebalancingIntervalInSec +
                     '}';
         }
     }
@@ -355,7 +357,8 @@ public class KafkaConfiguration implements Serializable{
         public String toString() {
             return "Producer{" +
                     "retries=" + retries +
-                    ", batchSIze=" + batchSize +
+                    ", retryBackoffMs=" + retryBackoffMs +
+                    ", batchSize=" + batchSize +
                     ", compressionType='" + compressionType + '\'' +
                     ", bufferMemory=" + bufferMemory +
                     ", maxRequestSize=" + maxRequestSize +
