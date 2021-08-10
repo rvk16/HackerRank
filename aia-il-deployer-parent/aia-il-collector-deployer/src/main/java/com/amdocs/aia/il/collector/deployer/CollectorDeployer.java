@@ -146,8 +146,8 @@ public class CollectorDeployer {
                     .replace(INIT_CONTAINER_IMAGE, deployerConfiguration.getInitContainerImage());
         }
 
-        saveDataToFile(TEMP_DIR + deploymentFileName, deploymentYaml);
-        LOGGER.info(deploymentFileName + deploymentYaml);
+        saveDataToFile(TEMP_DIR + "/" + deploymentFileName, deploymentYaml);
+        LOGGER.info("deploymentFileName: {}, deploymentYaml:{}",deploymentFileName, deploymentYaml);
 
         try {
             Map<String, Object> deploymentResult = kubernetesClient.customResource(getMilcyCRDContext(kubernetesClient)).load(stringToInputStream(deploymentYaml));
