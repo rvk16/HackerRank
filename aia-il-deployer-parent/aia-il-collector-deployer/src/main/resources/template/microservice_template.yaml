@@ -3,16 +3,7 @@ kind: Microservice
 metadata:
   name: $SERVICE_NAME
   labels:
-    app.kubernetes.io/managed-by: Helm
     service-type: runtime
-    monitored: prometheus
-  annotations:
-    meta.helm.sh/release-name: $SERVICE_NAME-$NAMESPACE
-    meta.helm.sh/release-namespace: $NAMESPACE
-    prometheus.io/scrape: "true"
-    prometheus.io/probe: "true"
-    prometheus.io/port: "8081"
-    prometheus.io/path: "/actuator/prometheus"
 spec:
   version: master-TRUNK-SNAPSHOT
   domain: aia
@@ -50,7 +41,13 @@ spec:
     metadata:
       labels:
         app: $SERVICE_NAME
+        monitored: prometheus
         service-type: runtime
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/probe: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/actuator/prometheus"
     spec:
       strategy:
         type: RollingUpdate
