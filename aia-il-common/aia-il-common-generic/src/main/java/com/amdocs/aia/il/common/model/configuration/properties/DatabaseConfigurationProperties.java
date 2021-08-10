@@ -326,6 +326,7 @@ public class DatabaseConfigurationProperties implements Serializable {
                 ", password='" + "******" + '\'' +
                 ", connStrings='" + connStrings + '\'' +
                 ", port=" + port +
+                ", localDatacenter='" + localDatacenter + '\'' +
                 ", keyspace='" + keyspace + '\'' +
                 ", maxLocalConnPerHost=" + maxLocalConnPerHost +
                 ", maxRemoteConnPerHost=" + maxRemoteConnPerHost +
@@ -344,6 +345,10 @@ public class DatabaseConfigurationProperties implements Serializable {
                 ", numOfRetry=" + numOfRetry +
                 ", retryConfig=" + retryConfig +
                 ", isSSLEnabled=" + isSSLEnabled +
+                ", timeToLive=" + timeToLive +
+                ", pageSize=" + pageSize +
+                ", nodeMetrics='" + nodeMetrics + '\'' +
+                ", sessionMetrics='" + sessionMetrics + '\'' +
                 '}';
     }
 }
