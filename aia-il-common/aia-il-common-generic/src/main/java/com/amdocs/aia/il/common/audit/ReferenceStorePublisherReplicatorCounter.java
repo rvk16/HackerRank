@@ -13,66 +13,61 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class BulkReplicatorCounter implements AuditCounter {
-    private static final long serialVersionUID = 6223802941316281829L;
+public class ReferenceStorePublisherReplicatorCounter implements AuditCounter {
+    private static final long serialVersionUID = -317379243689785025L;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(BulkReplicatorCounter.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReferenceStorePublisherReplicatorCounter.class);
 
-    private static final String SERVICE_NAME = "BulkReplicator";
+    private static final String SERVICE_NAME = "ReferenceStorePublisherReplicator";
 
     //Counters
     private Map<String, Map<String, AtomicLong>> recordsLoaded;
-    private Map<String, Map<String, AtomicLong>> recordsDropped;
     private Map<String, Map<String, AtomicLong>> recordsStored;
     private Map<String, Map<String, AtomicLong>> recordsDeleted;
     private Map<String, Map<String, AtomicLong>> recordsNoChange;
-    private Map<String, Map<String, AtomicLong>> recordsError;
+    private Map<String, Map<String, AtomicLong>> recordsMerged;
     private long auditGenerated;
 
-    public BulkReplicatorCounter() {
+    public ReferenceStorePublisherReplicatorCounter() {
         initCounters();
     }
 
     @Override
     public CounterType getType() {
-        return CounterType.BULKREPLICATOR;
+        return CounterType.REFERENCESTOREPUBLISHERREPLICATOR;
     }
 
     private void initCounters() {
         recordsLoaded = new ConcurrentHashMap<>();
-        recordsDropped = new ConcurrentHashMap<>();
+        recordsMerged = new ConcurrentHashMap<>();
         recordsStored = new ConcurrentHashMap<>();
         recordsDeleted = new ConcurrentHashMap<>();
         recordsNoChange = new ConcurrentHashMap<>();
-        recordsError = new ConcurrentHashMap<>();
     }
 
     public void addCounter(Object... args) {
         //Add audit stats to corresponding counter per entity per correlation id
         CounterType counterSubType = CounterType.valueOf(args[0].toString());
-        String correlationId = (String) args[1]; // correlationId
-        Object entity = args[2]; // entity
-        Object value = args[3]; // value
+        String correlationId = (String)args[1];
+        String entity = (String)args[2];
+        Long value = (Long)args[3];
         auditGenerated = System.currentTimeMillis();
         if (StringUtils.isNotBlank(correlationId)) {
             switch (counterSubType) {
                 case RECORDSLOADED:
-                    incrementRecordsLoaded(correlationId, (String) entity, (Long) value);
+                    incrementRecordsLoaded(correlationId, entity, value);
                     break;
-                case RECORDSDROPPED:
-                    incrementRecordsDropped(correlationId, (String) entity, (Long) value);
+                case RECORDSMERGED:
+                    incrementRecordsMerged(correlationId, entity, value);
                     break;
                 case RECORDSSTORED:
-                    incrementRecordsStored(correlationId, (String) entity, (Long) value);
+                    incrementRecordsStored(correlationId, entity, value);
                     break;
                 case RECORDSDELETED:
-                    incrementRecordsDeleted(correlationId, (String) entity, (Long) value);
+                    incrementRecordsDeleted(correlationId, entity, value);
                     break;
                 case RECORDSNOCHANGE:
-                    incrementRecordsNoChange(correlationId, (String) entity, (Long) value);
-                    break;
-                case RECORDSERROR:
-                    incrementRecordsError(correlationId, (String) entity, (Long) value);
+                    incrementRecordsNoChange(correlationId, entity, value);
                     break;
                 default:
                     break;
@@ -81,8 +76,39 @@ public class BulkReplicatorCounter implements AuditCounter {
     }
 
     @Override
+    public List<String> getMessageStructure() {
+        List<String> jsonString = new ArrayList<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        recordsLoaded.forEach((correlationID, innerMap) -> innerMap.forEach((table, countValue) -> {
+            AuditData auditData = new AuditData();
+            auditData.setCorrelationID(correlationID);
+            auditData.setEntity(table);
+            auditData.setRecordsLoaded(countValue);
+            auditData.setCorrelatingEntity("");
+            auditData.setServiceName(SERVICE_NAME);
+            auditData.setAuditTime(System.currentTimeMillis());
+            auditData.setAuditGenerated(auditGenerated);
+
+            if (recordsMerged.containsKey(correlationID) && recordsMerged.get(correlationID).containsKey(table)) {
+                auditData.setRecordsMerged(recordsMerged.get(correlationID).get(table));
+            }
+            if (recordsNoChange.containsKey(correlationID) && recordsNoChange.get(correlationID).containsKey(table)) {
+                auditData.setRecordsNoChange(recordsNoChange.get(correlationID).get(table));
+            }
+            ReplicatorLoadCounter.recordStoredDelete(table, correlationID, auditData, recordsStored, recordsDeleted);
+
+            try {
+                jsonString.add(objectMapper.writeValueAsString(auditData));
+            } catch (JsonProcessingException e) {
+                LOGGER.error("JSON failure", e);
+            }
+        }));
+        return jsonString;
+    }
+
+    @Override
     public void setContextLead(Map<String, String> contextLead) {
-        //used in ReplicatorGenCounter
+        // empty
     }
 
     public void incrementRecordsLoaded(String correlationId, String entity, Long value) {
@@ -98,16 +124,16 @@ public class BulkReplicatorCounter implements AuditCounter {
         }
     }
 
-    public void incrementRecordsDropped(String correlationId, String entity, Long value) {
-        if (!recordsDropped.containsKey(correlationId)) {
+    public void incrementRecordsMerged(String correlationId, String entity, Long value) {
+        if (!recordsMerged.containsKey(correlationId)) {
             Map<String, AtomicLong> entityValue = new ConcurrentHashMap<>();
-            recordsDropped.put(correlationId, entityValue);
+            recordsMerged.put(correlationId, entityValue);
         }
-        if (!recordsDropped.get(correlationId).containsKey(entity)) {
-            recordsDropped.get(correlationId).put(entity, new AtomicLong());
+        if (!recordsMerged.get(correlationId).containsKey(entity)) {
+            recordsMerged.get(correlationId).put(entity, new AtomicLong());
         }
-        if (recordsDropped.get(correlationId).get(entity) != null) {
-            recordsDropped.get(correlationId).get(entity).getAndAccumulate(value, Long::sum);
+        if (recordsMerged.get(correlationId).get(entity) != null) {
+            recordsMerged.get(correlationId).get(entity).getAndAccumulate(value, Long::sum);
         }
     }
 
@@ -148,52 +174,6 @@ public class BulkReplicatorCounter implements AuditCounter {
         if (recordsNoChange.get(correlationId).get(entity) != null) {
             recordsNoChange.get(correlationId).get(entity).getAndAccumulate(value, Long::sum);
         }
-    }
-
-    public void incrementRecordsError(String correlationId, String entity, Long value) {
-        if (!recordsError.containsKey(correlationId)) {
-            Map<String, AtomicLong> entityValue = new ConcurrentHashMap<>();
-            recordsError.put(correlationId, entityValue);
-        }
-        if (!recordsError.get(correlationId).containsKey(entity)) {
-            recordsError.get(correlationId).put(entity, new AtomicLong());
-        }
-        if (recordsError.get(correlationId).get(entity) != null) {
-            recordsError.get(correlationId).get(entity).getAndAccumulate(value, Long::sum);
-        }
-    }
-
-    @Override
-    public List<String> getMessageStructure() {
-        List<String> jsonString = new ArrayList<>();
-        ObjectMapper objectMapper = new ObjectMapper();
-        recordsLoaded.forEach((correlationID, innerMap) -> innerMap.forEach((table, countValue) -> {
-            AuditData auditData = new AuditData();
-            auditData.setCorrelationID(correlationID);
-            auditData.setEntity(table);
-            auditData.setRecordsLoaded(countValue);
-            auditData.setCorrelatingEntity("");
-            auditData.setServiceName(SERVICE_NAME);
-            auditData.setAuditTime(System.currentTimeMillis());
-            auditData.setAuditGenerated(auditGenerated);
-
-            if (recordsDropped.containsKey(correlationID) && recordsDropped.get(correlationID).containsKey(table)) {
-                auditData.setRecordsDropped(recordsDropped.get(correlationID).get(table));
-            }
-            ReplicatorLoadCounter.recordStoredDelete(table, correlationID, auditData, recordsStored, recordsDeleted);
-            if (recordsError.containsKey(correlationID) && recordsError.get(correlationID).containsKey(table)) {
-                auditData.setRecordsError(recordsError.get(correlationID).get(table));
-            }
-            if (recordsNoChange.containsKey(correlationID) && recordsNoChange.get(correlationID).containsKey(table)) {
-                auditData.setRecordsNoChange(recordsNoChange.get(correlationID).get(table));
-            }
-            try {
-                jsonString.add(objectMapper.writeValueAsString(auditData));
-            } catch (JsonProcessingException e) {
-                LOGGER.error("JSON failure", e);
-            }
-        }));
-        return jsonString;
     }
 
     @Override

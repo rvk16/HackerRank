@@ -393,7 +393,7 @@ public class BulkServiceImpl implements BulkService {
             switch (externalSchemaExportCSV.getStoreType()){
                 case ExternalSchemaStoreTypes.CSV:
                     return  new ExternalCsvSchemaStoreInfoDTO()
-                            .defaultColumnDelimiter(externalSchemaExportCSV.getDefaultDateFormat())
+                            .defaultColumnDelimiter(externalSchemaExportCSV.getDefaultColumnDelimiter())
                             .defaultDateFormat(externalSchemaExportCSV.getDefaultDateFormat())
                             .storeType(ExternalSchemaStoreInfoDTO.StoreTypeEnum.CSV);
 

@@ -186,11 +186,11 @@ public class ReplicatorLoadCounter implements AuditCounter {
         if (recordsMerged.containsKey(correlationID) && recordsMerged.get(correlationID).containsKey(table)) {
             auditData.setRecordsMerged(recordsMerged.get(correlationID).get(table));
         }
-        recordLoadDelete(table, correlationID, auditData, recordsStored, recordsDeleted);
+        recordStoredDelete(table, correlationID, auditData, recordsStored, recordsDeleted);
         return auditData;
     }
 
-    static void recordLoadDelete(String table, String correlationID, AuditData auditData,
+    static void recordStoredDelete(String table, String correlationID, AuditData auditData,
                                  Map<String, Map<String, AtomicLong>> recordsStored,
                                  Map<String, Map<String, AtomicLong>> recordsDeleted) {
         if (recordsStored.containsKey(correlationID) && recordsStored.get(correlationID).containsKey(table)) {

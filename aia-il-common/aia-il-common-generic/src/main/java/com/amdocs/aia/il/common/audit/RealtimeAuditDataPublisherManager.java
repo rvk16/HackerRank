@@ -49,6 +49,10 @@ public class RealtimeAuditDataPublisherManager {
                 this.auditRecordsAccumulator.registerCounter(new TransientTransformerLoadCounter());
                 this.auditRecordsAccumulator.registerCounter(new TransientTransformerStoreCounter());
                 break;
+            case REFERENCESTOREPUBLISHER:
+                this.auditRecordsAccumulator.registerCounter(new ReferenceStorePublisherReplicatorCounter());
+                this.auditRecordsAccumulator.registerCounter(new ReferenceStorePublisherTransformerCounter());
+                break;
             default:
                 break;
         }
@@ -108,9 +112,22 @@ public class RealtimeAuditDataPublisherManager {
             case TRANSIENTTRANSFORMER:
                 transientTransformerMergePublish(topicName, producer, auditLogsEnabled);
                 break;
+            case REFERENCESTOREPUBLISHER:
+                referenceStorePublisherMergePublish(topicName, producer, auditLogsEnabled);
+                break;
             default:
                 break;
         }
+    }
+
+    private void referenceStorePublisherMergePublish(String topicName, Producer<String, String> producer, boolean auditLogsEnabled) {
+        publisher.merge(getAuditRecordsAccumulator().getCounters().get(CounterType.REFERENCESTOREPUBLISHERREPLICATOR).values().stream().iterator().next().getMessageStructure());
+        publisher.publish(topicName, producer, auditLogsEnabled);
+        clear(CounterType.REFERENCESTOREPUBLISHERREPLICATOR);
+
+        publisher.merge(getAuditRecordsAccumulator().getCounters().get(CounterType.REFERENCESTOREPUBLISHERTRANSFORMER).values().stream().iterator().next().getMessageStructure());
+        publisher.publish(topicName, producer, auditLogsEnabled);
+        clear(CounterType.REFERENCESTOREPUBLISHERTRANSFORMER);
     }
 
     private void kafkaCollectorMergeAndPublish(String topicName, Producer<String, String> producer, boolean auditLogsEnabled) {
