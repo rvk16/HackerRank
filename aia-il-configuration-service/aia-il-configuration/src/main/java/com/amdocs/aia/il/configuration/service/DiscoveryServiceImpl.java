@@ -13,6 +13,7 @@ import com.amdocs.aia.il.configuration.discovery.DiscoveryFilesRepository;
 import com.amdocs.aia.il.configuration.discovery.ExternalModelDiscoveryConsumer;
 import com.amdocs.aia.il.configuration.discovery.csv.ExternalCsvDiscoveryParameters;
 import com.amdocs.aia.il.configuration.discovery.json.ExternalJsonDiscoveryParameters;
+import com.amdocs.aia.il.configuration.discovery.sql.ExternalSqlDiscoveryParameters;
 import com.amdocs.aia.il.configuration.dto.*;
 import com.amdocs.aia.il.configuration.message.AiaApiMessages;
 import com.amdocs.aia.repo.client.AiaRepositoryOperations;
@@ -33,6 +34,7 @@ public class DiscoveryServiceImpl implements DiscoveryService {
 
     public static final String DISCOVER_EXTERNAL_CSV_DISPLAY_NAME = "Discover External Csv";
     public static final String DISCOVER_EXTERNAL_JSON_DISPLAY_NAME = "Discover External Json";
+    public static final String DISCOVER_EXTERNAL_SQL_DISPLAY_NAME = "Discover External Sql";
 
     private final DiscoveryFilesRepository discoveryFilesRepository;
     private final AiaRepositoryOperations repositoryOperations;
@@ -125,6 +127,19 @@ public class DiscoveryServiceImpl implements DiscoveryService {
         } finally {
             discoveryFilesRepository.cleanAllFiles();
         }
+    }
+
+    @Override
+    public AsyncResponseDTO discoverExternalSqlAsync(String projectKey, DiscoverExternalSqlRequestDTO discoverExternalSqlRequest) {
+        ExternalSqlDiscoveryParameters discoveryParams = new ExternalSqlDiscoveryParameters();
+        discoveryParams.setConnectionString(discoverExternalSqlRequest.getConnectionString());
+        discoveryParams.setDbPassword(discoverExternalSqlRequest.getDbPassword());
+        discoveryParams.setDbUser(discoverExternalSqlRequest.getDbUser());
+        discoveryParams.setAvailability(toAvailabilityModel(discoverExternalSqlRequest.getAvailability()));
+        discoveryParams.setSubjectAreaName(discoverExternalSqlRequest.getSubjectAreaName());
+        discoveryParams.setSubjectAreaKey(discoverExternalSqlRequest.getSubjectAreaKey());
+        discoveryParams.setDbType(discoverExternalSqlRequest.getDbType());
+        return generalDiscovery(projectKey, discoveryParams, DISCOVER_EXTERNAL_SQL_DISPLAY_NAME, discoverExternalSqlRequest.getSchemaName(), discoverExternalSqlRequest.getDbType());
     }
 
     private static Availability toAvailabilityModel(AvailabilityDTO dto) {

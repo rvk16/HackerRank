@@ -5,14 +5,16 @@ public class ColumnInfo {
     // from java.sql.Types
     private int datatype;
     private int columnSize;
+    private int decimalDigits;
 
     public ColumnInfo() {
     }
 
-    public ColumnInfo(String name, int datatype, int columnSize) {
+    public ColumnInfo(String name, int datatype, int columnSize,int decimalDigits) {
         this.name = name;
         this.datatype = datatype;
         this.columnSize = columnSize;
+        this.decimalDigits = decimalDigits;
     }
 
     public String getName() {
@@ -37,5 +39,13 @@ public class ColumnInfo {
 
     public void setColumnSize(int columnSize) {
         this.columnSize = columnSize;
+    }
+
+    public int getDecimalDigits() {
+        return decimalDigits;
+    }
+
+    public void setDecimalDigits(int decimalDigits) {
+        this.decimalDigits = decimalDigits;
     }
 }

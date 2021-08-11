@@ -1,8 +1,6 @@
 package com.amdocs.aia.il.configuration.discovery.sql;
 
 import com.amdocs.aia.il.configuration.discovery.DiscoveryRuntimeException;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -55,7 +53,7 @@ public class DatabaseIntrospector {
     }
 
     private ResultSet getTableResultSet(DatabaseMetaData databaseMetaData) throws SQLException {
-        return databaseMetaData.getTables(null, null, null, new String[]{"TABLE", "VIEW", "PARTITIONED TABLE"});
+        return databaseMetaData.getTables(databaseMetaData.getConnection().getCatalog(), databaseMetaData.getConnection().getSchema(), null, new String[]{"TABLE", "VIEW", "PARTITIONED TABLE"});
     }
 
     private TableInfo getTableInfo(DatabaseMetaData databaseMetaData, ResultSet tableResultSet) throws SQLException {
@@ -67,20 +65,21 @@ public class DatabaseIntrospector {
     }
 
     private List<ColumnInfo> getColumnInfos(DatabaseMetaData databaseMetaData, String tableName) throws SQLException {
-        ResultSet columnsResultSet = databaseMetaData.getColumns(null, null, toIdentifierName(databaseMetaData, tableName), null);
+        ResultSet columnsResultSet = databaseMetaData.getColumns(databaseMetaData.getConnection().getCatalog(), databaseMetaData.getConnection().getSchema(), toIdentifierName(databaseMetaData, tableName), null);
         List<ColumnInfo> columns = new ArrayList<>();
         while (columnsResultSet.next()) {
             // see https://docs.oracle.com/javase/8/docs/api/java/sql/DatabaseMetaData.html#getColumns-java.lang.String-java.lang.String-java.lang.String-java.lang.String-
             String columnName = columnsResultSet.getString(COLUMN_NAME);
             int datatype = columnsResultSet.getInt("DATA_TYPE");
             int columnSize = columnsResultSet.getInt("COLUMN_SIZE");
-            columns.add(new ColumnInfo(columnName, datatype, columnSize));
+            int decimalDigits = columnsResultSet.getInt("DECIMAL_DIGITS");
+            columns.add(new ColumnInfo(columnName, datatype, columnSize,decimalDigits));
         }
         return columns;
     }
 
     private List<IndexInfo> getIndexInfos(DatabaseMetaData databaseMetaData, String tableName) throws SQLException {
-        ResultSet indexesResultSet = databaseMetaData.getIndexInfo(null, null, toIdentifierName(databaseMetaData, tableName), false, false);
+        ResultSet indexesResultSet = databaseMetaData.getIndexInfo(databaseMetaData.getConnection().getCatalog(), databaseMetaData.getConnection().getSchema(), toIdentifierName(databaseMetaData, tableName), false, false);
         List<IndexInfo> indexes = new ArrayList<>();
         // NOTE: for composite indexes, the JDBC API returns a single row (in the result set) for each column in the index. So we'll have to do the 'grouping' ourselves
         List<IndexColumn> indexColumns = new ArrayList<>();
@@ -111,7 +110,7 @@ public class DatabaseIntrospector {
 
     @Nullable
     private PrimaryKeyInfo getPrimaryKeyInfo(DatabaseMetaData databaseMetaData, String tableName) throws SQLException {
-        ResultSet primaryKeyResultSet = databaseMetaData.getPrimaryKeys(null, null, toIdentifierName(databaseMetaData, tableName));
+        ResultSet primaryKeyResultSet = databaseMetaData.getPrimaryKeys(databaseMetaData.getConnection().getCatalog(), databaseMetaData.getConnection().getSchema(), toIdentifierName(databaseMetaData, tableName));
         List<KeyColumn> keyColumns = new ArrayList<>();
         while (primaryKeyResultSet.next()) {
             String columnName = primaryKeyResultSet.getString(COLUMN_NAME);

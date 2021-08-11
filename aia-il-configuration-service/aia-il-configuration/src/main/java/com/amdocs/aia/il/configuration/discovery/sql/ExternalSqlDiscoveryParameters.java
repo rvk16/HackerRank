@@ -7,40 +7,52 @@ import java.util.List;
 
 public class ExternalSqlDiscoveryParameters extends AbstractExternalModelDiscoveryParameters {
 
-    public static final String FILE_NAMES = "filenames";
-    public static final String COLUMN_DELIMITER = "columnDelimiter";
-    public static final String DATE_FORMAT = "dateFormat";
+    public static final String CONNECTION_STRING = "connectionString";
+    public static final String DB_USER = "dbUser";
+    public static final String DB_PASSWORD = "dbPassword";
+    public static final String DB_TYPE = "dbType";
 
     @DiscoveryParameter
-    private List<String> filenames;
+    private String connectionString;
 
-    @DiscoveryParameter(required = false)
-    private Character columnDelimiter;
+    @DiscoveryParameter
+    private String dbUser;
 
-    @DiscoveryParameter(required = false)
-    private String dateFormat;
+    @DiscoveryParameter
+    private String dbPassword;
 
-    public List<String> getFilenames() {
-        return filenames;
+    @DiscoveryParameter
+    private String dbType;
+
+    public String getConnectionString() {
+        return connectionString;
     }
 
-    public void setFilenames(List<String> filenames) {
-        this.filenames = filenames;
+    public void setConnectionString(String connectionString) {
+        this.connectionString = connectionString;
     }
 
-    public Character getColumnDelimiter() {
-        return columnDelimiter;
+    public String getDbUser() {
+        return dbUser;
     }
 
-    public void setColumnDelimiter(Character columnDelimiter) {
-        this.columnDelimiter = columnDelimiter;
+    public void setDbUser(String dbUser) {
+        this.dbUser = dbUser;
     }
 
-    public String getDateFormat() {
-        return dateFormat;
+    public String getDbPassword() {
+        return dbPassword;
     }
 
-    public void setDateFormat(String dateFormat) {
-        this.dateFormat = dateFormat;
+    public void setDbPassword(String dbPassword) {
+        this.dbPassword = dbPassword;
+    }
+
+    public String getDbType() {
+        return dbType;
+    }
+
+    public void setDbType(String dbType) {
+        this.dbType = dbType;
     }
 }

@@ -1,6 +1,8 @@
 package com.amdocs.aia.il.configuration.discovery.sql;
 
 import com.amdocs.aia.common.model.extensions.typesystems.LogicalTypeSystem;
+import com.amdocs.aia.common.model.extensions.typesystems.SqlTypeSystem;
+import com.amdocs.aia.common.model.extensions.typesystems.TypeSystemFactory;
 import com.amdocs.aia.common.model.utils.ModelUtils;
 import com.amdocs.aia.il.common.model.external.*;
 import com.amdocs.aia.il.common.model.external.sql.*;
@@ -14,7 +16,7 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.sql.Types;
+import javax.inject.Provider;
 import java.util.stream.Collectors;
 
 @Component
@@ -25,20 +27,38 @@ public class ExternalSqlDiscoverer extends AbstractExternalModelDiscoverer<Exter
 
     private final ExternalSqlDiscoveryConfigurationProperties properties;
     private final DatabaseIntrospector databaseIntrospector;
-    private final ConnectionManager connectionManager;
+    private ConnectionManager connectionManager;
+    private final TypeSystemFactory typeSystemFactory;
 
     public ExternalSqlDiscoverer(AiaRepositoryOperations repositoryOperations, ExternalSqlDiscoveryConfigurationProperties properties,
-                                 DatabaseIntrospector databaseIntrospector, ConnectionManager connectionManager, SerializationIDAssigner serializationIDAssigner) {
+                                 DatabaseIntrospector databaseIntrospector, SerializationIDAssigner serializationIDAssigner, Provider<ConnectionManager> connectionManagerProvider, TypeSystemFactory typeSystemFactory) {
         super(repositoryOperations, serializationIDAssigner);
         this.properties = properties;
         this.databaseIntrospector = databaseIntrospector;
-        this.connectionManager = connectionManager;
+        this.connectionManager = connectionManagerProvider.get();
+        this.typeSystemFactory = typeSystemFactory;
+    }
+
+
+    @Override
+    protected void initDiscovery() {
+        DatabaseProperties databaseProperties = new DatabaseProperties();
+        databaseProperties.setUser(getParameters().getDbUser());
+        databaseProperties.setPassword(getParameters().getDbPassword());
+        databaseProperties.setUrl(getParameters().getConnectionString());
+        databaseProperties.setDbType(getParameters().getDbType());
+        connectionManager.init(databaseProperties);
+    }
+
+    @Override
+    protected void discoveryEnded(boolean isSuccessful) {
+        connectionManager.closeConnection();
     }
 
     @Override
     protected ExternalSchemaStoreInfo createSchemaStoreInfo() {
         ExternalSqlSchemaStoreInfo externalSqlSchemaStoreInfo = new ExternalSqlSchemaStoreInfo();
-        //externalSqlSchemaStoreInfo.setDatabaseType(properties.());
+        externalSqlSchemaStoreInfo.setDatabaseType(getParameters().getDbType());
         return externalSqlSchemaStoreInfo;
     }
 
@@ -46,7 +66,7 @@ public class ExternalSqlDiscoverer extends AbstractExternalModelDiscoverer<Exter
     @Override
     protected ExternalSchemaCollectionRules createSchemaCollectionRules() {
         ExternalSqlSchemaCollectionRules collectionRules = new ExternalSqlSchemaCollectionRules();
-        collectionRules.setOngoingChannel(CollectorChannelType.SQL);
+        collectionRules.setOngoingChannel(CollectorChannelType.ATTUNITY);
         collectionRules.setInitialLoadChannel(CollectorChannelType.SQL);
         collectionRules.setReplayChannel(CollectorChannelType.SQL);
         collectionRules.setInitialLoadRelativeURL(null);
@@ -61,7 +81,7 @@ public class ExternalSqlDiscoverer extends AbstractExternalModelDiscoverer<Exter
 
     @Override
     protected String getTypeSystem() {
-        return LogicalTypeSystem.NAME;
+        return SqlTypeSystem.NAME;
     }
 
     @Override
@@ -86,7 +106,7 @@ public class ExternalSqlDiscoverer extends AbstractExternalModelDiscoverer<Exter
         entity.setAttributes(tableInfo.getColumns()
                 .stream()
                 .map(columnInfo -> {
-                    int keyPosition = tableInfo.getPrimaryKeyInfo().getColumnNames().indexOf(columnInfo.getName());
+                    int keyPosition = tableInfo.getPrimaryKeyInfo() == null? -1 : tableInfo.getPrimaryKeyInfo().getColumnNames().indexOf(columnInfo.getName());
                     return createAttribute(columnInfo, keyPosition);
                 })
                 .collect(Collectors.toList()));
@@ -94,86 +114,23 @@ public class ExternalSqlDiscoverer extends AbstractExternalModelDiscoverer<Exter
         getConsumer().acceptEntity(entity);
     }
 
-    private ExternalAttribute createAttribute(ColumnInfo columnInfo, int keyPosition) {
+    private ExternalAttribute createAttribute(ColumnInfo columnInfo, Integer keyPosition) {
         ExternalAttribute attribute = new ExternalAttribute();
         attribute.setAttributeKey(ModelUtils.toAllowedLocalKey(columnInfo.getName()));
         attribute.setName(DiscoveryUtils.getNameFromKey(attribute.getAttributeKey()));
-        attribute.setDatatype(getDatatype(columnInfo.getDatatype(), columnInfo.getColumnSize()));
-        attribute.setLogicalDatatype(attribute.getDatatype());
+        String sqlDatatype = DatatypeToSqlTypeSystemConvertor.getDatatypeInSqlTypeSystem(columnInfo, properties.getMaxPrecision(), properties.getMaxScale(), properties.getDefaultVarcharLength());
+        attribute.setDatatype(sqlDatatype);
+        attribute.setLogicalDatatype(LogicalTypeSystem.format(typeSystemFactory.getTypeSystemForKey(SqlTypeSystem.NAME).toLogicalDatatype(sqlDatatype)));
         attribute.setKeyPosition(keyPosition > -1 ? keyPosition : null);
         attribute.setLogicalTime(false);
         attribute.setUpdateTime(false);
-        attribute.setRequired(false);
+        attribute.setRequired(keyPosition != -1);
         attribute.setStoreInfo(new ExternalSqlAttributeStoreInfo());
         attribute.setOrigin(getSchema().getOrigin());
         return attribute;
     }
 
-    private String getDatatype(int dataType, int columnSize) {
-        String result;
-        switch (dataType) {
-            case Types.CHAR:
-                result = String.format("%s%s", "CHAR", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.VARCHAR:
-                result = String.format("%s%s", "VARCHAR", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.LONGVARCHAR:
-                result = String.format("%s%s", "LONGVARCHAR", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.NUMERIC:
-                result = String.format("%s%s", "NUMERIC", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.DECIMAL:
-                result = String.format("%s%s", "DECIMAL", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.BIT:
-                result = String.format("%s%s", "BIT", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.TINYINT:
-                result = String.format("%s%s", "TINYINT", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.SMALLINT:
-                result = String.format("%s%s", "SMALLINT", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.INTEGER:
-                result = String.format("%s%s", "INTEGER", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.BIGINT:
-                result = String.format("%s%s", "BIGINT", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.REAL:
-                result = String.format("%s%s", "REAL", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.FLOAT:
-                result = String.format("%s%s", "FLOAT", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.DOUBLE:
-                result = String.format("%s%s", "DOUBLE", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.BINARY:
-                result = String.format("%s%s", "BINARY", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.VARBINARY:
-                result = String.format("%s%s", "VARBINARY", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.LONGVARBINARY:
-                result = String.format("%s%s", "LONGVARBINARY", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.DATE:
-                result = String.format("%s%s", "DATE", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.TIME:
-                result = String.format("%s%s", "TIME", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            case Types.TIMESTAMP:
-                result = String.format("%s%s", "TIMESTAMP", (columnSize > 0 ? "(" + columnSize + ")" : ""));
-                break;
-            default:
-                result = properties.getDefaultDatatype();
-                break;
-        }
-
-        return result;
+    public ConnectionManager getConnectionManager() {
+        return connectionManager;
     }
 }

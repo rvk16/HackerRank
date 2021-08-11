@@ -54,4 +54,10 @@ public class DiscoveryController implements DiscoveryApi {
         discoveryService.discoverExternalSchema(projectKey, discoveryRequest);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
+
+    @Override
+    public ResponseEntity<AsyncResponseDTO> discoverExternalSqlAsync(String projectKey, DiscoverExternalSqlRequestDTO discoverExternalSqlRequest) {
+        AsyncResponseDTO asyncResponseDTO=discoveryService.discoverExternalSqlAsync(projectKey,discoverExternalSqlRequest);
+        return new ResponseEntity<>(asyncResponseDTO, HttpStatus.OK);
+    }
 }

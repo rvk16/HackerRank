@@ -88,6 +88,11 @@ aia:
                 replace-character: ref_
           JSON_OVER_KAFKA:
             generate-entity-for-operation-response: true
+      sql:
+        max-precision: 15
+        max-scale: 4
+        default-varchar-lenght: 4000
+
 
 monitoring:
   enabled: true

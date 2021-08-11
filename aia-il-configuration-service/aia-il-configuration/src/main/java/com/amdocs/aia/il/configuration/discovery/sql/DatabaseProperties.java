@@ -13,7 +13,7 @@ public class DatabaseProperties {
     @NotNull
     private String password;
     @NotNull
-    private String dialect;
+    private String dbType;
 
     public String getUrl() {
         return url;
@@ -39,11 +39,11 @@ public class DatabaseProperties {
         this.password = password;
     }
 
-    public String getDialect() {
-        return dialect;
+    public String getDbType() {
+        return dbType;
     }
 
-    public void setDialect(String dialect) {
-        this.dialect = dialect;
+    public void setDbType(String dbType) {
+        this.dbType = dbType;
     }
 }
