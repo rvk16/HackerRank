@@ -180,7 +180,7 @@ public class BulkReplicatorCounter implements AuditCounter {
             if (recordsDropped.containsKey(correlationID) && recordsDropped.get(correlationID).containsKey(table)) {
                 auditData.setRecordsDropped(recordsDropped.get(correlationID).get(table));
             }
-            ReplicatorLoadCounter.recordLoadDelete(table, correlationID, auditData, recordsStored, recordsDeleted);
+            ReplicatorLoadCounter.recordStoredDelete(table, correlationID, auditData, recordsStored, recordsDeleted);
             if (recordsError.containsKey(correlationID) && recordsError.get(correlationID).containsKey(table)) {
                 auditData.setRecordsError(recordsError.get(correlationID).get(table));
             }

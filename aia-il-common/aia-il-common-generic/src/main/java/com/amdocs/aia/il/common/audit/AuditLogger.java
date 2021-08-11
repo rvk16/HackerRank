@@ -13,8 +13,9 @@ public class AuditLogger {
     public void logAudit(PartitionHandler partitionHandler, boolean auditLogsEnabled) {
         List<JSONObject> auditJsonArray = partitionHandler.getAuditDataList();
         auditJsonArray.forEach(item-> {
-            if (item != null && item.length() > 0 && auditLogsEnabled)
+            if (item != null && item.length() > 0 && auditLogsEnabled) {
                 LOGGER.info("Audit logs for {} ", item);
+            }
         });
     }
 }

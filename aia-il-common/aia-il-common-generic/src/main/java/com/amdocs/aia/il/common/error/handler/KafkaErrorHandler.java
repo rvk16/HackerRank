@@ -19,14 +19,16 @@ import org.springframework.stereotype.Component;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.Future;
 
 @Component
-public class KafkaErrorHandler implements Handler {
+public class KafkaErrorHandler implements Handler, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KafkaErrorHandler.class);
+    private static final long serialVersionUID = -3244715798905603773L;
 
     private static Set<String> allowedKafkaExceptionTypes;
     private ErrorHandler errorHandler;
@@ -290,7 +292,7 @@ public class KafkaErrorHandler implements Handler {
         return msgCount;
     }
 
-    private int getComputeLeadingKeyRepeatedMsgCount(ComputeLeadingProducerRecord computeLeadingProducerRecord) {
+    private static int getComputeLeadingKeyRepeatedMsgCount(ComputeLeadingProducerRecord computeLeadingProducerRecord) {
         return (computeLeadingProducerRecord.getKafkaBulkPublishTransaction().getLeadingEntityKeys().size());
     }
 
@@ -400,10 +402,10 @@ public class KafkaErrorHandler implements Handler {
         }
     }
 
-    private static byte[] getKafkaPublishTransactionByteArray(Object KafkaObject) throws IOException {
+    private static byte[] getKafkaPublishTransactionByteArray(Object kafkaObject) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ObjectOutputStream objectWriter = new ObjectOutputStream(os);
-        objectWriter.writeObject(KafkaObject);
+        objectWriter.writeObject(kafkaObject);
         return os.toByteArray();
     }
 

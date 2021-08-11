@@ -10,7 +10,7 @@ public class AbstractExternalModelDiscoveryParameters implements ExternalModelDi
     private Boolean referenceSchema;
 
     @DiscoveryParameter(required = false)
-    private Availability availability;
+    private Availability availability;//NOSONAR
 
     @DiscoveryParameter(required = false)
     private String subjectAreaName;

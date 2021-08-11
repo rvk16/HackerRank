@@ -3,9 +3,12 @@ package com.amdocs.aia.il.common.error.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-@Component
-public class ErrorHandlerFactory {
+import java.io.Serializable;
 
+@Component
+public class ErrorHandlerFactory implements Serializable {
+
+    private static final long serialVersionUID = 7454516969302355884L;
     private ScyllaErrorHandler scyllaErrorHandler;
     private KafkaErrorHandler kafkaErrorHandler;
 

@@ -292,6 +292,12 @@ public class ExternalEntityServiceImpl extends AbstractModelService<ExternalEnti
     }
 
     @Override
+    public List<ExternalEntityDTO> listAll(String projectKey) {
+        List<ExternalEntity> externalEntityList = super.getRepository().findByProjectKey(projectKey);
+        return externalEntityList == null || externalEntityList.isEmpty() ? new ArrayList<>() : externalEntityList.stream().map(mapper::toDTO).collect(Collectors.toList());
+    }
+
+    @Override
     public ExternalEntityDTO save(String projectKey, ExternalEntityDTO s) {
         return save(projectKey, s.getSchemaKey(), s);
     }

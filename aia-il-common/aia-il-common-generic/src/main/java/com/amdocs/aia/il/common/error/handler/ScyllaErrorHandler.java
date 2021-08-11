@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
@@ -15,9 +16,10 @@ import java.util.Set;
 
 
 @Component
-public class ScyllaErrorHandler implements Handler {
+public class ScyllaErrorHandler implements Handler, Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ScyllaErrorHandler.class);
+    private static final long serialVersionUID = 6311749959147264275L;
 
     private static Set<String> allowedScyllaExceptionTypes;
     private ErrorHandler errorHandler;
@@ -94,29 +96,45 @@ public class ScyllaErrorHandler implements Handler {
     }
 
     private <T> void setErrorMetricFlag(Checkpoint<T> checkpoint) {
-        String threadName;
-        if(checkpoint.getThreadName().substring(checkpoint.getThreadName().length() - 1).matches(".*\\d.*")) {
-            threadName = checkpoint.getThreadName().substring(0, checkpoint.getThreadName().length() - 1);
-        }
-        else {
-            threadName = checkpoint.getThreadName();
-        }
-        if (checkpoint.isErrorFlag()) {
-            if (checkpoint.getRetryCounter() == 0) {
-                errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(1, threadName);
+        try {
+            LOGGER.info("setErrorMetricFlag errorHandler.getMetrics {}", errorHandler.getMetrics());
+            if (errorHandler.getMetrics() != null) {
+                String threadName;
+                if (checkpoint.getThreadName().substring(checkpoint.getThreadName().length() - 1).matches(".*\\d.*")) {
+                    threadName = checkpoint.getThreadName().substring(0, checkpoint.getThreadName().length() - 1);
+                } else {
+                    threadName = checkpoint.getThreadName();
+                }
+                LOGGER.info("inside if setErrorMetricFlag errorHandler.getMetrics {}", errorHandler.getMetrics());
+                if (checkpoint.isErrorFlag()) {
+                    LOGGER.info("inside if setErrorMetricFlag checkpoint.getRetryCounter {}", checkpoint.getRetryCounter());
+                    if (checkpoint.getRetryCounter() == 0) {
+                        errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(1, threadName);
+                    }
+                } else {
+                    errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(0, threadName);
+                }
             }
-        } else {
-            errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(0, threadName);
+        }
+        catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
     private <T> void setExceptionMetricCounter(Checkpoint<T> checkpoint) {
-        Optional<ExecutionState> executionState = checkpoint.getExecutionStates().entrySet().stream().map(Map.Entry::getValue).findFirst();
-        if (executionState.isPresent()) {
-            for (Map.Entry<Object, ErrorType> failedTaskMap : executionState.get().getFailedTasks().entrySet()) {
-                errorHandler.getMetrics().incrementCounterPerScyllaExceptionType(1, failedTaskMap.getValue().getExceptionType().getSimpleName());
-                break; //NOSONAR
+        try {
+            if (errorHandler.getMetrics() != null) {
+                Optional<ExecutionState> executionState = checkpoint.getExecutionStates().entrySet().stream().map(Map.Entry::getValue).findFirst();
+                if (executionState.isPresent()) {
+                    for (Map.Entry<Object, ErrorType> failedTaskMap : executionState.get().getFailedTasks().entrySet()) {
+                        errorHandler.getMetrics().incrementCounterPerScyllaExceptionType(1, failedTaskMap.getValue().getExceptionType().getSimpleName());
+                        break; //NOSONAR
+                    }
+                }
             }
+        }
+        catch (Exception e){
+            e.printStackTrace();
         }
     }
 

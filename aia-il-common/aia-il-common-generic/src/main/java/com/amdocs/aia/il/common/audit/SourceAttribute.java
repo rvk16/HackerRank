@@ -2,7 +2,10 @@ package com.amdocs.aia.il.common.audit;
 
 import com.amdocs.aia.il.common.stores.KeyColumn;
 
-public class SourceAttribute implements Comparable<SourceAttribute>{
+import java.io.Serializable;
+
+public class SourceAttribute implements Comparable<SourceAttribute>, Serializable {
+    private static final long serialVersionUID = 1879459975268597821L;
     String correlationId;
     long sourceUpdateTime;
     String entityName;
@@ -50,6 +53,11 @@ public class SourceAttribute implements Comparable<SourceAttribute>{
     @Override
     public boolean equals(Object obj) {
         return super.equals(obj);
+    }
+
+    @Override
+    public int hashCode() {
+        return 1;
     }
 
     @Override

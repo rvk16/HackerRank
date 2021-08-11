@@ -188,6 +188,8 @@ com.amdocs:
         roleAddBulkGroupsMethod: BizRole2 #aia_il_configuration_authoring_addBulkGroups
         roleAddTransformationsMethod: BizRole2 #aia_il_configuration_authoring_addTransformations
         roleAddEntitiesReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_addEntitiesReferentialIntegrity
+        roleExportExternalSchemasMethod: BizRole2 #aia_il_configuration_authoring_exportExternalSchemas
+        roleImportExternalSchemasMethod: BizRole2 #aia_il_configuration_authoring_importExternalSchemas
       tgt.enabled: true
       roles-deployment.enabled: true
 

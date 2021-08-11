@@ -21,6 +21,7 @@ public class TrxPublishingInfo implements Serializable {
     private List<String> contextContributingColumns;
     private String dataChannel;
     private long arrivalTime;
+    private long rtpQueryTime;
     private String targetEntity;
 
     public TrxPublishingInfo(String txnId, long updateTime, long queryTime, long currentBatchTime) {
@@ -110,6 +111,14 @@ public class TrxPublishingInfo implements Serializable {
         this.targetEntity = targetEntity;
     }
 
+    public long getRtpQueryTime() {
+        return rtpQueryTime;
+    }
+
+    public void setRtpQueryTime(long rtpQueryTime) {
+        this.rtpQueryTime = rtpQueryTime;
+    }
+
     @Override
     public String toString() {
         return "TrxPublishingInfo{" +
@@ -119,6 +128,7 @@ public class TrxPublishingInfo implements Serializable {
                 ", sourceSystemId='" + sourceSystemId + '\'' +
                 ", timestamp=" + timestamp +
                 ", arrivalTime=" + arrivalTime +
+                ", rtpQueryTime=" + rtpQueryTime +
                 ", dataChannel=" + dataChannel +
                 ", targetEntity=" + targetEntity +
                 '}';

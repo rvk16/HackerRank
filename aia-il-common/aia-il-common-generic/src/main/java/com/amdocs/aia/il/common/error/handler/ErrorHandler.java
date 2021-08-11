@@ -1,7 +1,6 @@
 package com.amdocs.aia.il.common.error.handler;
 
 
-import com.amdocs.aia.il.common.publisher.ComputeLeadingProducerRecord;
 import com.amdocs.aia.il.common.stores.scylla.monitor.DbMetrics;
 import org.apache.kafka.clients.producer.Producer;
 import org.slf4j.Logger;
@@ -9,13 +8,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class ErrorHandler {
+public class ErrorHandler implements Serializable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ErrorHandler.class);
+    private static final long serialVersionUID = -8825354376124146646L;
 
     Map<String, Object> checkpoints = new ConcurrentHashMap<>();
     private boolean errorHandlerEnabled;

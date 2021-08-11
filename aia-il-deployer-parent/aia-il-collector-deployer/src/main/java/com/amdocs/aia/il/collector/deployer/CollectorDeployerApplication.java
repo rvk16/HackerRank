@@ -33,7 +33,8 @@ public class CollectorDeployerApplication implements CommandLineRunner, ExitCode
         try {
             deployer.execute();
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace();//NOSONAR
+            LOGGER.error("Exception in CollectorDeployerApplication {}", e.getMessage());
         } finally {
             System.exit(getExitCode()); //NOSONAR
         }

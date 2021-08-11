@@ -30,6 +30,7 @@ public final class PublisherUtils {
     public static final String QUERY_TIME_FIELD_NAME = "queryTime";
     public static final String LAST_PROCESSING_TIME = "lastProcessingTime";
     public static final String ARRIVAL_TIME_FIELD_NAME = "arrivalTime";
+    public static final String RTP_QUERY_TIME_FIELD_NAME = "rtpQueryTime";
 
     public static final String TOPIC = "topic";
     public static final String VALUE = "value";

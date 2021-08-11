@@ -3,6 +3,9 @@ info:
   title: Integration Layer Configuration API
   description: This is a REST API specification for Integration Layer Configuration application.
   version: "TRUNK-SNAPSHOT"
+  x-amdocs:
+    service-principals:
+      - aia-il-configuration-authoring
 schemes:
   - http
   - https
@@ -692,8 +695,68 @@ paths:
             $ref: '#/definitions/SaveElementsResponse'
         '405':
           description: Invalid input
-
-
+  /projects/{projectKey}/configuration/external-schemas/export:
+    get:
+      tags:
+        - "Bulk"
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_exportExternalSchemas
+        private-roles:
+          - aia_il_configuration_authoring_exportExternalSchemas
+      summary: "Export External Schemas"
+      description: ""
+      operationId: "exportExternalSchemas"
+      produces:
+        - "application/octet-stream"
+      parameters:
+        - name: "projectKey"
+          in: "path"
+          description: "The project key"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: file
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
+  /projects/{projectKey}/configuration/external-schemas/import:
+    post:
+      tags:
+        - "Bulk"
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_importExternalSchemas
+        private-roles:
+          - aia_il_configuration_authoring_importExternalSchemas
+      summary: "Import External Schemas "
+      description: ""
+      operationId: "importExternalSchemas"
+      consumes:
+        - "multipart/form-data"
+      parameters:
+        - name: "file"
+          in: "formData"
+          required: true
+          type: "file"
+        - name: "projectKey"
+          in: "path"
+          description: "The project key"
+          required: true
+          type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/BulkImportResponse"
+        400:
+          description: "Bad Request"
+        500:
+          description: "Internal Server Error"
   '/projects/{projectKey}/configuration/external-schemas/{externalSchemaKey}':
     get:
       x-amdocs:
@@ -3491,7 +3554,28 @@ definitions:
         description: List of Context Entity Ref
         items:
           $ref: '#/definitions/ContextEntityRef'
-
+  BulkImportResponse:
+    type: object
+    description: Bulk Import Response
+    properties:
+      newSchemasCount:
+        type: integer
+        description: Number of new Schemas in file
+      newEntitiesCount:
+        type: integer
+        description: Number of new Entities in file
+      modifiedSchemasCount:
+        type: integer
+        description: Number of modified schemas
+      modifiedEntitiesCount:
+        type: integer
+        description: Number of modified entities
+      deletedSchemasCount:
+        type: integer
+        description: Number of deleted schemas
+      deletedEntitiesCount:
+        type: integer
+        description: Number of deleted entities
 responses:
   NotFound:
     description: The specified resource was not found
