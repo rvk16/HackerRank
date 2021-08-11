@@ -3,11 +3,12 @@ package com.amdocs.aia.il.common.error.handler;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ExecutionState {
 
     List<String> completedTasks = new ArrayList<>();
-    Map<Object, ErrorType> failedTasks;
+    Map<Object, ErrorType> failedTasks = new ConcurrentHashMap<>();
 
     public List<String> getCompletedTasks() {
         return completedTasks;
