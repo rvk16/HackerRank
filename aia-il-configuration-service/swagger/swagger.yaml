@@ -1137,6 +1137,67 @@ paths:
 
         '405':
           description: Invalid input
+  '/projects/{projectKey}/configuration/discovery/discover-external-sql':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_discoverExternalSql
+        private-roles:
+          - aiaP_il_configuration_authoring_discoverExternalSql
+      tags:
+        - Discovery
+      summary: Discover External Sql Async
+      operationId: discoverExternalSqlAsync
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: discoverExternalSqlRequest
+          description: The discovery external Sql request details
+          required: true
+          schema:
+            $ref: '#/definitions/DiscoverExternalSqlRequest'
+      responses:
+        '201':
+          description: OK discover External Sql Schema
+          schema:
+            $ref: '#/definitions/AsyncResponse'
+
+        '405':
+          description: Invalid input
+  '/projects/{projectKey}/configuration/discovery/test-sql-connection':
+    post:
+      x-amdocs:
+        public-roles:
+          - aia_il_configuration_authoring_testSqlConnection
+        private-roles:
+          - aiaP_il_configuration_authoring_testSqlConnection
+      tags:
+        - Discovery
+      summary: Test database connection for external sql discovery
+      operationId: discoveryTestSqlConnection
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - $ref: '#/parameters/projectKey'
+        - in: body
+          name: testSqlConnectionRequest
+          description: The discovery external Sql database connection details
+          required: true
+          schema:
+            $ref: '#/definitions/DiscoveryTestSqlConnectionRequest'
+      responses:
+        '200':
+          description: OK test discovery sql connection
+        '400':
+          description: Invalid input
+        '500':
+          description: Error during discovery sql connection creation
   '/projects/{projectKey}/configuration/discovery/discover-external-json':
     post:
       x-amdocs:
@@ -3425,6 +3486,49 @@ definitions:
       subjectAreaKey:
         type: string
         description: The external schema's subjectArea key
+
+  DiscoverExternalSqlRequest:
+    title: A parameterized request for external Sql discovery
+    properties:
+      schemaName:
+        description: The schemaName of the discover External Sql Schema
+        type: string
+      connectionString:
+        description: The jdbc connection string
+        type: string
+      dbUser:
+        description: The jdbc user name
+        type: string
+      dbPassword:
+        description: The jdbc user password
+        type: string
+      dbType:
+        description: A sql types,valid types are ORACLE, POSTGRESQL
+        type: string
+      availability:
+        $ref: "#/definitions/Availability"
+      subjectAreaName:
+        type: string
+        description: The external schema's subjectArea name
+      subjectAreaKey:
+        type: string
+        description: The external schema's subjectArea key
+
+  DiscoveryTestSqlConnectionRequest:
+    title: A parameterized request for test Sql discovery connection
+    properties:
+      connectionString:
+        description: The jdbc connection string
+        type: string
+      dbUser:
+        description: The jdbc user name
+        type: string
+      dbPassword:
+        description: The jdbc user password
+        type: string
+      dbType:
+        description: A sql types,valid types are ORACLE, POSTGRESQL
+        type: string
 
   SchemaDiscoveryRequest:
     title: A parameterized request for external schema discovery

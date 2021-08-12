@@ -66,6 +66,11 @@
             it uses swagger-core 1.5.20, which is the one also used by springfox 2.9.2 which we also use -->
             <version>1.0.36</version>
         </dependency>
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc8</artifactId>
+            <version>21.1.0.0</version>
+        </dependency>
         <!-- tests -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -8,6 +8,8 @@ package com.amdocs.aia.il.configuration.api;
 import com.amdocs.aia.il.configuration.dto.AsyncResponseDTO;
 import com.amdocs.aia.il.configuration.dto.DiscoverExternalCsvRequestDTO;
 import com.amdocs.aia.il.configuration.dto.DiscoverExternalJsonRequestDTO;
+import com.amdocs.aia.il.configuration.dto.DiscoverExternalSqlRequestDTO;
+import com.amdocs.aia.il.configuration.dto.DiscoveryTestSqlConnectionRequestDTO;
 import org.springframework.core.io.Resource;
 import com.amdocs.aia.il.configuration.dto.SchemaDiscoveryRequestDTO;
 import com.amdocs.aia.il.configuration.dto.UploadDiscoveryFileResponseDTO;
@@ -116,6 +118,49 @@ public interface DiscoveryApi {
         consumes = { "application/json" },
         method = RequestMethod.POST)
     default ResponseEntity<Void> discoverExternalSchema(@ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey,@ApiParam(value = "The discovery request details" ,required=true )  @Valid @RequestBody SchemaDiscoveryRequestDTO discoveryRequest) {
+        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+        } else {
+            log.warn("ObjectMapper or HttpServletRequest not configured in default DiscoveryApi interface so no example is generated");
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+
+    @ApiOperation(value = "Discover External Sql Async", nickname = "discoverExternalSqlAsync", notes = "", response = AsyncResponseDTO.class, tags={ "Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 201, message = "OK discover External Sql Schema", response = AsyncResponseDTO.class),
+        @ApiResponse(code = 405, message = "Invalid input") })
+    @RequestMapping(value = "/projects/{projectKey}/configuration/discovery/discover-external-sql",
+        produces = { "application/json" }, 
+        consumes = { "application/json" },
+        method = RequestMethod.POST)
+    default ResponseEntity<AsyncResponseDTO> discoverExternalSqlAsync(@ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey,@ApiParam(value = "The discovery external Sql request details" ,required=true )  @Valid @RequestBody DiscoverExternalSqlRequestDTO discoverExternalSqlRequest) {
+        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
+            if (getAcceptHeader().get().contains("application/json")) {
+                try {
+                    return new ResponseEntity<>(getObjectMapper().get().readValue("{  \"processId\" : 0}", AsyncResponseDTO.class), HttpStatus.NOT_IMPLEMENTED);
+                } catch (IOException e) {
+                    log.error("Couldn't serialize response for content type application/json", e);
+                    return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+                }
+            }
+        } else {
+            log.warn("ObjectMapper or HttpServletRequest not configured in default DiscoveryApi interface so no example is generated");
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+
+    @ApiOperation(value = "Test database connection for external sql discovery", nickname = "discoveryTestSqlConnection", notes = "", tags={ "Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK test discovery sql connection"),
+        @ApiResponse(code = 400, message = "Invalid input"),
+        @ApiResponse(code = 500, message = "Error during discovery sql connection creation") })
+    @RequestMapping(value = "/projects/{projectKey}/configuration/discovery/test-sql-connection",
+        produces = { "application/json" }, 
+        consumes = { "application/json" },
+        method = RequestMethod.POST)
+    default ResponseEntity<Void> discoveryTestSqlConnection(@ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey,@ApiParam(value = "The discovery external Sql database connection details" ,required=true )  @Valid @RequestBody DiscoveryTestSqlConnectionRequestDTO testSqlConnectionRequest) {
         if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default DiscoveryApi interface so no example is generated");

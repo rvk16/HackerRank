@@ -93,12 +93,23 @@ public abstract class AbstractExternalModelDiscoverer<P extends AbstractExternal
 
     @Override
     public final void discover() {
-        validateInput();
-        consumer.discoveryStarted();
-        initDiscovery();
-        createSchema();
-        discoverEntities();
-        consumer.discoveryCompleted();
+        try {
+            validateInput();
+            consumer.discoveryStarted();
+            initDiscovery();
+            createSchema();
+            discoverEntities();
+            consumer.discoveryCompleted();
+        }catch(RuntimeException e)
+        {
+            discoveryEnded(false);
+            throw e;
+        }
+        discoveryEnded(true);
+    }
+
+    protected void discoveryEnded(boolean isSuccessful) {
+
     }
 
     protected void initDiscovery() {

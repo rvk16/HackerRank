@@ -88,6 +88,11 @@ aia:
                 replace-character: ref_
           JSON_OVER_KAFKA:
             generate-entity-for-operation-response: true
+      sql:
+        max-precision: 15
+        max-scale: 4
+        default-varchar-lenght: 4000
+
 
 monitoring:
   enabled: true
@@ -190,6 +195,8 @@ com.amdocs:
         roleAddEntitiesReferentialIntegrityMethod: BizRole2 #aia_il_configuration_authoring_addEntitiesReferentialIntegrity
         roleExportExternalSchemasMethod: BizRole2 #aia_il_configuration_authoring_exportExternalSchemas
         roleImportExternalSchemasMethod: BizRole2 #aia_il_configuration_authoring_importExternalSchemas
+        roleDiscoverExternalSql: BizRole2 #aia_il_configuration_authoring_discoverExternalSql
+        roleDiscoverTestSqlConnection: BizRole2 #aia_il_configuration_authoring_testSqlConnection
       tgt.enabled: true
       roles-deployment.enabled: true
 

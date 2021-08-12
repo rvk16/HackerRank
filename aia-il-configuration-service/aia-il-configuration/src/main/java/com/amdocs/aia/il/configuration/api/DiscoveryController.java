@@ -54,4 +54,23 @@ public class DiscoveryController implements DiscoveryApi {
         discoveryService.discoverExternalSchema(projectKey, discoveryRequest);
         return new ResponseEntity<>(null, HttpStatus.CREATED);
     }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority(@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleDiscoverExternalSql'),@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleGateway'))")
+    public ResponseEntity<AsyncResponseDTO> discoverExternalSqlAsync(String projectKey, DiscoverExternalSqlRequestDTO discoverExternalSqlRequest) {
+        AsyncResponseDTO asyncResponseDTO=discoveryService.discoverExternalSqlAsync(projectKey,discoverExternalSqlRequest);
+        return new ResponseEntity<>(asyncResponseDTO, HttpStatus.OK);
+    }
+
+    @Override
+    @PreAuthorize("hasAnyAuthority(@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleDiscoverTestSqlConnection'),@environment.getProperty('com.amdocs.msnext.securitya3s.service.roles.roleGateway'))")
+    public ResponseEntity<Void> discoveryTestSqlConnection(String projectKey, DiscoveryTestSqlConnectionRequestDTO testSqlConnectionRequest) {
+        boolean isConnected = discoveryService.testDiscoverySqlConnection(testSqlConnectionRequest);
+        if(isConnected) {
+            return new ResponseEntity<>(null, HttpStatus.OK);
+        }
+        else{
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+    }
 }
