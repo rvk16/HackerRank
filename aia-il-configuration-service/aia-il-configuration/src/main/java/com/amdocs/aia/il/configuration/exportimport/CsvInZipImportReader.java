@@ -13,6 +13,7 @@ import java.io.BufferedInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -31,11 +32,13 @@ public class CsvInZipImportReader {
                         .statusCode(AiaApiException.AiaApiHttpCodes.INTERNAL_SERVER_ERROR)
                         .message(aiaApiMessage);
             }
-            findFileInZip(zipInputStream, EXTERNAL_SCHEMAS_EXPORT_FILE_NAME);
-            final CsvMapper mapper = new CsvMapper();
-            final CsvSchema schema = mapper.schemaFor(ExternalSchemaExportCSV.class).withHeader().withNullValue("");
-            final MappingIterator<ExternalSchemaExportCSV> externalSchemasInFileIter = mapper.readerFor(ExternalSchemaExportCSV.class).with(schema).readValues(zipInputStream);
-            return externalSchemasInFileIter.readAll();
+             if (findFileInZip(zipInputStream, EXTERNAL_SCHEMAS_EXPORT_FILE_NAME)){
+                final CsvMapper mapper = new CsvMapper();
+                final CsvSchema schema = mapper.schemaFor(ExternalSchemaExportCSV.class).withHeader().withNullValue("");
+                final MappingIterator<ExternalSchemaExportCSV> externalSchemasInFileIter = mapper.readerFor(ExternalSchemaExportCSV.class).with(schema).readValues(zipInputStream);
+                return externalSchemasInFileIter.readAll();
+            }
+
         } catch (IOException e) {
             final AiaApiMessage aiaApiMessage = new AiaApiMessage(AiaApiMessages.GENERAL.IMPORT_FROM_ZIP_ERROR);
             throw new AiaApiException()
@@ -43,15 +46,18 @@ public class CsvInZipImportReader {
                     .message(aiaApiMessage)
                     .originalException(e);
         }
+        return Collections.emptyList();
     }
 
     public List<ExternalEntityExportCSV> readExternalEntityFromZipFile(MultipartFile file) {
         try (ZipInputStream zipInputStream = new ZipInputStream(file.getInputStream())) {
-            findFileInZip(zipInputStream, EXTERNAL_ENTITIES_EXPORT_FILE_NAME);
-            final CsvMapper mapper = new CsvMapper();
-            final CsvSchema schema = mapper.schemaFor(ExternalEntityExportCSV.class).withHeader().withNullValue("");
-            final MappingIterator<ExternalEntityExportCSV> externalSchemasInFileIter = mapper.readerFor(ExternalEntityExportCSV.class).with(schema).readValues(zipInputStream);
-            return externalSchemasInFileIter.readAll();
+            if(findFileInZip(zipInputStream, EXTERNAL_ENTITIES_EXPORT_FILE_NAME)){
+                final CsvMapper mapper = new CsvMapper();
+                final CsvSchema schema = mapper.schemaFor(ExternalEntityExportCSV.class).withHeader().withNullValue("");
+                final MappingIterator<ExternalEntityExportCSV> externalSchemasInFileIter = mapper.readerFor(ExternalEntityExportCSV.class).with(schema).readValues(zipInputStream);
+                return externalSchemasInFileIter.readAll();
+            }
+
         } catch (IOException e) {
             final AiaApiMessage aiaApiMessage = new AiaApiMessage(AiaApiMessages.GENERAL.IMPORT_FROM_ZIP_ERROR);
             throw new AiaApiException()
@@ -59,15 +65,18 @@ public class CsvInZipImportReader {
                     .message(aiaApiMessage)
                     .originalException(e);
         }
+        return Collections.emptyList();
     }
 
     public List<ExternalAttributeExportCSV> readExternalAttributesFromZipFile(MultipartFile file) {
         try (ZipInputStream zipInputStream = new ZipInputStream(file.getInputStream())) {
-            findFileInZip(zipInputStream, EXTERNAL_ATTRIBUTES_EXPORT_FILE_NAME);
-            final CsvMapper mapper = new CsvMapper();
-            final CsvSchema schema = mapper.schemaFor(ExternalAttributeExportCSV.class).withHeader().withNullValue("");
-            final MappingIterator<ExternalAttributeExportCSV> externalSchemasInFileIter = mapper.readerFor(ExternalAttributeExportCSV.class).with(schema).readValues(zipInputStream);
-            return externalSchemasInFileIter.readAll();
+            if(findFileInZip(zipInputStream, EXTERNAL_ATTRIBUTES_EXPORT_FILE_NAME)){
+                final CsvMapper mapper = new CsvMapper();
+                final CsvSchema schema = mapper.schemaFor(ExternalAttributeExportCSV.class).withHeader().withNullValue("");
+                final MappingIterator<ExternalAttributeExportCSV> externalSchemasInFileIter = mapper.readerFor(ExternalAttributeExportCSV.class).with(schema).readValues(zipInputStream);
+                return externalSchemasInFileIter.readAll();
+            }
+
         } catch (IOException e) {
             final AiaApiMessage aiaApiMessage = new AiaApiMessage(AiaApiMessages.GENERAL.IMPORT_FROM_ZIP_ERROR);
             throw new AiaApiException()
@@ -75,6 +84,7 @@ public class CsvInZipImportReader {
                     .message(aiaApiMessage)
                     .originalException(e);
         }
+        return Collections.emptyList();
     }
 
     private static boolean isZipFile(String filename, InputStream stream) throws IOException {
@@ -89,17 +99,13 @@ public class CsvInZipImportReader {
         return test == 0x504b0304;
     }
 
-    private void findFileInZip(ZipInputStream zipInputStream,String fileName) throws IOException {
+    private boolean findFileInZip(ZipInputStream zipInputStream,String fileName) throws IOException {
         ZipEntry entry;
         while (( entry = zipInputStream.getNextEntry()) != null) {
             if (entry.getName().equals(fileName)) {
-                return;
+                return true;
             }
         }
-
-        final AiaApiMessage aiaApiMessage = new AiaApiMessage(AiaApiMessages.GENERAL.IMPORT_FROM_ZIP_MISSING_CSV_ERROR,fileName);
-        throw new AiaApiException()
-                .statusCode(AiaApiException.AiaApiHttpCodes.INTERNAL_SERVER_ERROR)
-                .message(aiaApiMessage);
+        return false;
     }
 }
