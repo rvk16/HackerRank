@@ -13,4 +13,6 @@ public interface DiscoveryService {
     void discoverExternalSchema(String projectKey, SchemaDiscoveryRequestDTO discoveryRequest);
 
     AsyncResponseDTO discoverExternalSqlAsync(String projectKey, DiscoverExternalSqlRequestDTO discoverExternalSqlRequest);
+
+    boolean testDiscoverySqlConnection(DiscoveryTestSqlConnectionRequestDTO discoveryTestSqlConnectionRequest);
 }

@@ -86,7 +86,7 @@ public class ExternalSqlDiscovererTest {
         assertEquals("VARCHAR(6)", externalEntityBlCharge.getAttributes().get(7).getDatatype());
         ExternalEntity externalEntityTestData = consumer.getEntities().get(2);
         assertEquals("TEST_DATA", externalEntityTestData.getEntityKey());
-        assertEquals(17, externalEntityTestData.getAttributes().size());
+        assertEquals(18, externalEntityTestData.getAttributes().size());
         assertEquals("INT_COL", externalEntityTestData.getAttributes().get(0).getAttributeKey());
         assertEquals("BIGINT", externalEntityTestData.getAttributes().get(0).getDatatype());
         assertEquals("VARCHAR_COL", externalEntityTestData.getAttributes().get(1).getAttributeKey());

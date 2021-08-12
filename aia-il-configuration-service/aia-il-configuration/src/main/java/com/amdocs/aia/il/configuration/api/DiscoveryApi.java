@@ -9,6 +9,7 @@ import com.amdocs.aia.il.configuration.dto.AsyncResponseDTO;
 import com.amdocs.aia.il.configuration.dto.DiscoverExternalCsvRequestDTO;
 import com.amdocs.aia.il.configuration.dto.DiscoverExternalJsonRequestDTO;
 import com.amdocs.aia.il.configuration.dto.DiscoverExternalSqlRequestDTO;
+import com.amdocs.aia.il.configuration.dto.DiscoveryTestSqlConnectionRequestDTO;
 import org.springframework.core.io.Resource;
 import com.amdocs.aia.il.configuration.dto.SchemaDiscoveryRequestDTO;
 import com.amdocs.aia.il.configuration.dto.UploadDiscoveryFileResponseDTO;
@@ -143,6 +144,24 @@ public interface DiscoveryApi {
                     return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
+        } else {
+            log.warn("ObjectMapper or HttpServletRequest not configured in default DiscoveryApi interface so no example is generated");
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+    }
+
+
+    @ApiOperation(value = "Test database connection for external sql discovery", nickname = "discoveryTestSqlConnection", notes = "", tags={ "Discovery", })
+    @ApiResponses(value = { 
+        @ApiResponse(code = 200, message = "OK test discovery sql connection"),
+        @ApiResponse(code = 400, message = "Invalid input"),
+        @ApiResponse(code = 500, message = "Error during discovery sql connection creation") })
+    @RequestMapping(value = "/projects/{projectKey}/configuration/discovery/test-sql-connection",
+        produces = { "application/json" }, 
+        consumes = { "application/json" },
+        method = RequestMethod.POST)
+    default ResponseEntity<Void> discoveryTestSqlConnection(@ApiParam(value = "The project key",required=true) @PathVariable("projectKey") String projectKey,@ApiParam(value = "The discovery external Sql database connection details" ,required=true )  @Valid @RequestBody DiscoveryTestSqlConnectionRequestDTO testSqlConnectionRequest) {
+        if(getObjectMapper().isPresent() && getAcceptHeader().isPresent()) {
         } else {
             log.warn("ObjectMapper or HttpServletRequest not configured in default DiscoveryApi interface so no example is generated");
         }

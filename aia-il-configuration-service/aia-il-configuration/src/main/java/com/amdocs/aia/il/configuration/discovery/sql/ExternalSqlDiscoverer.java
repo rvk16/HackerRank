@@ -121,7 +121,7 @@ public class ExternalSqlDiscoverer extends AbstractExternalModelDiscoverer<Exter
         String sqlDatatype = DatatypeToSqlTypeSystemConvertor.getDatatypeInSqlTypeSystem(columnInfo, properties.getMaxPrecision(), properties.getMaxScale(), properties.getDefaultVarcharLength());
         attribute.setDatatype(sqlDatatype);
         attribute.setLogicalDatatype(LogicalTypeSystem.format(typeSystemFactory.getTypeSystemForKey(SqlTypeSystem.NAME).toLogicalDatatype(sqlDatatype)));
-        attribute.setKeyPosition(keyPosition > -1 ? keyPosition : null);
+        attribute.setKeyPosition(keyPosition > -1 ? keyPosition + 1 : null); //TODO verify
         attribute.setLogicalTime(false);
         attribute.setUpdateTime(false);
         attribute.setRequired(keyPosition != -1);

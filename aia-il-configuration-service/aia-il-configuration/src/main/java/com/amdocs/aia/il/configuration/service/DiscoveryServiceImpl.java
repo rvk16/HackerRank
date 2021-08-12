@@ -7,10 +7,7 @@ import com.amdocs.aia.common.model.repo.AsyncProcessRequestDTO;
 import com.amdocs.aia.common.model.repo.AsyncProcessResponseDTO;
 import com.amdocs.aia.il.common.model.external.Availability;
 import com.amdocs.aia.il.common.model.external.ExternalSchemaType;
-import com.amdocs.aia.il.configuration.discovery.AbstractExternalModelDiscoveryParameters;
-import com.amdocs.aia.il.configuration.discovery.DiscoveryExecutor;
-import com.amdocs.aia.il.configuration.discovery.DiscoveryFilesRepository;
-import com.amdocs.aia.il.configuration.discovery.ExternalModelDiscoveryConsumer;
+import com.amdocs.aia.il.configuration.discovery.*;
 import com.amdocs.aia.il.configuration.discovery.csv.ExternalCsvDiscoveryParameters;
 import com.amdocs.aia.il.configuration.discovery.json.ExternalJsonDiscoveryParameters;
 import com.amdocs.aia.il.configuration.discovery.sql.ExternalSqlDiscoveryParameters;
@@ -24,6 +21,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import static com.amdocs.aia.il.configuration.discovery.DiscoveryUtils.convertDiscoveryParametersToMap;
 import static com.amdocs.aia.il.configuration.discovery.DiscoveryUtils.discoveryRequestToJson;
@@ -140,6 +140,21 @@ public class DiscoveryServiceImpl implements DiscoveryService {
         discoveryParams.setSubjectAreaKey(discoverExternalSqlRequest.getSubjectAreaKey());
         discoveryParams.setDbType(discoverExternalSqlRequest.getDbType());
         return generalDiscovery(projectKey, discoveryParams, DISCOVER_EXTERNAL_SQL_DISPLAY_NAME, discoverExternalSqlRequest.getSchemaName(), discoverExternalSqlRequest.getDbType());
+    }
+
+    @Override
+    public boolean testDiscoverySqlConnection(DiscoveryTestSqlConnectionRequestDTO discoveryTestSqlConnectionRequest) {
+        boolean isConnected = false;
+        try {
+                Connection connection = DriverManager.getConnection(discoveryTestSqlConnectionRequest.getConnectionString(), discoveryTestSqlConnectionRequest.getDbUser(),discoveryTestSqlConnectionRequest.getDbPassword());
+                if(connection != null){
+                    isConnected = true;
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                throw new DiscoveryRuntimeException(e);
+            }
+        return isConnected;
     }
 
     private static Availability toAvailabilityModel(AvailabilityDTO dto) {

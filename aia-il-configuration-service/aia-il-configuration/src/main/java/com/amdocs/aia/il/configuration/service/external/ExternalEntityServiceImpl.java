@@ -388,6 +388,7 @@ public class ExternalEntityServiceImpl extends AbstractModelService<ExternalEnti
             logicalAttribute.setOrigin(externalAttribute.getOrigin());
             logicalAttribute.setIsLogicalTime(externalAttribute.isLogicalTime());
             logicalAttribute.setKeyPosition(externalAttribute.getKeyPosition());
+            //TODO verify if need to change to get logical datatype here
             logicalAttribute.setDatatype(Datatype.forPrimitive(PrimitiveDatatype.valueOf(externalAttribute.getDatatype()), Collections.emptyMap()));
 
             logicalAttributes.add(logicalAttribute);

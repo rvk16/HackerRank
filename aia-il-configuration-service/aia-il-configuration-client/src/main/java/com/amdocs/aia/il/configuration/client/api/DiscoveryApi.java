@@ -7,6 +7,7 @@ import com.amdocs.aia.il.configuration.client.dto.AsyncResponseDTO;
 import com.amdocs.aia.il.configuration.client.dto.DiscoverExternalCsvRequestDTO;
 import com.amdocs.aia.il.configuration.client.dto.DiscoverExternalJsonRequestDTO;
 import com.amdocs.aia.il.configuration.client.dto.DiscoverExternalSqlRequestDTO;
+import com.amdocs.aia.il.configuration.client.dto.DiscoveryTestSqlConnectionRequestDTO;
 import java.io.File;
 import com.amdocs.aia.il.configuration.client.dto.SchemaDiscoveryRequestDTO;
 import com.amdocs.aia.il.configuration.client.dto.UploadDiscoveryFileResponseDTO;
@@ -75,6 +76,19 @@ public interface DiscoveryApi extends ApiClient.Api {
     "Accept: application/json",
   })
   AsyncResponseDTO discoverExternalSqlAsync(@Param("projectKey") String projectKey, DiscoverExternalSqlRequestDTO discoverExternalSqlRequest);
+
+  /**
+   * Test database connection for external sql discovery
+   * 
+    * @param projectKey The project key (required)
+    * @param testSqlConnectionRequest The discovery external Sql database connection details (required)
+   */
+  @RequestLine("POST /projects/{projectKey}/configuration/discovery/test-sql-connection")
+  @Headers({
+    "Content-Type: application/json",
+    "Accept: application/json",
+  })
+  void discoveryTestSqlConnection(@Param("projectKey") String projectKey, DiscoveryTestSqlConnectionRequestDTO testSqlConnectionRequest);
 
   /**
    * Upload Discovery File
