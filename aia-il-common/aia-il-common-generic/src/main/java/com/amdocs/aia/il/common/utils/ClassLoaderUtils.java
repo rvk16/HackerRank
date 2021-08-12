@@ -32,7 +32,8 @@ public class ClassLoaderUtils {
                 "com.datastax.oss.driver.api.core.servererrors.UnavailableException",
                 "com.datastax.oss.driver.api.core.servererrors.WriteFailureException",
                 "com.datastax.oss.driver.api.core.servererrors.WriteTimeoutException",
-                "com.datastax.oss.driver.api.core.NoNodeAvailableException");
+                "com.datastax.oss.driver.api.core.NoNodeAvailableException",
+                "com.datastax.oss.driver.api.core.AllNodesFailedException");
 
         return new HashSet<>(classes);
     }
