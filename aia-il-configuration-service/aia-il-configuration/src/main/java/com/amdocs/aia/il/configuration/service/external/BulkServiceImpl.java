@@ -30,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -53,7 +54,6 @@ public class BulkServiceImpl implements BulkService {
     private final MessageHelper messageHelper;
 
     private Map<Boolean,Map<String ,Map< String, List<ExternalAttributeExportCSV>>>> attributesInFileMapByKeys;
-
 
     private final CsvInZipImportReader csvInZipImportReader;
 
@@ -101,8 +101,8 @@ public class BulkServiceImpl implements BulkService {
         if (file.getSize() == 0) {
             return response;
         }
-        importExternalSchemas(projectKey, csvInZipImportReader.readExternalSchemaFromZipFile(file),response);
-        importExternalEntities(projectKey, csvInZipImportReader.readExternalEntityFromZipFile(file),csvInZipImportReader.readExternalAttributesFromZipFile(file),response);
+        importExternalSchemas(projectKey,csvInZipImportReader.readExternalSchemaFromZipFile(file),response);
+        importExternalEntities(projectKey,csvInZipImportReader.readExternalEntityFromZipFile(file),csvInZipImportReader.readExternalAttributesFromZipFile(file),response);
         return response;
     }
 
@@ -149,14 +149,95 @@ public class BulkServiceImpl implements BulkService {
      if (!externalEntityDTOsToUpdate.isEmpty()) {
             externalEntityDTOsToUpdate.forEach( externalEntityDTO -> externalEntityService.update(projectKey,externalEntityDTO.getSchemaKey(),externalEntityDTO));
         }
-        response.setModifiedEntitiesCount(externalEntityDTOsToUpdate.size());
+
+        Set<String> ExternalEntitiesKeysInFileNotToDelete = externalEntitiesInFileNotToDelete.stream().map(h ->h.getSchemaKey()+"_"+h.getEntityKey()).collect(Collectors.toSet());
+
+        Map<String,Map<String,List<ExternalAttributeExportCSV>>> attributesInFileWithoutParentMap =
+                externalAttributesKeysInFile.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey()))
+                        .collect(Collectors.groupingBy( ExternalAttributeExportCSV::getSchemaKey,Collectors.groupingBy( ExternalAttributeExportCSV::getEntityKey, Collectors.toList())));
+
+//
+//        Map<String,Map<String,List<ExternalAttributeExportCSV>>> attributesNotToDeleteInFileWithoutParentMap = attributesInFileMapByKeys.get(false).values().stream()
+//                .flatMap(entitiesMap -> entitiesMap.values().stream())
+//                .flatMap(attributes -> attributes.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey())))
+//                .collect(Collectors.groupingBy( ExternalAttributeExportCSV::getSchemaKey,Collectors.groupingBy( ExternalAttributeExportCSV::getEntityKey, Collectors.toList())));
+//
+//        Map<String,Map<String,List<ExternalAttributeExportCSV>>> attributesToDeleteInFileWithoutParentMap = attributesInFileMapByKeys.get(true).values().stream()
+//                .flatMap(entitiesMap -> entitiesMap.values().stream())
+//                .flatMap(attributes -> attributes.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey())))
+//                .collect(Collectors.groupingBy( ExternalAttributeExportCSV::getSchemaKey,Collectors.groupingBy( ExternalAttributeExportCSV::getEntityKey, Collectors.toList())));
+
+
+        AtomicInteger additionalUpdateEntity = new AtomicInteger();
+
+
+
+
+        attributesInFileWithoutParentMap.forEach( (schemaKey, entitiesMap) -> {
+            entitiesMap.forEach((entityKey, attributes) -> {
+                ExternalEntityDTO existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(schemaKey).get(entityKey);
+                if( existingEntityDTO != null) {
+                    Map<String, ExternalAttributeDTO > existingAttributeMapByKey = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey,externalAttributeDTO -> externalAttributeDTO));
+                    for (ExternalAttributeExportCSV csvAttribute : attributes) {
+                        if (csvAttribute.getToDelete()){
+                            existingAttributeMapByKey.remove(csvAttribute.getAttributeKey());
+                        }else{
+                            ExternalAttributeDTO attributeDTO =  toExternalAttributeDTO(csvAttribute,existingEntityDTO.getStoreInfo().getStoreType().name());
+                            existingAttributeMapByKey.put(attributeDTO.getAttributeKey(),attributeDTO);
+                        }
+                    }
+                   existingEntityDTO.setAttributes(existingAttributeMapByKey.values().stream().collect(toList()));
+                   externalEntityService.update(projectKey,schemaKey,existingEntityDTO);
+                   additionalUpdateEntity.getAndIncrement();
+                }
+            });
+        });
+//            ExternalEntityDTO existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(externalAttributeExportCSV.getSchemaKey()).get(externalAttributeExportCSV.getEntityKey());
+//            if(existingEntityDTO!=null){
+//                Map <String, ExternalAttributeDTO> attributeDTOMap = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
+//                if(externalAttributeExportCSV.getToDelete()){
+//                    attributeDTOMap.remove(externalAttributeExportCSV.getAttributeKey());
+//               }else{
+//                    attributeDTOMap.(toExternalAttributeDTO(externalAttributeExportCSV,existingSchemaTypesByKeys.get(existingEntityDTO.getSchemaKey()).getStoreType()));
+//               }
+//            }
+//        });
+
+//
+//
+//
+//
+//        List<ExternalAttributeExportCSV> attributesInFileWithoutParent = attributesInFileMapByKeys.get(false).values().stream()
+//                .flatMap(entitiesMap -> entitiesMap.values().stream())
+//                .flatMap(attributes -> attributes.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey())))
+//                .collect(Collectors.toList());
+
+
+
+
+//        attributesInFileWithoutParent.forEach( externalAttributeExportCSV -> {
+//            ExternalEntityDTO existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(externalAttributeExportCSV.getSchemaKey()).get(externalAttributeExportCSV.getEntityKey());
+//            if(existingEntityDTO!=null){
+//                Map <String, ExternalAttributeDTO> attributeDTOMap = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
+//                if(externalAttributeExportCSV.getToDelete()){
+//                    attributeDTOMap.remove(externalAttributeExportCSV.getAttributeKey());
+//               }else{
+//                    attributeDTOMap.(toExternalAttributeDTO(externalAttributeExportCSV,existingSchemaTypesByKeys.get(existingEntityDTO.getSchemaKey()).getStoreType()));
+//               }
+//            }
+//        });
+
+
+
+        response.setModifiedEntitiesCount(externalEntityDTOsToUpdate.size()+additionalUpdateEntity.get());
+
+
+
     }
 
 
     private void importExternalSchemas(String projectKey, List<ExternalSchemaExportCSV> externalSchemasKeysInFile, BulkImportResponseDTO response) {
-
         //delete external schemas
-
         final List<String> externalSchemasKeysInFileToDelete = externalSchemasKeysInFile.stream().filter(externalSchemaExportCSV -> externalSchemaExportCSV.getToDelete()==Boolean.TRUE).map(ExternalSchemaExportCSV::getSchemaKey).collect(Collectors.toList());
         int notExitSchema = 0;
         for (String schemaKey : externalSchemasKeysInFileToDelete) {
@@ -396,7 +477,6 @@ public class BulkServiceImpl implements BulkService {
                             .defaultColumnDelimiter(externalSchemaExportCSV.getDefaultColumnDelimiter())
                             .defaultDateFormat(externalSchemaExportCSV.getDefaultDateFormat())
                             .storeType(ExternalSchemaStoreInfoDTO.StoreTypeEnum.CSV);
-
                 case ExternalSchemaStoreTypes.KAFKA:
                     return new ExternalKafkaSchemaStoreInfoDTO()
                             .defaultDateFormat(externalSchemaExportCSV.getDefaultDateFormat())
@@ -488,7 +568,7 @@ public class BulkServiceImpl implements BulkService {
         externalEntityDTO.setIsTransaction(externalEntityExportCSV.getTransaction());
         externalEntityDTO.setStoreInfo(toStoreInfoEntity(externalEntityExportCSV,schemaType));
         externalEntityDTO.setCollectionRules(toCollectionRulesEntity(externalEntityExportCSV,schemaType));
-        externalEntityDTO.setAttributes(isNew? getAttributes(externalEntityExportCSV, schemaType): mergeAttribute (externalEntityExportCSV, schemaType,externalEntity.getAttributes()));
+        externalEntityDTO.setAttributes(isNew? getAttributes(externalEntityExportCSV, schemaType): mergeAttribute (externalEntityExportCSV.getSchemaKey(),externalEntityExportCSV.getEntityKey(), schemaType,externalEntity.getAttributes()));
         externalEntityDTO.setIsActive(externalEntityExportCSV.getActive());
         externalEntityDTO.setOriginProcess(isNew? OriginProcess.IMPLEMENTATION.name(): externalEntity.getOriginProcess() );
         return externalEntityDTO;
@@ -505,17 +585,17 @@ public class BulkServiceImpl implements BulkService {
        return null;
     }
 
-    private List<ExternalAttributeDTO> mergeAttribute(ExternalEntityExportCSV externalEntityExportCSV, String schemaType, List <ExternalAttributeDTO> exitingExternalAttributeDTOS ) {
+    private List<ExternalAttributeDTO> mergeAttribute(String schemaKey,String  entityKey ,String schemaType, List <ExternalAttributeDTO> exitingExternalAttributeDTOS ) {
         List<ExternalAttributeDTO> attributes = new ArrayList<>();
 
         Map<String, ExternalAttributeDTO > existingAttributeMapByKey = exitingExternalAttributeDTOS.stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey,externalAttributeDTO -> externalAttributeDTO));
         List<ExternalAttributeExportCSV> attributeExportInCSVList = null;
-        if( attributesInFileMapByKeys.get(false)!= null && attributesInFileMapByKeys.get(false).get(externalEntityExportCSV.getSchemaKey())!= null) {
-            attributeExportInCSVList = attributesInFileMapByKeys.get(false).get(externalEntityExportCSV.getSchemaKey()).get(externalEntityExportCSV.getEntityKey());
+        if( attributesInFileMapByKeys.get(false)!= null && attributesInFileMapByKeys.get(false).get(schemaKey)!= null) {
+            attributeExportInCSVList = attributesInFileMapByKeys.get(false).get(schemaKey).get(entityKey);
         }
         List<ExternalAttributeExportCSV> attributeToDelete =  null;
-        if( attributesInFileMapByKeys.get(true)!= null && attributesInFileMapByKeys.get(true).get(externalEntityExportCSV.getSchemaKey())!= null ){
-            attributeToDelete = attributesInFileMapByKeys.get(true).get(externalEntityExportCSV.getSchemaKey()).get(externalEntityExportCSV.getEntityKey());
+        if( attributesInFileMapByKeys.get(true)!= null && attributesInFileMapByKeys.get(true).get(schemaKey)!= null ){
+            attributeToDelete = attributesInFileMapByKeys.get(true).get(schemaKey).get(entityKey);
         }
         //delete from existing entity list
         if(attributeToDelete !=null && !exitingExternalAttributeDTOS.isEmpty()){
