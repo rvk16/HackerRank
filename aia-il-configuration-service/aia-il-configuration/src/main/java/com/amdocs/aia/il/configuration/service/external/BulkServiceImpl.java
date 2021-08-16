@@ -97,6 +97,7 @@ public class BulkServiceImpl implements BulkService {
 
     @Override
     public BulkImportResponseDTO importExternalSchemasFromZIP(String projectKey, MultipartFile file) {
+        LOGGER.debug("import external schemas");
         final BulkImportResponseDTO response = new BulkImportResponseDTO();
         if (file.getSize() == 0) {
             return response;
@@ -150,92 +151,32 @@ public class BulkServiceImpl implements BulkService {
             externalEntityDTOsToUpdate.forEach( externalEntityDTO -> externalEntityService.update(projectKey,externalEntityDTO.getSchemaKey(),externalEntityDTO));
         }
 
-        Set<String> ExternalEntitiesKeysInFileNotToDelete = externalEntitiesInFileNotToDelete.stream().map(h ->h.getSchemaKey()+"_"+h.getEntityKey()).collect(Collectors.toSet());
-
+        Set<String> externalEntitiesKeysInFileNotToDelete = externalEntitiesInFileNotToDelete.stream().map(h ->h.getSchemaKey()+"_"+h.getEntityKey()).collect(Collectors.toSet());
         Map<String,Map<String,List<ExternalAttributeExportCSV>>> attributesInFileWithoutParentMap =
-                externalAttributesKeysInFile.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey()))
+                externalAttributesKeysInFile.stream().filter(externalAttributeExportCSV -> !externalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey()))
                         .collect(Collectors.groupingBy( ExternalAttributeExportCSV::getSchemaKey,Collectors.groupingBy( ExternalAttributeExportCSV::getEntityKey, Collectors.toList())));
-
-//
-//        Map<String,Map<String,List<ExternalAttributeExportCSV>>> attributesNotToDeleteInFileWithoutParentMap = attributesInFileMapByKeys.get(false).values().stream()
-//                .flatMap(entitiesMap -> entitiesMap.values().stream())
-//                .flatMap(attributes -> attributes.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey())))
-//                .collect(Collectors.groupingBy( ExternalAttributeExportCSV::getSchemaKey,Collectors.groupingBy( ExternalAttributeExportCSV::getEntityKey, Collectors.toList())));
-//
-//        Map<String,Map<String,List<ExternalAttributeExportCSV>>> attributesToDeleteInFileWithoutParentMap = attributesInFileMapByKeys.get(true).values().stream()
-//                .flatMap(entitiesMap -> entitiesMap.values().stream())
-//                .flatMap(attributes -> attributes.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey())))
-//                .collect(Collectors.groupingBy( ExternalAttributeExportCSV::getSchemaKey,Collectors.groupingBy( ExternalAttributeExportCSV::getEntityKey, Collectors.toList())));
-
-
         AtomicInteger additionalUpdateEntity = new AtomicInteger();
-
-
-
-
-        attributesInFileWithoutParentMap.forEach( (schemaKey, entitiesMap) -> {
-            entitiesMap.forEach((entityKey, attributes) -> {
-                ExternalEntityDTO existingEntityDTO = null;
-                if(existingExternalEntitiesBySchemaKey.get(schemaKey)!= null){
-                    existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(schemaKey).get(entityKey);
-                }
-                if( existingEntityDTO != null) {
-                    Map<String, ExternalAttributeDTO > existingAttributeMapByKey = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey,externalAttributeDTO -> externalAttributeDTO));
-                    for (ExternalAttributeExportCSV csvAttribute : attributes) {
-                        if (csvAttribute.getToDelete()){
-                            existingAttributeMapByKey.remove(csvAttribute.getAttributeKey());
-                        }else{
-                            ExternalAttributeDTO attributeDTO =  toExternalAttributeDTO(csvAttribute,existingEntityDTO.getStoreInfo().getStoreType().name());
-                            existingAttributeMapByKey.put(attributeDTO.getAttributeKey(),attributeDTO);
-                        }
+        attributesInFileWithoutParentMap.forEach( (schemaKey, entitiesMap) -> entitiesMap.forEach((entityKey, attributes) -> {
+            ExternalEntityDTO existingEntityDTO = null;
+            if(existingExternalEntitiesBySchemaKey.get(schemaKey)!= null){
+                existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(schemaKey).get(entityKey);
+            }
+            if( existingEntityDTO != null) {
+                Map<String, ExternalAttributeDTO > existingAttributeMapByKey = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey,externalAttributeDTO -> externalAttributeDTO));
+                for (ExternalAttributeExportCSV csvAttribute : attributes) {
+                    if (csvAttribute.getToDelete().booleanValue()){
+                        existingAttributeMapByKey.remove(csvAttribute.getAttributeKey());
+                    }else{
+                        ExternalAttributeDTO attributeDTO =  toExternalAttributeDTO(csvAttribute,existingEntityDTO.getStoreInfo().getStoreType().name());
+                        existingAttributeMapByKey.put(attributeDTO.getAttributeKey(),attributeDTO);
                     }
-                   existingEntityDTO.setAttributes(existingAttributeMapByKey.values().stream().collect(toList()));
-                   externalEntityService.update(projectKey,schemaKey,existingEntityDTO);
-                   additionalUpdateEntity.getAndIncrement();
                 }
-            });
-        });
-//            ExternalEntityDTO existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(externalAttributeExportCSV.getSchemaKey()).get(externalAttributeExportCSV.getEntityKey());
-//            if(existingEntityDTO!=null){
-//                Map <String, ExternalAttributeDTO> attributeDTOMap = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
-//                if(externalAttributeExportCSV.getToDelete()){
-//                    attributeDTOMap.remove(externalAttributeExportCSV.getAttributeKey());
-//               }else{
-//                    attributeDTOMap.(toExternalAttributeDTO(externalAttributeExportCSV,existingSchemaTypesByKeys.get(existingEntityDTO.getSchemaKey()).getStoreType()));
-//               }
-//            }
-//        });
-
-//
-//
-//
-//
-//        List<ExternalAttributeExportCSV> attributesInFileWithoutParent = attributesInFileMapByKeys.get(false).values().stream()
-//                .flatMap(entitiesMap -> entitiesMap.values().stream())
-//                .flatMap(attributes -> attributes.stream().filter(externalAttributeExportCSV -> !ExternalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey())))
-//                .collect(Collectors.toList());
-
-
-
-
-//        attributesInFileWithoutParent.forEach( externalAttributeExportCSV -> {
-//            ExternalEntityDTO existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(externalAttributeExportCSV.getSchemaKey()).get(externalAttributeExportCSV.getEntityKey());
-//            if(existingEntityDTO!=null){
-//                Map <String, ExternalAttributeDTO> attributeDTOMap = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
-//                if(externalAttributeExportCSV.getToDelete()){
-//                    attributeDTOMap.remove(externalAttributeExportCSV.getAttributeKey());
-//               }else{
-//                    attributeDTOMap.(toExternalAttributeDTO(externalAttributeExportCSV,existingSchemaTypesByKeys.get(existingEntityDTO.getSchemaKey()).getStoreType()));
-//               }
-//            }
-//        });
-
-
-
+               existingEntityDTO.setAttributes(new ArrayList<>(existingAttributeMapByKey.values()));
+               externalEntityService.update(projectKey,schemaKey,existingEntityDTO);
+               additionalUpdateEntity.getAndIncrement();
+            }
+        }));
         response.setModifiedEntitiesCount(externalEntityDTOsToUpdate.size()+additionalUpdateEntity.get());
-
-
-
     }
 
 
@@ -245,7 +186,8 @@ public class BulkServiceImpl implements BulkService {
         int notExitSchema = 0;
         for (String schemaKey : externalSchemasKeysInFileToDelete) {
             try {
-                externalSchemaService.delete(projectKey, schemaKey);
+              externalSchemaService.delete(projectKey, schemaKey);
+              LOGGER.debug("schema {} was deleted",schemaKey);
             } catch (ApiException e) {
                 notExitSchema++;
             }
@@ -263,19 +205,25 @@ public class BulkServiceImpl implements BulkService {
         SaveElementsResponseDTO saveElementsResponseDTO = null;
         if (!externalSchemaDTOsToAdd.isEmpty()) {
             saveElementsResponseDTO = externalSchemaService.bulkSave(projectKey,externalSchemaDTOsToAdd);
+            LOGGER.debug("bulk operation for saving {} new schemas was performed",externalSchemaDTOsToAdd.size());
         }
         response.setNewSchemasCount(saveElementsResponseDTO != null ? saveElementsResponseDTO.getSavedElementsCount().intValue() : 0);
 
-        final List<ExternalSchemaDTO> ExternalSchemaDTOsToUpdate = externalSchemasInFileNotToDelete.stream().filter(externalSchemaExportCSV -> existingExternalSchemaKeys.contains(externalSchemaExportCSV.getSchemaKey()))
+        final List<ExternalSchemaDTO> externalSchemaDTOsToUpdate = externalSchemasInFileNotToDelete.stream().filter(externalSchemaExportCSV -> existingExternalSchemaKeys.contains(externalSchemaExportCSV.getSchemaKey()))
                 .map(this::toExternalSchemaDTO).collect(Collectors.toList());
-        if (!ExternalSchemaDTOsToUpdate.isEmpty()) {
-            ExternalSchemaDTOsToUpdate.forEach( externalSchemaDTO -> externalSchemaService.update(projectKey,externalSchemaDTO.getSchemaKey(),externalSchemaDTO) );
+        if (!externalSchemaDTOsToUpdate.isEmpty()) {
+            externalSchemaDTOsToUpdate.forEach( externalSchemaDTO -> {
+                externalSchemaService.update(projectKey,externalSchemaDTO.getSchemaKey(),externalSchemaDTO);
+                LOGGER.debug("schema {} was updated",externalSchemaDTO.getSchemaKey());
+            } );
         }
-        response.setModifiedSchemasCount(ExternalSchemaDTOsToUpdate.size());
+
+        response.setModifiedSchemasCount(externalSchemaDTOsToUpdate.size());
     }
 
 
     private void createExternalSchemasCSV(final String projectKey,final ZipOutputStream out ) {
+        LOGGER.debug("exporting external schemas");
         final List<ExternalSchema> externalSchema = externalSchemaRepository.findByProjectKey(projectKey);
         final CsvMapper mapper = new CsvMapper();
         mapper.enable(CsvGenerator.Feature.STRICT_CHECK_FOR_QUOTING);
@@ -286,7 +234,8 @@ public class BulkServiceImpl implements BulkService {
 
     private void writeCSvFile(ZipOutputStream out, CsvMapper mapper, CsvSchema csvSchema, List<AbstractCsvExternalModel> externalSchemaExportCSVS) {
         try{
-           mapper.writer(csvSchema).without(com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET).writeValue(out, externalSchemaExportCSVS);
+            LOGGER.debug("write scv file");
+            mapper.writer(csvSchema).without(com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET).writeValue(out, externalSchemaExportCSVS);
         } catch (IOException e) {
             final AiaApiMessage aiaApiMessage = new AiaApiMessage(AiaApiMessages.GENERAL.EXPORT_JACKSON_ERROR);
             throw new AiaApiException()
@@ -335,14 +284,15 @@ public class BulkServiceImpl implements BulkService {
                 externalSchemaExportCSV.setImplicitHandlerPreviousNode(((ExternalKafkaSchemaCollectionRules)externalSchema.getCollectionRules()).getImplicitHandlerPreviousNode());
                 externalSchemaExportCSV.setImplicitHandlerCurrentNode(((ExternalKafkaSchemaCollectionRules)externalSchema.getCollectionRules()).getImplicitHandlerCurrentNode());
                 break;
-
+            default:
+                break;
         }
         return externalSchemaExportCSV;
     }
 
 
     private void createExternalEntitiesCSV(final String projectKey,final ZipOutputStream out ) {
-
+        LOGGER.debug("exporting external entities");
         final List<ExternalEntity> externalEntities = externalEntityRepository.findByProjectKey(projectKey);
         final  CsvMapper mapper = new CsvMapper();
         mapper.enable(CsvGenerator.Feature.STRICT_CHECK_FOR_QUOTING);
@@ -351,16 +301,6 @@ public class BulkServiceImpl implements BulkService {
 
         final List<AbstractCsvExternalModel> externalEntityExportCSVS = externalEntities.stream().map(this::createExternalEntityExportCSVDTO).collect(Collectors.toList());
         writeCSvFile(out, mapper, csvSchema, externalEntityExportCSVS);
-//        try {
-//            mapper.writer(schema).without(com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET).writeValue(out, externalEntityExportCSVS);
-//
-//        } catch (IOException e) {
-//            final AiaApiMessage aiaApiMessage = new AiaApiMessage(AiaApiMessages.GENERAL.EXPORT_JACKSON_ERROR);
-//            throw new AiaApiException()
-//                    .statusCode(AiaApiException.AiaApiHttpCodes.INTERNAL_SERVER_ERROR)
-//                    .message(aiaApiMessage)
-//                    .originalException(e);
-//        }
     }
 
     private ExternalEntityExportCSV createExternalEntityExportCSVDTO(ExternalEntity externalEntity) {
@@ -387,6 +327,7 @@ public class BulkServiceImpl implements BulkService {
                 externalEntityExportCSV.setRelativePaths(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getRelativePaths());
                 externalEntityExportCSV.setMergedNodes(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getMergedNodes());
                 break;
+            default:
 
         }
         return externalEntityExportCSV;
@@ -395,6 +336,7 @@ public class BulkServiceImpl implements BulkService {
 
 
     private void createExternalAttributesCSV(final String projectKey,final ZipOutputStream out ) {
+        LOGGER.debug("exporting external attributes");
         final List<ExternalEntity> externalEntities = externalEntityRepository.findByProjectKey(projectKey);
         final CsvMapper mapper = new CsvMapper();
         final CsvSchema csvSchema = mapper.schemaFor(ExternalAttributeExportCSV.class).withHeader();
@@ -404,21 +346,7 @@ public class BulkServiceImpl implements BulkService {
                 .flatMap(externalEntity -> externalEntity.getAttributes().stream()
                         .map(att ->createExternalAttributeExportCSVDTO(att,externalEntity.getSchemaKey(),externalEntity.getEntityKey(),externalEntity.getStoreInfo().getType()))).collect(Collectors.toList());
 
-
         writeCSvFile(out, mapper, csvSchema, externalAttributeExportCSVS);
-        //        try {
-//            final ObjectWriter writer = mapper.writer(schema);
-//            writer.without(com.fasterxml.jackson.core.JsonGenerator.Feature.AUTO_CLOSE_TARGET).writeValue(out, externalAttributeExportCSVS);
-//
-//        } catch (IOException e) {
-//            final AiaApiMessage aiaApiMessage = new AiaApiMessage(AiaApiMessages.GENERAL.EXPORT_JACKSON_ERROR);
-//            throw new AiaApiException()
-//                    .statusCode(AiaApiException.AiaApiHttpCodes.INTERNAL_SERVER_ERROR)
-//                    .message(aiaApiMessage)
-//                    .originalException(e);
-//
-//        }
-
     }
 
     private ExternalAttributeExportCSV createExternalAttributeExportCSVDTO(ExternalAttribute externalAttribute, String schemaKey, String entityKey, String entityType) {
@@ -437,14 +365,12 @@ public class BulkServiceImpl implements BulkService {
         externalAttributeExportCSV.setDefaultValue(externalAttribute.getDefaultValue());
         externalAttributeExportCSV.setValidationRegex(externalAttribute.getValidationRegex());
         externalAttributeExportCSV.setSerializationId(externalAttribute.getSerializationId());
-        switch (entityType) {
-            case ExternalSchemaStoreTypes.KAFKA:
-                externalAttributeExportCSV.setDateFormat(((ExternalKafkaAttributeStoreInfo) externalAttribute.getStoreInfo()).getDateFormat());
-                externalAttributeExportCSV.setJsonPath(((ExternalKafkaAttributeStoreInfo) externalAttribute.getStoreInfo()).getJsonPath());
-                break;
-            case ExternalSchemaStoreTypes.CSV:
-                externalAttributeExportCSV.setDateFormat(((ExternalCsvAttributeStoreInfo) externalAttribute.getStoreInfo()).getDateFormat());
-                break;
+        if (entityType.equals(ExternalSchemaStoreTypes.KAFKA)) {
+            externalAttributeExportCSV.setDateFormat(((ExternalKafkaAttributeStoreInfo) externalAttribute.getStoreInfo()).getDateFormat());
+            externalAttributeExportCSV.setJsonPath(((ExternalKafkaAttributeStoreInfo) externalAttribute.getStoreInfo()).getJsonPath());
+        }
+        else if (entityType.equals(ExternalSchemaStoreTypes.CSV)){
+            externalAttributeExportCSV.setDateFormat(((ExternalCsvAttributeStoreInfo) externalAttribute.getStoreInfo()).getDateFormat());
         }
         return externalAttributeExportCSV;
     }
@@ -467,7 +393,6 @@ public class BulkServiceImpl implements BulkService {
         externalSchemaDTO.setDisplayType(getDisplayType(externalSchemaExportCSV));
         externalSchemaDTO.setAvailability(externalSchemaExportCSV.getAvailability() != null && externalSchemaExportCSV.getAvailability().equals(AvailabilityDTO.SHARED.toString()) ? AvailabilityDTO.SHARED : AvailabilityDTO.EXTERNAL);
         externalSchemaDTO.setSubjectAreaName(externalSchemaDTO.getAvailability()==AvailabilityDTO.EXTERNAL?null: externalSchemaExportCSV.getSubjectAreaName());
-        //TODO generate key????
         externalSchemaDTO.setSubjectAreaKey(externalSchemaDTO.getAvailability()==AvailabilityDTO.EXTERNAL?null: externalSchemaExportCSV.getSubjectAreaName());
         return externalSchemaDTO;
     }
@@ -552,9 +477,9 @@ public class BulkServiceImpl implements BulkService {
         }
     }
 
-    public ExternalSchemaDataChannelInfoDTO toExternalSchemaDataChannelInfoDTO(String SerializationMethod) {
+    public ExternalSchemaDataChannelInfoDTO toExternalSchemaDataChannelInfoDTO(String serializationMethod) {
         final ExternalSchemaDataChannelInfoDTO externalSchemaDataChannelInfoDTO = new ExternalSchemaDataChannelInfoDTO();
-        externalSchemaDataChannelInfoDTO.setSerializationMethod(ExternalSchemaDataChannelInfoDTO.SerializationMethodEnum.fromValue(SerializationMethod));
+        externalSchemaDataChannelInfoDTO.setSerializationMethod(ExternalSchemaDataChannelInfoDTO.SerializationMethodEnum.fromValue(serializationMethod));
         return externalSchemaDataChannelInfoDTO;
 
     }
@@ -585,7 +510,7 @@ public class BulkServiceImpl implements BulkService {
                    .sorted(Comparator.comparingInt(ExternalAttributeDTO::getSerializationId))
                    .collect(Collectors.toList());
        }
-       return null;
+       return Collections.emptyList();
     }
 
     private List<ExternalAttributeDTO> mergeAttribute(String schemaKey,String  entityKey ,String schemaType, List <ExternalAttributeDTO> exitingExternalAttributeDTOS ) {
