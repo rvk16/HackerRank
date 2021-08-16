@@ -175,7 +175,10 @@ public class BulkServiceImpl implements BulkService {
 
         attributesInFileWithoutParentMap.forEach( (schemaKey, entitiesMap) -> {
             entitiesMap.forEach((entityKey, attributes) -> {
-                ExternalEntityDTO existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(schemaKey).get(entityKey);
+                ExternalEntityDTO existingEntityDTO = null;
+                if(existingExternalEntitiesBySchemaKey.get(schemaKey)!= null){
+                    existingEntityDTO =  existingExternalEntitiesBySchemaKey.get(schemaKey).get(entityKey);
+                }
                 if( existingEntityDTO != null) {
                     Map<String, ExternalAttributeDTO > existingAttributeMapByKey = existingEntityDTO.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey,externalAttributeDTO -> externalAttributeDTO));
                     for (ExternalAttributeExportCSV csvAttribute : attributes) {
