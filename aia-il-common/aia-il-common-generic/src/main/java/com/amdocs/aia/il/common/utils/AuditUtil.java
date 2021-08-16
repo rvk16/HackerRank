@@ -1,6 +1,9 @@
 package com.amdocs.aia.il.common.utils;
 
-public class AuditUtil {
+import java.io.Serializable;
+
+public class AuditUtil implements Serializable {
+    private static final long serialVersionUID = 6424480276108530535L;
     private boolean isAuditEnable;
     private boolean isAuditLogsEnabled;
     private final String auditEnable;
