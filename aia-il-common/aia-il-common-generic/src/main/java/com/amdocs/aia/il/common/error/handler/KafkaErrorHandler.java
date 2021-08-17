@@ -387,7 +387,6 @@ public class KafkaErrorHandler implements Handler, Serializable {
         }
 
         for (Future<Object> objectFuture : objectFutureList) {
-            objectFuture.get();
             try {
                 objectFuture.get();
             } catch (Exception e) {
