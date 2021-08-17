@@ -107,50 +107,29 @@ public class BulkServiceImpl implements BulkService {
         return response;
     }
 
-    private void importExternalEntities(String projectKey, List<ExternalEntityExportCSV> externalEntitiesKeysInFile , List<ExternalAttributeExportCSV> externalAttributesKeysInFile,
+    private void importExternalEntities(String projectKey, List<ExternalEntityExportCSV> externalEntitiesKeysInFile ,
+                                        List<ExternalAttributeExportCSV> externalAttributesKeysInFile,
                                         BulkImportResponseDTO response)  {
-        //delete external entities
-        List<ExternalEntityExportCSV> entitiesToDelete =  externalEntitiesKeysInFile.stream()
-                .filter( externalSchemaExportCSVDTO -> externalSchemaExportCSVDTO.getToDelete()==Boolean.TRUE).collect(Collectors.toList());
-
-        int notExitEntity = 0;
-        for (ExternalEntityExportCSV externalEntityExportCSV : entitiesToDelete) {
-            try {
-                externalEntityService.delete(projectKey, externalEntityExportCSV.getSchemaKey(), externalEntityExportCSV.getEntityKey());
-            }catch (ApiException e) {
-                notExitEntity++;
-            }
-       }
-       response.setDeletedEntitiesCount(entitiesToDelete.size()>notExitEntity?entitiesToDelete.size()-notExitEntity:0);
+       deleteExternalEntities(projectKey, externalEntitiesKeysInFile, response);
 
        final List<ExternalEntityExportCSV> externalEntitiesInFileNotToDelete = externalEntitiesKeysInFile.stream().filter(externalEntityExportCSV -> externalEntityExportCSV.getToDelete()!=Boolean.TRUE).collect(Collectors.toList());
        final Map<String,Map<String,ExternalEntityDTO>> existingExternalEntitiesBySchemaKey = externalEntityService.listAll(projectKey).stream().collect(Collectors.groupingBy( ExternalEntityDTO::getSchemaKey,toMap(ExternalEntityDTO::getEntityKey, externalEntityDTO -> externalEntityDTO)));
        final Map<String, ExternalSchemaType> existingSchemaTypesByKeys = externalSchemaRepository.findByProjectKey(projectKey).stream().collect(Collectors.toMap(ExternalSchema::getSchemaKey,ExternalSchema::getSchemaType));
 
        attributesInFileMapByKeys =
-               externalAttributesKeysInFile.stream()//.filter(externalAttributeExportCSVDTO -> externalAttributeExportCSVDTO.getToDelete()!=Boolean.TRUE)
+               externalAttributesKeysInFile.stream()
                        .collect(partitioningBy(ExternalAttributeExportCSV::getToDelete,Collectors.groupingBy( ExternalAttributeExportCSV::getSchemaKey,Collectors.groupingBy( ExternalAttributeExportCSV::getEntityKey, Collectors.toList()))));
 
 
-        final List<ExternalEntityDTO> externalEntityDTOsToAdd = externalEntitiesInFileNotToDelete.stream()
-                .filter(externalEntityExportCSV ->  existingSchemaTypesByKeys.containsKey(externalEntityExportCSV.getSchemaKey()))
-                .filter(externalEntityExportCSV ->  existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()) == null ||   !(existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()).containsKey(externalEntityExportCSV.getEntityKey())))
-                .map(externalEntityExportCSV -> toExternalEntityDTO(externalEntityExportCSV,existingSchemaTypesByKeys.get(externalEntityExportCSV.getSchemaKey()).getStoreType(),true, null)).collect(Collectors.toList());
-        SaveElementsResponseDTO saveElementsResponseDTO = null;
-        if (!externalEntityDTOsToAdd.isEmpty()) {
-            saveElementsResponseDTO = externalEntityService.bulkSave(projectKey,externalEntityDTOsToAdd);
-        }
-        response.setNewEntitiesCount(saveElementsResponseDTO != null ? saveElementsResponseDTO.getSavedElementsCount().intValue() : 0);
+        addExternalEntities(projectKey, response, externalEntitiesInFileNotToDelete, existingExternalEntitiesBySchemaKey, existingSchemaTypesByKeys);
 
-        final List<ExternalEntityDTO> externalEntityDTOsToUpdate = externalEntitiesInFileNotToDelete.stream()
-                .filter(externalEntityExportCSV -> existingExternalEntitiesBySchemaKey.containsKey(externalEntityExportCSV.getSchemaKey()))
-                .filter(externalEntityExportCSV -> (existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()).containsKey(externalEntityExportCSV.getEntityKey())))
-                .map(externalEntityExportCSV -> toExternalEntityDTO(externalEntityExportCSV,existingSchemaTypesByKeys.get(externalEntityExportCSV.getSchemaKey()).getStoreType(),false,existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()).get(externalEntityExportCSV.getEntityKey())))
-                .collect(Collectors.toList());
-     if (!externalEntityDTOsToUpdate.isEmpty()) {
-            externalEntityDTOsToUpdate.forEach( externalEntityDTO -> externalEntityService.update(projectKey,externalEntityDTO.getSchemaKey(),externalEntityDTO));
-        }
+        updateExternalEntities(projectKey, response, externalEntitiesInFileNotToDelete, existingExternalEntitiesBySchemaKey, existingSchemaTypesByKeys);
 
+        updateExternalEntitiesWithoutCSVFile(projectKey, externalAttributesKeysInFile, response, externalEntitiesInFileNotToDelete, existingExternalEntitiesBySchemaKey);
+    }
+
+    private void updateExternalEntitiesWithoutCSVFile(String projectKey, List<ExternalAttributeExportCSV> externalAttributesKeysInFile, BulkImportResponseDTO response,
+                                                      List<ExternalEntityExportCSV> externalEntitiesInFileNotToDelete, Map<String, Map<String, ExternalEntityDTO>> existingExternalEntitiesBySchemaKey) {
         Set<String> externalEntitiesKeysInFileNotToDelete = externalEntitiesInFileNotToDelete.stream().map(h ->h.getSchemaKey()+"_"+h.getEntityKey()).collect(Collectors.toSet());
         Map<String,Map<String,List<ExternalAttributeExportCSV>>> attributesInFileWithoutParentMap =
                 externalAttributesKeysInFile.stream().filter(externalAttributeExportCSV -> !externalEntitiesKeysInFileNotToDelete.contains(externalAttributeExportCSV.getSchemaKey()+"_"+externalAttributeExportCSV.getEntityKey()))
@@ -176,7 +155,47 @@ public class BulkServiceImpl implements BulkService {
                additionalUpdateEntity.getAndIncrement();
             }
         }));
-        response.setModifiedEntitiesCount(externalEntityDTOsToUpdate.size()+additionalUpdateEntity.get());
+        response.setModifiedEntitiesCount(+additionalUpdateEntity.get());
+    }
+
+    private void updateExternalEntities(String projectKey, BulkImportResponseDTO response, List<ExternalEntityExportCSV> externalEntitiesInFileNotToDelete, Map<String, Map<String, ExternalEntityDTO>> existingExternalEntitiesBySchemaKey, Map<String, ExternalSchemaType> existingSchemaTypesByKeys) {
+        final List<ExternalEntityDTO> externalEntityDTOsToUpdate = externalEntitiesInFileNotToDelete.stream()
+                .filter(externalEntityExportCSV -> existingExternalEntitiesBySchemaKey.containsKey(externalEntityExportCSV.getSchemaKey()))
+                .filter(externalEntityExportCSV -> (existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()).containsKey(externalEntityExportCSV.getEntityKey())))
+                .map(externalEntityExportCSV -> toExternalEntityDTO(externalEntityExportCSV, existingSchemaTypesByKeys.get(externalEntityExportCSV.getSchemaKey()).getStoreType(),false, existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()).get(externalEntityExportCSV.getEntityKey())))
+                .collect(Collectors.toList());
+        if (!externalEntityDTOsToUpdate.isEmpty()) {
+            externalEntityDTOsToUpdate.forEach( externalEntityDTO -> externalEntityService.update(projectKey,externalEntityDTO.getSchemaKey(),externalEntityDTO));
+        }
+        response.setModifiedEntitiesCount(externalEntityDTOsToUpdate.size());
+    }
+
+    private void addExternalEntities(String projectKey, BulkImportResponseDTO response, List<ExternalEntityExportCSV> externalEntitiesInFileNotToDelete, Map<String, Map<String, ExternalEntityDTO>> existingExternalEntitiesBySchemaKey, Map<String, ExternalSchemaType> existingSchemaTypesByKeys) {
+        final List<ExternalEntityDTO> externalEntityDTOsToAdd = externalEntitiesInFileNotToDelete.stream()
+                .filter(externalEntityExportCSV ->  existingSchemaTypesByKeys.containsKey(externalEntityExportCSV.getSchemaKey()))
+                .filter(externalEntityExportCSV ->  existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()) == null ||   !(existingExternalEntitiesBySchemaKey.get(externalEntityExportCSV.getSchemaKey()).containsKey(externalEntityExportCSV.getEntityKey())))
+                .map(externalEntityExportCSV -> toExternalEntityDTO(externalEntityExportCSV, existingSchemaTypesByKeys.get(externalEntityExportCSV.getSchemaKey()).getStoreType(),true, null)).collect(Collectors.toList());
+        SaveElementsResponseDTO saveElementsResponseDTO = null;
+        if (!externalEntityDTOsToAdd.isEmpty()) {
+            saveElementsResponseDTO = externalEntityService.bulkSave(projectKey,externalEntityDTOsToAdd);
+        }
+        response.setNewEntitiesCount(saveElementsResponseDTO != null ? saveElementsResponseDTO.getSavedElementsCount().intValue() : 0);
+    }
+
+    private void deleteExternalEntities(String projectKey, List<ExternalEntityExportCSV> externalEntitiesKeysInFile, BulkImportResponseDTO response) {
+        //delete external entities
+        List<ExternalEntityExportCSV> entitiesToDelete =  externalEntitiesKeysInFile.stream()
+                .filter( externalSchemaExportCSVDTO -> externalSchemaExportCSVDTO.getToDelete()==Boolean.TRUE).collect(Collectors.toList());
+
+        int notExitEntity = 0;
+        for (ExternalEntityExportCSV externalEntityExportCSV : entitiesToDelete) {
+            try {
+                externalEntityService.delete(projectKey, externalEntityExportCSV.getSchemaKey(), externalEntityExportCSV.getEntityKey());
+            }catch (ApiException e) {
+                notExitEntity++;
+            }
+       }
+        response.setDeletedEntitiesCount(entitiesToDelete.size()>notExitEntity?entitiesToDelete.size()-notExitEntity:0);
     }
 
 
