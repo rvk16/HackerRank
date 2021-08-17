@@ -510,7 +510,7 @@ public class BulkServiceImpl implements BulkService {
         externalEntityDTO.setEntityKey(externalEntityExportCSV.getEntityKey());
         externalEntityDTO.setEntityName(externalEntityExportCSV.getEntityName());
         externalEntityDTO.setDescription(externalEntityExportCSV.getDescription());
-     //   externalEntityDTO.setSerializationId(externalEntityExportCSV.getSerializationId());
+        externalEntityDTO.setSerializationId(externalEntity.getSerializationId());
         externalEntityDTO.setIsTransient(externalEntityExportCSV.getTransient());
         externalEntityDTO.setIsTransaction(externalEntityExportCSV.getTransaction());
         externalEntityDTO.setStoreInfo(toStoreInfoEntity(externalEntityExportCSV,schemaType));
