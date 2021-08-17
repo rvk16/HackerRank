@@ -510,7 +510,7 @@ public class BulkServiceImpl implements BulkService {
         externalEntityDTO.setEntityKey(externalEntityExportCSV.getEntityKey());
         externalEntityDTO.setEntityName(externalEntityExportCSV.getEntityName());
         externalEntityDTO.setDescription(externalEntityExportCSV.getDescription());
-        externalEntityDTO.setSerializationId(externalEntity.getSerializationId());
+        externalEntityDTO.setSerializationId(externalEntity!=null? externalEntity.getSerializationId():null);
         externalEntityDTO.setIsTransient(externalEntityExportCSV.getTransient());
         externalEntityDTO.setIsTransaction(externalEntityExportCSV.getTransaction());
         externalEntityDTO.setStoreInfo(toStoreInfoEntity(externalEntityExportCSV,schemaType));
@@ -526,7 +526,7 @@ public class BulkServiceImpl implements BulkService {
         List<ExternalAttributeExportCSV> attributeExportCSVDTOS =  attributesInFileMapByKeys.get(false).get(externalEntityExportCSV.getSchemaKey()).get(externalEntityExportCSV.getEntityKey());
        if(attributeExportCSVDTOS != null){
           return attributeExportCSVDTOS.stream().map(attributeExportCSVDTO -> toExternalAttributeDTO(attributeExportCSVDTO,schemaType))
-                   .sorted(Comparator.comparingInt(ExternalAttributeDTO::getSerializationId))
+                  /* .sorted(Comparator.comparingInt(ExternalAttributeDTO::getSerializationId))*/
                    .collect(Collectors.toList());
        }
        return Collections.emptyList();
