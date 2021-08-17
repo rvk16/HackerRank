@@ -215,7 +215,7 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		assertEquals( tcEventSchema.getCollectionRules().getStoreType().name(), "CSV");
 		assertEquals( tcEventSchema.getCollectionRules().getOngoingChannel(), "FILES");
 		assertEquals(((ExternalCsvSchemaCollectionRulesDTO) tcEventSchema.getCollectionRules()).getDefaultInvalidFilenameAction().name(), "KEEP");
-		assertEquals( tcEventSchema.getDataChannelInfo().getSerializationMethod().getValue(), "SharedProtobuf");
+//		assertEquals( tcEventSchema.getDataChannelInfo().getSerializationMethod().getValue(), "SharedProtobuf");
 		assertEquals(tcEventSchema.getCreatedBy(), "testUser");
 		assertEquals(tcEventSchema.getOriginProcess(), "IMPLEMENTATION");
 		assertEquals( tcEventSchema.getAvailability().name(), "EXTERNAL");
