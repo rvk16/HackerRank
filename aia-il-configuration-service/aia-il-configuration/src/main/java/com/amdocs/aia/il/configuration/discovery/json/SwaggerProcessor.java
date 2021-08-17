@@ -173,7 +173,7 @@ class SwaggerProcessor {
                 }
             } else if (RefProperty.isType(property.getType(), property.getFormat())) {
                 // 1:1 relationship
-                processOneToOneReference(entityKey, childPath, propertyKey, (RefProperty) property, new HashSet<>());
+                processOneToOneReference(entityKey, childPath, propertyKey, (RefProperty) property, new HashSet<>(), propertyKey + "_");
             } else if (!ObjectProperty.isType(property.getType())) {
                  processPrimitive(entityKey, propertyKey, property, null, childPath, parentPath);
             }
@@ -207,7 +207,7 @@ class SwaggerProcessor {
         popFromFullPath(propertyKey);
     }
 
-    private void processOneToOneReference(String parentEntityKey, String parentPath, String propertyKey, RefProperty property, Set<String> visited) {
+    private void processOneToOneReference(String parentEntityKey, String parentPath, String propertyKey, RefProperty property, Set<String> visited, String attributeKeyPrefix) {
         pushToFullPath(propertyKey);
         if (!isInSkippedPath()) {
             if (shouldForceOnToOneEntityCreation()) {
@@ -227,10 +227,10 @@ class SwaggerProcessor {
                             }
                         } else if (RefProperty.isType(childProperty.getType(), childProperty.getFormat())) {
                             // currently we drill down only ONE level in 1:1 relation
-                            processOneToOneReference(parentEntityKey, propertyKey, childPropertyKey, (RefProperty) childProperty, visited);
+                            processOneToOneReference(parentEntityKey, propertyKey, childPropertyKey, (RefProperty) childProperty, visited, attributeKeyPrefix + childPropertyKey + "_");
                         } else if (!ObjectProperty.isType(childProperty.getType())) {
                             final String jsonPath = buildAttributeJsonPath(propertyJsonPath, childPropertyKey);
-                            final String attributeKey = propertyKey + "_" + childPropertyKey;
+                            final String attributeKey = attributeKeyPrefix + childPropertyKey;
                             processPrimitive(parentEntityKey, attributeKey, childProperty, jsonPath,null,null); // flatten attributes
                         }
                     });
