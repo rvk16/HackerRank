@@ -6,7 +6,7 @@ import java.io.Serializable;
 
 public abstract class AbstractCsvExternalModel implements Serializable {
 
-    @JsonProperty("schemaKey")
+    @JsonProperty(value = "schemaKey",required = true)
     private String schemaKey = null;
 
 

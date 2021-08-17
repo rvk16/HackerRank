@@ -11,22 +11,21 @@ import java.io.Serializable;
         "serializationId (read only)","toDelete", })
 public class ExternalAttributeExportCSV  extends AbstractCsvExternalModel implements Serializable {
 
-//    @JsonProperty("schemaKey")
-//    private String schemaKey = null;
 
-    @JsonProperty("entityKey")
+    @JsonProperty(value = "entityKey",required = true)
     private String entityKey = null;
 
-    @JsonProperty("attributeKey")
+    @JsonProperty(value="attributeKey",required = true)
     private String attributeKey = null;
 
-    @JsonProperty("attributeName")
+    @JsonProperty(value = "attributeName",required = true)
     private String attributeName = null;
 
 
-    @JsonProperty("datatype")
+    @JsonProperty(value = "datatype",required = true)
     private String datatype = null;
 
+    //ignore service will fill
     @JsonProperty("logicalDatatype (read only)")
     private String logicalDatatype = null;
 
@@ -54,23 +53,15 @@ public class ExternalAttributeExportCSV  extends AbstractCsvExternalModel implem
     @JsonProperty("jsonPath (kafka)")
     private String jsonPath = null;
 
+    //ignore
     @JsonProperty("serializationId (read only)")
     private Integer serializationId = null;
 
-//    @JsonProperty("toDelete")
-//    private Boolean toDelete = Boolean.FALSE;
 
 
     public ExternalAttributeExportCSV() {
     }
 
-//    public String getSchemaKey() {
-//        return schemaKey;
-//    }
-//
-//    public void setSchemaKey(String schemaKey) {
-//        this.schemaKey = schemaKey;
-//    }
 
     public String getEntityKey() {
         return entityKey;
@@ -95,14 +86,6 @@ public class ExternalAttributeExportCSV  extends AbstractCsvExternalModel implem
     public void setAttributeName(String attributeName) {
         this.attributeName = attributeName;
     }
-//
-//    public String getDescription() {
-//        return description;
-//    }
-//
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
 
     public String getDatatype() {
         return datatype;
@@ -183,17 +166,6 @@ public class ExternalAttributeExportCSV  extends AbstractCsvExternalModel implem
     public void setJsonPath(String jsonPath) {
         this.jsonPath = jsonPath;
     }
-
-//    public Boolean getToDelete() {
-//        return toDelete;
-//    }
-//
-//    public void setToDelete(Boolean toDelete) {
-//        if (toDelete != null) {
-//            this.toDelete = toDelete;
-//        }
-//
-//    }
 
     public Integer getSerializationId() {
         return serializationId;

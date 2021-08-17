@@ -1,40 +1,34 @@
 package com.amdocs.aia.il.configuration.exportimport;
 
 
+import com.amdocs.aia.il.configuration.dto.AvailabilityDTO;
+import com.amdocs.aia.il.configuration.dto.InvalidFilenameActionTypeDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import java.io.Serializable;
 
-@JsonPropertyOrder(value = { "schemaKey","schemaName","schemaType","isActive",  "description", "typeSystem","isReference", "storeType",
+@JsonPropertyOrder(value = { "schemaKey","schemaName","schemaType","isActive",  "description", "typeSystem","isReference",
         "databaseType (sql)","defaultDateFormat (kafka, csv)","defaultColumnDelimiter (csv)","defaultInvalidFilenameAction (csv)",
         "inputDataChannel (kafka)","skipNodeFromParsing (kafka)","deleteEventJsonPath (kafka)","deleteEventOperation (kafka)",
         "implicitHandlerPreviousNode (kafka)","implicitHandlerCurrentNode (kafka)","serializationMethod",
         "availability","subjectAreaName"})
 public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements Serializable {
 
-
-
-    @JsonProperty("schemaName")
+    @JsonProperty(value = "schemaName",required = true)
     private String schemaName = null;
 
-    @JsonProperty("schemaType")
+    @JsonProperty(value = "schemaType",required = true)
     private String schemaType = null;
 
-      @JsonProperty("isActive")
-    private Boolean isActive = null;
+    @JsonProperty("isActive")
+    private Boolean isActive = Boolean.TRUE;
 
-//    @JsonProperty("description")
-//    private String description = null;
-
-    @JsonProperty("typeSystem")
+    @JsonProperty(value = "typeSystem",required = true)
     private String typeSystem = null;
 
-    @JsonProperty("isReference")
+    @JsonProperty(value = "isReference",required = true)
     private Boolean isReference = null;
-
-    @JsonProperty("storeType")
-    private String storeType = null;
 
     @JsonProperty("databaseType (sql)")
     private String databaseType = null;
@@ -46,7 +40,7 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
     private String defaultColumnDelimiter = null;
 
     @JsonProperty("defaultInvalidFilenameAction (csv)")
-    private String defaultInvalidFilenameAction = null;
+    private InvalidFilenameActionTypeDTO defaultInvalidFilenameAction = null;
 
     @JsonProperty("inputDataChannel (kafka)")
     private String inputDataChannel = null;
@@ -66,11 +60,11 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
     @JsonProperty("implicitHandlerCurrentNode (kafka)")
     private String implicitHandlerCurrentNode = null;
 
-    @JsonProperty("serializationMethod")
+    @JsonProperty(value = "serializationMethod",required = true)
     private String serializationMethod = null;
 
     @JsonProperty("availability")
-    private String availability = null;
+    private AvailabilityDTO availability = null;
 
     @JsonProperty("subjectAreaName")
     private String subjectAreaName = null;
@@ -89,22 +83,11 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
 
     @JsonProperty("partialLoadRelativeURL")
     private String partialLoadRelativeURL = null;
-//
-//    @JsonProperty("toDelete")
-//    private Boolean toDelete = Boolean.FALSE;
 
 
     public ExternalSchemaExportCSV() {
     }
 
-
-//    public String getSchemaKey() {
-//        return schemaKey;
-//    }
-//
-//    public void setSchemaKey(String schemaKey) {
-//        this.schemaKey = schemaKey;
-//    }
 
     public String getSchemaName() {
         return schemaName;
@@ -129,14 +112,6 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
     public void setActive(Boolean active) {
         isActive = active;
     }
-//
-//    public String getDescription() {
-//        return description;
-//    }
-//
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
 
     public String getTypeSystem() {
         return typeSystem;
@@ -152,14 +127,6 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
 
     public void setReference(Boolean reference) {
         isReference = reference;
-    }
-
-    public String getStoreType() {
-        return storeType;
-    }
-
-    public void setStoreType(String storeType) {
-        this.storeType = storeType;
     }
 
     public String getDatabaseType() {
@@ -186,11 +153,11 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
         this.defaultColumnDelimiter = defaultColumnDelimiter;
     }
 
-    public String getDefaultInvalidFilenameAction() {
+    public InvalidFilenameActionTypeDTO getDefaultInvalidFilenameAction() {
         return defaultInvalidFilenameAction;
     }
 
-    public void setDefaultInvalidFilenameAction(String defaultInvalidFilenameAction) {
+    public void setDefaultInvalidFilenameAction(InvalidFilenameActionTypeDTO defaultInvalidFilenameAction) {
         this.defaultInvalidFilenameAction = defaultInvalidFilenameAction;
     }
 
@@ -250,11 +217,11 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
         this.serializationMethod = serializationMethod;
     }
 
-    public String getAvailability() {
+    public AvailabilityDTO getAvailability() {
         return availability;
     }
 
-    public void setAvailability(String availability) {
+    public void setAvailability(AvailabilityDTO availability) {
         this.availability = availability;
     }
 
@@ -306,12 +273,5 @@ public class ExternalSchemaExportCSV extends AbstractCsvExternalModel implements
         this.partialLoadRelativeURL = partialLoadRelativeURL;
     }
 
-//    public Boolean getToDelete() {
-//        return toDelete;
-//    }
-//
-//    public void setToDelete(Boolean toDelete) {
-//        this.toDelete = toDelete;
-//    }
 
 }

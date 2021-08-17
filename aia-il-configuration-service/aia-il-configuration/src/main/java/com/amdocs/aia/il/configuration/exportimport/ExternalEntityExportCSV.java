@@ -1,6 +1,7 @@
 package com.amdocs.aia.il.configuration.exportimport;
 
 
+import com.amdocs.aia.il.configuration.dto.InvalidFilenameActionTypeDTO;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
@@ -11,28 +12,24 @@ import java.io.Serializable;
         "isTransaction" })
 public class ExternalEntityExportCSV extends AbstractCsvExternalModel implements Serializable {
 
-//    @JsonProperty("schemaKey")
-//    private String schemaKey = null;
 
-    @JsonProperty("entityKey")
+    @JsonProperty(value = "entityKey",required = true)
     private String entityKey = null;
 
     @JsonProperty("isActive")
     private Boolean isActive = null;
 
-    @JsonProperty("entityName")
+    @JsonProperty(value = "entityName",required = true)
     private String entityName = null;
-//
-//    @JsonProperty("description")
-//    private String description = null;
 
+   //to ignore in import - check update
     @JsonProperty("serializationId (READ ONLY)")
     private Integer serializationId = null;
 
-    @JsonProperty("isTransient")
+    @JsonProperty(value = "isTransient",required = true)
     private Boolean isTransient = null;
 
-    @JsonProperty("isTransaction")
+    @JsonProperty(value = "isTransaction",required = true)
     private Boolean isTransaction = null;
 
 
@@ -42,7 +39,7 @@ public class ExternalEntityExportCSV extends AbstractCsvExternalModel implements
     @JsonProperty("jsonTypePath (kafka)")
     private String jsonTypePath = null;
 
-    @JsonProperty("relativePaths (kafka)")
+    @JsonProperty("relativePaths (kafka)")//check in code that if it is kafka it is mandatory
     private String relativePaths = null;
 
     @JsonProperty("mergedNodes (kafka)")
@@ -61,46 +58,10 @@ public class ExternalEntityExportCSV extends AbstractCsvExternalModel implements
     private String columnDelimiter = null;
 
     @JsonProperty("invalidFilenameAction  (csv)")
-    private String invalidFilenameAction = null;
-//
-//    @JsonProperty("toDelete")
-//    private Boolean toDelete = Boolean.FALSE;
+    private InvalidFilenameActionTypeDTO invalidFilenameAction = null;
 
-
-    public ExternalEntityExportCSV() {
+       public ExternalEntityExportCSV() {
     }
-
-//    public ExternalEntityExportCSV(String schemaKey, String entityKey, Boolean isActive, String entityName, String description,
-//                                   Integer serializationId, Boolean isTransient, Boolean isTransaction, String jsonTypeValue,
-//                                   String jsonTypePath, String relativePaths, String mergedNodes, Boolean fileHeader, String fileNameFormat,
-//                                   String dateFormat, String columnDelimiter, String invalidFilenameAction, Boolean toDelete) {
-//        this.schemaKey = schemaKey;
-//        this.entityKey = entityKey;
-//        this.isActive = isActive;
-//        this.entityName = entityName;
-//        this.description = description;
-//        this.serializationId = serializationId;
-//        this.isTransient = isTransient;
-//        this.isTransaction = isTransaction;
-//        this.jsonTypeValue = jsonTypeValue;
-//        this.jsonTypePath = jsonTypePath;
-//        this.relativePaths = relativePaths;
-//        this.mergedNodes = mergedNodes;
-//        this.fileHeader = fileHeader;
-//        this.fileNameFormat = fileNameFormat;
-//        this.dateFormat = dateFormat;
-//        this.columnDelimiter = columnDelimiter;
-//        this.invalidFilenameAction = invalidFilenameAction;
-//        this.toDelete = toDelete;
-//    }
-
-//    public String getSchemaKey() {
-//        return schemaKey;
-//    }
-//
-//    public void setSchemaKey(String schemaKey) {
-//        this.schemaKey = schemaKey;
-//    }
 
     public String getEntityKey() {
         return entityKey;
@@ -125,14 +86,6 @@ public class ExternalEntityExportCSV extends AbstractCsvExternalModel implements
     public void setEntityName(String entityName) {
         this.entityName = entityName;
     }
-
-//    public String getDescription() {
-//        return description;
-//    }
-//
-//    public void setDescription(String description) {
-//        this.description = description;
-//    }
 
     public Integer getSerializationId() {
         return serializationId;
@@ -222,19 +175,11 @@ public class ExternalEntityExportCSV extends AbstractCsvExternalModel implements
         this.columnDelimiter = columnDelimiter;
     }
 
-    public String getInvalidFilenameAction() {
+    public InvalidFilenameActionTypeDTO getInvalidFilenameAction() {
         return invalidFilenameAction;
     }
 
-    public void setInvalidFilenameAction(String invalidFilenameAction) {
+    public void setInvalidFilenameAction(InvalidFilenameActionTypeDTO invalidFilenameAction) {
         this.invalidFilenameAction = invalidFilenameAction;
     }
-
-//    public Boolean getToDelete() {
-//        return toDelete;
-//    }
-//
-//    public void setToDelete(Boolean toDelete) {
-//        this.toDelete = toDelete;
-//    }
 }
