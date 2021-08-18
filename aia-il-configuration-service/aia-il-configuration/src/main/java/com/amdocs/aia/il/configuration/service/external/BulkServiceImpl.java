@@ -498,7 +498,7 @@ public class BulkServiceImpl implements BulkService {
 
     public ExternalSchemaDataChannelInfoDTO toExternalSchemaDataChannelInfoDTO(String serializationMethod) {
         final ExternalSchemaDataChannelInfoDTO externalSchemaDataChannelInfoDTO = new ExternalSchemaDataChannelInfoDTO();
-    //    externalSchemaDataChannelInfoDTO.setSerializationMethod(ExternalSchemaDataChannelInfoDTO.SerializationMethodEnum.fromValue(serializationMethod));
+        externalSchemaDataChannelInfoDTO.setSerializationMethod(ExternalSchemaDataChannelInfoDTO.SerializationMethodEnum.fromValue(serializationMethod));
         return externalSchemaDataChannelInfoDTO;
 
     }
