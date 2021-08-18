@@ -13,6 +13,7 @@ import com.amdocs.aia.il.configuration.message.MessageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+
 @Component
 public class ExternalSchemasImportExportHelper {
 
@@ -100,7 +101,7 @@ public class ExternalSchemasImportExportHelper {
     }
 
     private ExternalAttributeStoreInfoDTO toStoreInfoAttribute(ExternalAttributeExportCSV attributeExportCSVDTO, String schemaType) {
-        switch(schemaType){
+        switch (schemaType.toLowerCase()){
             case ExternalSchemaStoreTypes.CSV:
                 return new ExternalCsvAttributeStoreInfoDTO()
                         .dateFormat(attributeExportCSVDTO.getDateFormat())
@@ -112,7 +113,8 @@ public class ExternalSchemasImportExportHelper {
                         .storeType(ExternalAttributeStoreInfoDTO.StoreTypeEnum.KAFKA);
             case ExternalSchemaStoreTypes.SQL:
                 return new ExternalSqlAttributeStoreInfoDTO().storeType(ExternalAttributeStoreInfoDTO.StoreTypeEnum.SQL);
-            default: throw new IllegalArgumentException(UNKNOWN_EXTERNAL_SCHEMA_STORE_TYPE + schemaType);
+            default:
+                throw new IllegalArgumentException(UNKNOWN_EXTERNAL_SCHEMA_STORE_TYPE + schemaType+ "for schema: "+attributeExportCSVDTO.getSchemaKey()+" for entity: "+attributeExportCSVDTO.getEntityKey()+" att:"+attributeExportCSVDTO.getAttributeKey());
         }
     }
 
