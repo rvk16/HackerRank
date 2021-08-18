@@ -28,6 +28,9 @@ public class ExternalSchemaTypeInfoDTO   {
   @JsonProperty("displayName")
   private String displayName = null;
 
+  @JsonProperty("nativeDatatype")
+  private String nativeDatatype = null;
+
   @JsonProperty("supportedTypeSystems")
   @Valid
   private List<TypeSystemInfoDTO> supportedTypeSystems = null;
@@ -118,6 +121,26 @@ public class ExternalSchemaTypeInfoDTO   {
 
   public void setDisplayName(String displayName) {
     this.displayName = displayName;
+  }
+
+  public ExternalSchemaTypeInfoDTO nativeDatatype(String nativeDatatype) {
+    this.nativeDatatype = nativeDatatype;
+    return this;
+  }
+
+  /**
+   * Get nativeDatatype
+   * @return nativeDatatype
+  **/
+  @ApiModelProperty(value = "")
+
+
+  public String getNativeDatatype() {
+    return nativeDatatype;
+  }
+
+  public void setNativeDatatype(String nativeDatatype) {
+    this.nativeDatatype = nativeDatatype;
   }
 
   public ExternalSchemaTypeInfoDTO supportedTypeSystems(List<TypeSystemInfoDTO> supportedTypeSystems) {
@@ -268,6 +291,7 @@ public class ExternalSchemaTypeInfoDTO   {
     ExternalSchemaTypeInfoDTO externalSchemaTypeInfo = (ExternalSchemaTypeInfoDTO) o;
     return Objects.equals(this.type, externalSchemaTypeInfo.type) &&
         Objects.equals(this.displayName, externalSchemaTypeInfo.displayName) &&
+        Objects.equals(this.nativeDatatype, externalSchemaTypeInfo.nativeDatatype) &&
         Objects.equals(this.supportedTypeSystems, externalSchemaTypeInfo.supportedTypeSystems) &&
         Objects.equals(this.supportedOngoingChannels, externalSchemaTypeInfo.supportedOngoingChannels) &&
         Objects.equals(this.supportedInitialLoadChannels, externalSchemaTypeInfo.supportedInitialLoadChannels) &&
@@ -277,7 +301,7 @@ public class ExternalSchemaTypeInfoDTO   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(type, displayName, supportedTypeSystems, supportedOngoingChannels, supportedInitialLoadChannels, supportedReplayChannels, storeType);
+    return Objects.hash(type, displayName, nativeDatatype, supportedTypeSystems, supportedOngoingChannels, supportedInitialLoadChannels, supportedReplayChannels, storeType);
   }
 
   @Override
@@ -287,6 +311,7 @@ public class ExternalSchemaTypeInfoDTO   {
     
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    displayName: ").append(toIndentedString(displayName)).append("\n");
+    sb.append("    nativeDatatype: ").append(toIndentedString(nativeDatatype)).append("\n");
     sb.append("    supportedTypeSystems: ").append(toIndentedString(supportedTypeSystems)).append("\n");
     sb.append("    supportedOngoingChannels: ").append(toIndentedString(supportedOngoingChannels)).append("\n");
     sb.append("    supportedInitialLoadChannels: ").append(toIndentedString(supportedInitialLoadChannels)).append("\n");

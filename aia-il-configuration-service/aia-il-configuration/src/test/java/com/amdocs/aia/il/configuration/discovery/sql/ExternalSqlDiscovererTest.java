@@ -75,11 +75,11 @@ public class ExternalSqlDiscovererTest {
         assertEquals("BL1_CHARGE", externalEntityBlCharge.getEntityKey());
         assertEquals(33, externalEntityBlCharge.getAttributes().size());
         assertEquals("CYCLE_SEQ_RUN", externalEntityBlCharge.getAttributes().get(26).getAttributeKey());
-        assertEquals(SqlTypeSystem.INTEGER, externalEntityBlCharge.getAttributes().get(26).getDatatype());
+        assertEquals(SqlTypeSystem.INTEGER.getDatatypeKey(), externalEntityBlCharge.getAttributes().get(26).getDatatype());
         assertEquals("DYNAMIC_ATTRIBUTE", externalEntityBlCharge.getAttributes().get(25).getAttributeKey());
         assertEquals("VARCHAR(4000)", externalEntityBlCharge.getAttributes().get(25).getDatatype());
         assertEquals("SYS_CREATION_DATE", externalEntityBlCharge.getAttributes().get(4).getAttributeKey());
-        assertEquals(SqlTypeSystem.TIMESTAMP, externalEntityBlCharge.getAttributes().get(4).getDatatype());
+        assertEquals(SqlTypeSystem.TIMESTAMP.getDatatypeKey(), externalEntityBlCharge.getAttributes().get(4).getDatatype());
         assertEquals("AMOUNT", externalEntityBlCharge.getAttributes().get(15).getAttributeKey());
         assertEquals("DOUBLE", externalEntityBlCharge.getAttributes().get(15).getDatatype());
         assertEquals("APPLICATION_ID", externalEntityBlCharge.getAttributes().get(7).getAttributeKey());

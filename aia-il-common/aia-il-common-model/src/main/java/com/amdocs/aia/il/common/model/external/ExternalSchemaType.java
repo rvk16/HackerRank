@@ -3,6 +3,7 @@ package com.amdocs.aia.il.common.model.external;
 import com.amdocs.aia.common.model.extensions.typesystems.LogicalTypeSystem;
 import com.amdocs.aia.common.model.extensions.typesystems.OracleTypeSystem;
 import com.amdocs.aia.common.model.extensions.typesystems.PostgreSqlTypeSystem;
+import com.amdocs.aia.common.model.extensions.typesystems.SqlTypeSystem;
 
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ import static com.amdocs.aia.il.common.model.external.CollectorChannelType.*;
 
 public enum ExternalSchemaType {
     CSV_FILES (
+            LogicalTypeSystem.NAME,
             Arrays.asList(LogicalTypeSystem.NAME),
             Arrays.asList(FILES),
             Arrays.asList(FILES, NONE),
@@ -18,6 +20,7 @@ public enum ExternalSchemaType {
             ExternalSchemaStoreTypes.CSV,
             true),
     JSON_OVER_KAFKA (
+            LogicalTypeSystem.NAME,
             Arrays.asList(LogicalTypeSystem.NAME),
             Arrays.asList(KAFKA),
             Arrays.asList(NONE, KAFKA, REST_KAFKA),
@@ -25,6 +28,7 @@ public enum ExternalSchemaType {
             ExternalSchemaStoreTypes.KAFKA,
             true),
     CATALOG1 (
+            LogicalTypeSystem.NAME,
             Arrays.asList(LogicalTypeSystem.NAME),
             Arrays.asList(KAFKA_NEXUS),
             Arrays.asList(REST_KAFKA_NEXUS),
@@ -32,6 +36,7 @@ public enum ExternalSchemaType {
             ExternalSchemaStoreTypes.KAFKA,
             true),
     DIGITAL1 (
+            LogicalTypeSystem.NAME,
             Arrays.asList(LogicalTypeSystem.NAME),
             Arrays.asList(KAFKA),
             Arrays.asList(REST_KAFKA, KAFKA),
@@ -39,20 +44,23 @@ public enum ExternalSchemaType {
             ExternalSchemaStoreTypes.KAFKA,
             true),
     ORACLE (
-            Arrays.asList(OracleTypeSystem.NAME),
+            OracleTypeSystem.NAME,
+            Arrays.asList(SqlTypeSystem.NAME),
             Arrays.asList(ATTUNITY, GOLDEN_GATE, EXTERNAL),
             Arrays.asList(SQL, NONE),
             Arrays.asList(SQL, NONE),
             ExternalSchemaStoreTypes.SQL,
             true),
     POSTGRESQL (
-            Arrays.asList(PostgreSqlTypeSystem.NAME),
+            PostgreSqlTypeSystem.NAME,
+            Arrays.asList(SqlTypeSystem.NAME),
             Arrays.asList(ATTUNITY, GOLDEN_GATE, EXTERNAL),
             Arrays.asList(SQL, NONE),
             Arrays.asList(SQL, NONE),
             ExternalSchemaStoreTypes.SQL,
             false),
     COUCHBASE (
+            LogicalTypeSystem.NAME,
             Arrays.asList(LogicalTypeSystem.NAME),
             Arrays.asList(KAFKA),
             Arrays.asList(NIQL),
@@ -60,6 +68,7 @@ public enum ExternalSchemaType {
             ExternalSchemaStoreTypes.KAFKA,
             false);
 
+    private String nativeDatatype;
     private List<String> supportedTypeSystems;
     private List<CollectorChannelType> supportedOngoingChannels;
     private List<CollectorChannelType> supportedInitialLoadChannels;
@@ -67,12 +76,14 @@ public enum ExternalSchemaType {
     private String storeType;
     private boolean isAuthoringSupported;
 
-    ExternalSchemaType(List<String> supportedTypeSystems,
+    ExternalSchemaType(String nativeDatatype,
+                       List<String> supportedTypeSystems,
                        List<CollectorChannelType> supportedOngoingChannels,
                        List<CollectorChannelType> supportedInitialLoadChannels,
                        List<CollectorChannelType> supportedReplayChannels,
                        String storeType,
                        boolean isAuthoringSupported) {
+        this.nativeDatatype = nativeDatatype;
         this.supportedTypeSystems = supportedTypeSystems;
         this.supportedOngoingChannels = supportedOngoingChannels;
         this.supportedInitialLoadChannels = supportedInitialLoadChannels;
@@ -80,6 +91,10 @@ public enum ExternalSchemaType {
         this.storeType= storeType;
         this.isAuthoringSupported = isAuthoringSupported;
     }
+
+    public String getNativeDatatype() { return nativeDatatype; }
+
+    public void setNativeDatatype(String nativeDatatype) { this.nativeDatatype = nativeDatatype; }
 
     public List<String> getSupportedTypeSystems() {
         return supportedTypeSystems;

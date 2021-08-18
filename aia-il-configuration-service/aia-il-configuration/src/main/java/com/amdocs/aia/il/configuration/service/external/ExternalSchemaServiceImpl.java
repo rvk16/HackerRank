@@ -129,6 +129,7 @@ public class ExternalSchemaServiceImpl extends AbstractModelService<ExternalSche
         return new ExternalSchemaTypeInfoDTO()
                 .type(schemaType.name())
                 .displayName(messageHelper.format("external.schema.type." + schemaType.name()))
+                .nativeDatatype(schemaType.getNativeDatatype())
                 .supportedTypeSystems(getTypeSystemsInfo(schemaType.getSupportedTypeSystems()))
                 .supportedOngoingChannels(getCollectorTypesInfo(schemaType.getSupportedOngoingChannels()))
                 .supportedInitialLoadChannels(getCollectorTypesInfo(schemaType.getSupportedInitialLoadChannels()))
