@@ -1,7 +1,6 @@
 package com.amdocs.aia.il.common.utils;
 
 import com.amdocs.aia.common.model.extensions.typesystems.SqlTypeSystem;
-import com.amdocs.aia.common.model.extensions.typesystems.TypeSystemFactory;
 import com.amdocs.aia.common.model.logical.PrimitiveDatatype;
 import com.amdocs.aia.common.model.utils.TypeSystemUtils;
 import com.amdocs.aia.il.common.constant.JavaTypes;
@@ -41,8 +40,8 @@ public class ConversionUtils {
 
     public static String getRawSqlType(String sqlType) { // NOSONAR
         String rawType = TypeSystemUtils.extractRawType(sqlType);
-        if(rawType.equals(SqlTypeSystem.DECIMAL)){
-            rawType = SqlTypeSystem.DOUBLE;
+        if(rawType.equals(SqlTypeSystem.DECIMAL.getDatatypeKey())){
+            rawType = SqlTypeSystem.DOUBLE.getDatatypeKey();
         }
         return rawType;
     }

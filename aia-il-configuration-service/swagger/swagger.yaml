@@ -2769,6 +2769,8 @@ definitions:
         type: string
       displayName:
         type: string
+      nativeDatatype:
+        type: string
       supportedTypeSystems:
         type: array
         description: List of type systems that can be used by external schemas of this type
