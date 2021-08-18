@@ -3,10 +3,7 @@ package com.amdocs.aia.il.configuration.service.external;
 import com.amdocs.aia.common.core.web.AiaApiException;
 import com.amdocs.aia.common.model.ModelConstants;
 import com.amdocs.aia.common.model.extensions.storetypes.DataChannelStoreType;
-import com.amdocs.aia.common.model.extensions.typesystems.LogicalTypeSystem;
-import com.amdocs.aia.common.model.extensions.typesystems.OracleTypeSystem;
-import com.amdocs.aia.common.model.extensions.typesystems.PostgreSqlTypeSystem;
-import com.amdocs.aia.common.model.extensions.typesystems.ProtoTypeSystem;
+import com.amdocs.aia.common.model.extensions.typesystems.*;
 import com.amdocs.aia.common.model.logical.LogicalSchema;
 import com.amdocs.aia.common.model.logical.LogicalSchemaCategory;
 import com.amdocs.aia.common.model.repo.ElementMetadata;
@@ -121,7 +118,8 @@ public class ExternalSchemaServiceImpl extends AbstractModelService<ExternalSche
                 LogicalTypeSystem.NAME,
                 OracleTypeSystem.NAME,
                 PostgreSqlTypeSystem.NAME,
-                ProtoTypeSystem.NAME
+                ProtoTypeSystem.NAME,
+                SqlTypeSystem.NAME
         ));
     }
 
