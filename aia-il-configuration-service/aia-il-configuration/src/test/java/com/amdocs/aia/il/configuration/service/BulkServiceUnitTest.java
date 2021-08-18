@@ -5,6 +5,7 @@ import com.amdocs.aia.il.common.model.external.sql.ExternalSqlEntityCollectionRu
 import com.amdocs.aia.il.common.model.external.sql.ExternalSqlEntityStoreInfo;
 import com.amdocs.aia.il.common.model.external.sql.ExternalSqlSchemaCollectionRules;
 import com.amdocs.aia.il.common.model.external.sql.ExternalSqlSchemaStoreInfo;
+import com.amdocs.aia.il.configuration.exportimport.ExternalSchemasImportExportHelper;
 import com.amdocs.aia.il.configuration.repository.external.ExternalEntityRepository;
 import com.amdocs.aia.il.configuration.repository.external.ExternalSchemaRepository;
 import com.amdocs.aia.il.configuration.service.external.BulkServiceImpl;
@@ -41,6 +42,8 @@ public class BulkServiceUnitTest {
     @Mock
     ExternalEntityRepository externalEntityRepository;
 
+    @Mock
+    ExternalSchemasImportExportHelper externalSchemasImportExportHelper;
 
     @InjectMocks
     private BulkServiceImpl bulkService;
