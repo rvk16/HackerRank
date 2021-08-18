@@ -38,7 +38,7 @@ public class BulkApiControllerUnitTest extends AbstractApiControllerUnitTest {
     private InputStreamResource inputStreamResource;
 
     @Test
-    void exportDatastoreTablesToCSV_ShouldReturn200OK_and_file() throws Exception {
+    void exportExternalSchemasToCSV_ShouldReturn200OK_and_file() throws Exception {
         when(this.bulkService.exportExternalSchemasToZIP("projectKey")).thenReturn(inputStreamResource);
         mockMvc.perform(get("/aia/api/v1/integration-layer/projects/aia/configuration/external-schemas/export")
                 .contentType(MediaType.APPLICATION_OCTET_STREAM))

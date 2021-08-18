@@ -75,6 +75,13 @@ public class MessageHelper {
                 getElementDisplayType(elementType),
                 elementKey);
     }
+    public ApiException invalidExternalCollectionRulesException(String elementType, String SchemaKey,String schemaType,String channel) {
+        return new ApiException(AiaApiException.AiaApiHttpCodes.BAD_RERQUEST, AiaApiMessages.GENERAL.INVALID_EXTERNAL_COLLECTION_RULES,
+                getElementDisplayType(elementType),
+                SchemaKey,schemaType,channel);
+    }
+
+
 
 
     public ApiException invalidPrimaryKeyException(String elementType, String elementKey) {

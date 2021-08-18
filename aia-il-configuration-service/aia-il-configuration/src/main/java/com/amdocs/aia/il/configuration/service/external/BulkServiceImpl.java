@@ -276,7 +276,7 @@ public class BulkServiceImpl implements BulkService {
         externalSchemaExportCSV.setTypeSystem(externalSchema.getTypeSystem());
         externalSchemaExportCSV.setReference(externalSchema.getIsReference());
         externalSchemaExportCSV.setSerializationMethod(externalSchema.getDataChannelInfo().getSerializationMethod());
-        externalSchemaExportCSV.setAvailability(externalSchema != null && externalSchema.equals(Availability.SHARED) ? AvailabilityDTO.SHARED : AvailabilityDTO.EXTERNAL);
+        externalSchemaExportCSV.setAvailability(externalSchema.getAvailability().equals(Availability.SHARED) ? AvailabilityDTO.SHARED : AvailabilityDTO.EXTERNAL);
         externalSchemaExportCSV.setSubjectAreaName(externalSchema.getSubjectAreaName());
 
         externalSchemaExportCSV.setOngoingChannel(externalSchema.getCollectionRules().getOngoingChannel()!= null?externalSchema.getCollectionRules().getOngoingChannel().name():null);
@@ -484,13 +484,21 @@ public class BulkServiceImpl implements BulkService {
     }
 
     private void setExternalCollectionRules(ExternalSchemaExportCSV externalSchemaExportCSV, ExternalSchemaCollectionRulesDTO externalSchemaCollectionRulesDTO) {
-      //todo :checks
-        //  ExternalSchemaType.valueOf(  externalSchemaExportCSV.getSchemaType()).getSupportedInitialLoadChannels().contains(externalSchemaExportCSV.getInitialLoadChannel())?
-
-
-        externalSchemaCollectionRulesDTO.setOngoingChannel(externalSchemaExportCSV.getOngoingChannel());
-        externalSchemaCollectionRulesDTO.setInitialLoadChannel(externalSchemaExportCSV.getInitialLoadChannel());
-        externalSchemaCollectionRulesDTO.setReplayChannel(externalSchemaExportCSV.getReplayChannel());
+       if( ExternalSchemaType.valueOf(externalSchemaExportCSV.getSchemaType()).getSupportedInitialLoadChannels().contains( CollectorChannelType.valueOf(externalSchemaExportCSV.getInitialLoadChannel()))){
+           externalSchemaCollectionRulesDTO.setInitialLoadChannel(externalSchemaExportCSV.getInitialLoadChannel());
+        }else{
+           throw messageHelper.invalidExternalCollectionRulesException(ExternalSchema.ELEMENT_TYPE, externalSchemaExportCSV.getSchemaKey(),externalSchemaExportCSV.getSchemaType(), externalSchemaExportCSV.getInitialLoadChannel());
+        }
+        if( ExternalSchemaType.valueOf(externalSchemaExportCSV.getSchemaType()).getSupportedOngoingChannels().contains(CollectorChannelType.valueOf(externalSchemaExportCSV.getOngoingChannel()))){
+            externalSchemaCollectionRulesDTO.setOngoingChannel(externalSchemaExportCSV.getOngoingChannel());
+        }else{
+            throw messageHelper.invalidExternalCollectionRulesException(ExternalSchema.ELEMENT_TYPE, externalSchemaExportCSV.getSchemaKey(),externalSchemaExportCSV.getSchemaType(), externalSchemaExportCSV.getOngoingChannel());
+        }
+        if( ExternalSchemaType.valueOf(externalSchemaExportCSV.getSchemaType()).getSupportedReplayChannels().contains(CollectorChannelType.valueOf(externalSchemaExportCSV.getReplayChannel()))){
+            externalSchemaCollectionRulesDTO.setReplayChannel(externalSchemaExportCSV.getReplayChannel());
+        }else{
+            throw messageHelper.invalidExternalCollectionRulesException(ExternalSchema.ELEMENT_TYPE, externalSchemaExportCSV.getSchemaKey(),externalSchemaExportCSV.getSchemaType(), externalSchemaExportCSV.getReplayChannel());
+        }
         externalSchemaCollectionRulesDTO.setPartialLoadRelativeURL(externalSchemaExportCSV.getPartialLoadRelativeURL());
         externalSchemaCollectionRulesDTO.setInitialLoadRelativeURL(externalSchemaExportCSV.getInitialLoadRelativeURL());
     }
@@ -510,7 +518,7 @@ public class BulkServiceImpl implements BulkService {
         externalEntityDTO.setEntityKey(externalEntityExportCSV.getEntityKey());
         externalEntityDTO.setEntityName(externalEntityExportCSV.getEntityName());
         externalEntityDTO.setDescription(externalEntityExportCSV.getDescription());
-        externalEntityDTO.setSerializationId(externalEntity!=null? externalEntity.getSerializationId():null);
+        externalEntityDTO.setSerializationId(!isNew ? externalEntity.getSerializationId():null);
         externalEntityDTO.setIsTransient(externalEntityExportCSV.getTransient());
         externalEntityDTO.setIsTransaction(externalEntityExportCSV.getTransaction());
         externalEntityDTO.setStoreInfo(toStoreInfoEntity(externalEntityExportCSV,schemaType));

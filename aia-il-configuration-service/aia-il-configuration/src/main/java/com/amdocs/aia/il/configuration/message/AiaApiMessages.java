@@ -75,7 +75,8 @@ public final class AiaApiMessages {
         public static final AIAAPIMessageTemplate IMPORT_FROM_ZIP_NOT_ZIP_ERROR =
                 new AIAAPIMessageTemplate(11, "general.import.from.zip.not.zip", AIAAPIMessageTemplate.MessageType.ERROR);
 
-
+        public static final AIAAPIMessageTemplate INVALID_EXTERNAL_COLLECTION_RULES =
+                new AIAAPIMessageTemplate(53, "general.invalid.external.collection.rules", AIAAPIMessageTemplate.MessageType.ERROR);
 
 
         private GENERAL() {

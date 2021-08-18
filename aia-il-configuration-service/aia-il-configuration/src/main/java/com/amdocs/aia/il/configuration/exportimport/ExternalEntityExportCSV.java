@@ -22,7 +22,6 @@ public class ExternalEntityExportCSV extends AbstractCsvExternalModel implements
     @JsonProperty(value = "entityName",required = true)
     private String entityName = null;
 
-   //to ignore in import - check update
     @JsonProperty("serializationId (READ ONLY)")
     private Integer serializationId = null;
 
