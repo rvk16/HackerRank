@@ -26,141 +26,150 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		createChangeRequest("IL import - export external Schema - Test");
 	}
 
-//
-//	@Test
-//	public void T001_whenImportZipFile_initial() {
-//
-//		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import.zip");
-//		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-//		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
-//		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-//		checkBulkImportResponse(bulkImportResponseDTO, 4,15,0,0,0,0);
-//		checkSchemasA();
-//		checkEntitiesA();
-//	}
-//
-//	@Test
-//	public void T002_whenImportZipFile_missing_Entities_and_attribute_on_file() {
-//
-//		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_missing.zip");
-//		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-//		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
-//		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-//		checkBulkImportResponse(bulkImportResponseDTO, 0,0,2,15,0,0);
-//		checkSchemasA();
-//		checkEntitiesA();
-//	}
-//
-//	@Test
-//	public void T003_whenImportZipFile_deleteAndUpdate() {
-//		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_delUp.zip");
-//		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-//		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
-//		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-//		checkBulkImportResponse(bulkImportResponseDTO, 1,1,3,10,1,2);
-//		checkSchemasB();
-//		checkEntitiesB();
-//	}
-//
-//	@Test
-//	public void T004_whenImportZipFile_SchemaSheetOnly() {
-//		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_schemasOnly.zip");
-//		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-//		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
-//
-//		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-//		checkBulkImportResponse(bulkImportResponseDTO, 1,0,3,0,1,0);
-//		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
-//		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
-//		Map <String,  ExternalSchemaDTO>  externalSchemaDTOMap = externalSchemaDTOS.stream().collect(Collectors.toMap(ExternalSchemaDTO::getSchemaKey, Function.identity()));
-//		assertTrue(externalSchemaDTOMap.containsKey("TCEVENT"));
-//		assertTrue(externalSchemaDTOMap.containsKey("REFDATA"));
-//		assertFalse(externalSchemaDTOMap.containsKey("SOM"));
-//		assertFalse(externalSchemaDTOMap.containsKey("OMS_FAKE"));
-//		assertTrue(externalSchemaDTOMap.containsKey("OMS_FAKE2"));
-//	}
-//
-//	@Test
-//	public void T005_whenImportZipFile_AttributeSheetOnly() {
-//		Response responseGet1 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBORDER_ACTION", HttpStatus.SC_OK);
-//		ExternalEntityDTO OMS_TBORDER_ACTIONEntity = responseGet1.as(ExternalEntityDTO.class);
-//		Map <String,  ExternalAttributeDTO>  OMS_BORDER_ACTIONEntityAttMap = OMS_TBORDER_ACTIONEntity.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
-//		assertEquals(OMS_BORDER_ACTIONEntityAttMap.size(),106);
-//		assertFalse(OMS_BORDER_ACTIONEntityAttMap.containsKey("CREATION_METHOD_1"));
-//		assertFalse(OMS_BORDER_ACTIONEntityAttMap.containsKey("CREATION_METHOD_2"));
-//
-//		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBNAME", HttpStatus.SC_OK);
-//		ExternalEntityDTO OMS_TBNAME_Entity = responseGet2.as(ExternalEntityDTO.class);
-//		Map <String,  ExternalAttributeDTO>  OMS_TBNAME_EntityAttMap = OMS_TBNAME_Entity.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
-//		assertEquals(OMS_TBNAME_EntityAttMap.size(),11);
-//		assertTrue(OMS_TBNAME_EntityAttMap.containsKey("LANGUAGE"));
-//
-//
-//		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_attributesOnly.zip");
-//		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-//		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
-//		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-//
-//		checkBulkImportResponse(bulkImportResponseDTO, 0,0,0,10,0,0);
-//
-//
-//		Response responseGet3 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBORDER_ACTION", HttpStatus.SC_OK);
-//		ExternalEntityDTO OMS_TBORDER_ACTIONEntity2 = responseGet3.as(ExternalEntityDTO.class);
-//		Map <String,  ExternalAttributeDTO>  OMS_TBORDER_ACTION_EntityAttMap2 = OMS_TBORDER_ACTIONEntity2.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
-//		assertEquals(OMS_TBORDER_ACTION_EntityAttMap2.size(),108);
-//		assertTrue(OMS_TBORDER_ACTION_EntityAttMap2.containsKey("CREATION_METHOD_1"));
-//		assertTrue(OMS_TBORDER_ACTION_EntityAttMap2.containsKey("CREATION_METHOD_2"));
-//
-//
-//		Response responseGet4 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBNAME", HttpStatus.SC_OK);
-//		ExternalEntityDTO OMS_TBNAME_Entity2 = responseGet4.as(ExternalEntityDTO.class);
-//		Map <String,  ExternalAttributeDTO>  OMS_TBNAME_EntityAttMap2 = OMS_TBNAME_Entity2.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
-//		assertEquals(OMS_TBNAME_EntityAttMap2.size(),10);
-//		assertFalse(OMS_TBNAME_EntityAttMap2.containsKey("LANGUAGE"));
-//
-//	}
-//
-//
-//
-//	@Test
-//	public void T006_whenImportZipFile_AddEntity() {
-//		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities", HttpStatus.SC_OK);
-//		List<ExternalEntityDTO> externalEntitiesDTOs = Arrays.asList(responseGet.getBody().as(ExternalEntityDTO[].class));
-//		Map <String,  ExternalEntityDTO>  OMS_EntityAttMap = externalEntitiesDTOs.stream().collect(Collectors.toMap(ExternalEntityDTO::getEntityKey, Function.identity()));
-//		assertEquals(OMS_EntityAttMap.size(),8);
-//		assertFalse(OMS_EntityAttMap.containsKey("TEST"));
-//		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import-addEntity.zip");
-//		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-//		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
-//		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-//		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities", HttpStatus.SC_OK);
-//		List<ExternalEntityDTO> externalEntitiesDTOs2 = Arrays.asList(responseGet2.getBody().as(ExternalEntityDTO[].class));
-//		Map <String,  ExternalEntityDTO>  OMS_EntityAttMap2 = externalEntitiesDTOs2.stream().collect(Collectors.toMap(ExternalEntityDTO::getEntityKey, Function.identity()));
-//		assertEquals(OMS_EntityAttMap2.size(),9);
-//		assertTrue(OMS_EntityAttMap2.containsKey("TEST"));
-//		ExternalEntityDTO testEntity = OMS_EntityAttMap2.get("TEST");
-//		assertEquals(testEntity.getAttributes().size(),1);
-//		assertEquals(testEntity.getAttributes().get(0).getAttributeKey(),"ATT1");
-//		assertEquals(testEntity.getAttributes().get(0).getKeyPosition().intValue(),2);
-//
-////		checkBulkImportResponse(bulkImportResponseDTO, 1,0,3,0,1,0);
-//	}
-//
-//
-//	@Test
-//	public void T007_whenImportZipFile_DeleteAll() {
-//		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
-//		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
-//		assertEquals(externalSchemaDTOS.size(),4);
-//		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import-deleteAll.zip");
-//		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-//		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
-//		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-//		checkBulkImportResponse(bulkImportResponseDTO, 0,0,0,0,4,0);
-//		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
-//		List<ExternalSchemaDTO> externalSchemaDTOS2 = Arrays.asList(responseGet2.getBody().as(ExternalSchemaDTO[].class));
-//		assertEquals(externalSchemaDTOS2.size(),0);
-//	}
+
+	@Test
+	public void T001_whenImportZipFile_initial() {
+
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+		checkBulkImportResponse(bulkImportResponseDTO, 4,15,0,0,0,0);
+		checkSchemasA();
+		checkEntitiesA();
+	}
+
+	@Test
+	public void T002_whenImportZipFile_missing_Entities_and_attribute_on_file() {
+
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_missing.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+		checkBulkImportResponse(bulkImportResponseDTO, 0,0,2,15,0,0);
+		checkSchemasA();
+		checkEntitiesA();
+	}
+
+	@Test
+	public void T003_whenImportZipFile_deleteAndUpdate() {
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_delUp.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+		checkBulkImportResponse(bulkImportResponseDTO, 1,1,3,10,1,2);
+		checkSchemasB();
+		checkEntitiesB();
+	}
+
+	@Test
+	public void T004_whenImportZipFile_SchemaSheetOnly() {
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_schemasOnly.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+		checkBulkImportResponse(bulkImportResponseDTO, 1,0,3,0,1,0);
+		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
+		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
+		Map <String,  ExternalSchemaDTO>  externalSchemaDTOMap = externalSchemaDTOS.stream().collect(Collectors.toMap(ExternalSchemaDTO::getSchemaKey, Function.identity()));
+		assertTrue(externalSchemaDTOMap.containsKey("TCEVENT"));
+		assertTrue(externalSchemaDTOMap.containsKey("REFDATA"));
+		assertFalse(externalSchemaDTOMap.containsKey("SOM"));
+		assertFalse(externalSchemaDTOMap.containsKey("OMS_FAKE"));
+		assertTrue(externalSchemaDTOMap.containsKey("OMS_FAKE2"));
+	}
+
+	@Test
+	public void T005_whenImportZipFile_AttributeSheetOnly() {
+		Response responseGet1 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBORDER_ACTION", HttpStatus.SC_OK);
+		ExternalEntityDTO OMS_TBORDER_ACTIONEntity = responseGet1.as(ExternalEntityDTO.class);
+		Map <String,  ExternalAttributeDTO>  OMS_BORDER_ACTIONEntityAttMap = OMS_TBORDER_ACTIONEntity.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
+		assertEquals(OMS_BORDER_ACTIONEntityAttMap.size(),106);
+		assertFalse(OMS_BORDER_ACTIONEntityAttMap.containsKey("CREATION_METHOD_1"));
+		assertFalse(OMS_BORDER_ACTIONEntityAttMap.containsKey("CREATION_METHOD_2"));
+
+		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBNAME", HttpStatus.SC_OK);
+		ExternalEntityDTO OMS_TBNAME_Entity = responseGet2.as(ExternalEntityDTO.class);
+		Map <String,  ExternalAttributeDTO>  OMS_TBNAME_EntityAttMap = OMS_TBNAME_Entity.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
+		assertEquals(OMS_TBNAME_EntityAttMap.size(),11);
+		assertTrue(OMS_TBNAME_EntityAttMap.containsKey("LANGUAGE"));
+
+
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_attributesOnly.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+
+		checkBulkImportResponse(bulkImportResponseDTO, 0,0,0,10,0,0);
+
+
+		Response responseGet3 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBORDER_ACTION", HttpStatus.SC_OK);
+		ExternalEntityDTO OMS_TBORDER_ACTIONEntity2 = responseGet3.as(ExternalEntityDTO.class);
+		Map <String,  ExternalAttributeDTO>  OMS_TBORDER_ACTION_EntityAttMap2 = OMS_TBORDER_ACTIONEntity2.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
+		assertEquals(OMS_TBORDER_ACTION_EntityAttMap2.size(),108);
+		assertTrue(OMS_TBORDER_ACTION_EntityAttMap2.containsKey("CREATION_METHOD_1"));
+		assertTrue(OMS_TBORDER_ACTION_EntityAttMap2.containsKey("CREATION_METHOD_2"));
+
+
+		Response responseGet4 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities/TBNAME", HttpStatus.SC_OK);
+		ExternalEntityDTO OMS_TBNAME_Entity2 = responseGet4.as(ExternalEntityDTO.class);
+		Map <String,  ExternalAttributeDTO>  OMS_TBNAME_EntityAttMap2 = OMS_TBNAME_Entity2.getAttributes().stream().collect(Collectors.toMap(ExternalAttributeDTO::getAttributeKey, Function.identity()));
+		assertEquals(OMS_TBNAME_EntityAttMap2.size(),10);
+		assertFalse(OMS_TBNAME_EntityAttMap2.containsKey("LANGUAGE"));
+
+	}
+
+
+
+	@Test
+	public void T006_whenImportZipFile_AddEntity() {
+		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities", HttpStatus.SC_OK);
+		List<ExternalEntityDTO> externalEntitiesDTOs = Arrays.asList(responseGet.getBody().as(ExternalEntityDTO[].class));
+		Map <String,  ExternalEntityDTO>  OMS_EntityAttMap = externalEntitiesDTOs.stream().collect(Collectors.toMap(ExternalEntityDTO::getEntityKey, Function.identity()));
+		assertEquals(OMS_EntityAttMap.size(),8);
+		assertFalse(OMS_EntityAttMap.containsKey("TEST"));
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import-addEntity.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+		checkBulkImportResponse(bulkImportResponseDTO,0,1,0,0,0,0);
+		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/OMS/entities", HttpStatus.SC_OK);
+		List<ExternalEntityDTO> externalEntitiesDTOs2 = Arrays.asList(responseGet2.getBody().as(ExternalEntityDTO[].class));
+		Map <String,  ExternalEntityDTO>  OMS_EntityAttMap2 = externalEntitiesDTOs2.stream().collect(Collectors.toMap(ExternalEntityDTO::getEntityKey, Function.identity()));
+		assertEquals(OMS_EntityAttMap2.size(),9);
+		assertTrue(OMS_EntityAttMap2.containsKey("TEST"));
+		ExternalEntityDTO testEntity = OMS_EntityAttMap2.get("TEST");
+		assertEquals(testEntity.getAttributes().size(),1);
+		assertEquals(testEntity.getAttributes().get(0).getAttributeKey(),"ATT1");
+		assertEquals(testEntity.getAttributes().get(0).getKeyPosition().intValue(),2);
+	}
+
+
+	@Test
+	public void T007_whenImportZipFile_SchemasOnlyWithErrors() {
+		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
+		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
+		assertEquals(externalSchemaDTOS.size(),4);
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_schemasOnly_withChannelError.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
+	}
+
+	@Test
+	public void T008_whenImportZipFile_DeleteAll() {
+		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
+		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
+		assertEquals(externalSchemaDTOS.size(),4);
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import-deleteAll.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+		checkBulkImportResponse(bulkImportResponseDTO, 0,0,0,0,4,0);
+		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
+		List<ExternalSchemaDTO> externalSchemaDTOS2 = Arrays.asList(responseGet2.getBody().as(ExternalSchemaDTO[].class));
+		assertEquals(externalSchemaDTOS2.size(),0);
+	}
 
 
 	private void checkSchemasA() {
@@ -216,7 +225,7 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		assertEquals( tcEventSchema.getCollectionRules().getStoreType().name(), "CSV");
 		assertEquals( tcEventSchema.getCollectionRules().getOngoingChannel(), "FILES");
 		assertEquals(((ExternalCsvSchemaCollectionRulesDTO) tcEventSchema.getCollectionRules()).getDefaultInvalidFilenameAction().name(), "KEEP");
-//		assertEquals( tcEventSchema.getDataChannelInfo().getSerializationMethod().getValue(), "SharedProtobuf");
+	//	assertEquals( tcEventSchema.getDataChannelInfo().getSerializationMethod().getValue(), "SharedProtobuf");
 		assertEquals(tcEventSchema.getCreatedBy(), "testUser");
 		assertEquals(tcEventSchema.getOriginProcess(), "IMPLEMENTATION");
 		assertEquals( tcEventSchema.getAvailability().name(), "EXTERNAL");
@@ -328,7 +337,7 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		assertEquals(cidAtt.getAttributeName(),"CID");
 		assertEquals(cidAtt.getDatatype(),"VARCHAR2");
 		assertEquals(cidAtt.getLogicalDatatype(),"STRING");
-		assertEquals(cidAtt.getSerializationId().intValue(),1);
+		assertNotNull(cidAtt.getSerializationId().intValue());
 		assertEquals(cidAtt.getKeyPosition().intValue(),1);
 		assertTrue(cidAtt.isIsRequired());
 		assertFalse(cidAtt.isIsUpdateTime());
