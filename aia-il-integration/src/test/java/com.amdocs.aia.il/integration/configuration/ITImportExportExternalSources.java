@@ -1,5 +1,6 @@
 package com.amdocs.aia.il.integration.configuration;
 
+import com.amdocs.aia.common.core.web.AiaApiResponseMessage;
 import com.amdocs.aia.il.configuration.client.dto.*;
 import com.amdocs.aia.il.integration.BaseIntegrationTest;
 import io.restassured.response.Response;
@@ -162,6 +163,10 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_schemasOnly_withChannelError.zip");
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
+		AiaApiResponseMessage message = response.as(AiaApiResponseMessage.class);
+		assertEquals(message.getUserMessageKey(),"general.invalid.external.collection.rules");
+
+
 	}
 	@Test
 	public void T009_whenImportZipFile_addKafkaSchema() {
@@ -191,6 +196,8 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_export_addKafkaEntityMissingRelativePaths.zip");
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
+		AiaApiResponseMessage message = response.as(AiaApiResponseMessage.class);
+		assertEquals(message.getUserMessageKey(),"general.missing.relative.paths");
 	}
 
 	@Test
