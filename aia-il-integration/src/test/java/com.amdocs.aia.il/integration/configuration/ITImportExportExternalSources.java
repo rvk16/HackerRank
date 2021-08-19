@@ -154,22 +154,13 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_schemasOnly_withChannelError.zip");
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
-	}
-	@Test
-	public void T008_whenImportZipFile_SchemasOnlyWithErrors() {
-		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
-		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
-		assertEquals(externalSchemaDTOS.size(),4);
-		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_schemasOnly_withChannelError.zip");
-		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
-		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
 		AiaApiResponseMessage message = response.as(AiaApiResponseMessage.class);
 		assertEquals(message.getUserMessageKey(),"general.invalid.external.collection.rules");
 
 
 	}
 	@Test
-	public void T009_whenImportZipFile_addKafkaSchema() {
+	public void T008_whenImportZipFile_addKafkaSchema() {
 		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_export_addKafkaSchema.zip");
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
@@ -192,7 +183,7 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 	}
 
 	@Test
-	public void T010_whenImportZipFile_addKafkaEntityMissingRelativePaths() {
+	public void T09_whenImportZipFile_addKafkaEntityMissingRelativePaths() {
 		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_export_addKafkaEntityMissingRelativePaths.zip");
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
@@ -201,7 +192,7 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 	}
 
 	@Test
-	public void T011_whenImportZipFile_DeleteAll() {
+	public void T010_whenImportZipFile_DeleteAll() {
 		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
 		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
 		assertEquals(externalSchemaDTOS.size(),5);
