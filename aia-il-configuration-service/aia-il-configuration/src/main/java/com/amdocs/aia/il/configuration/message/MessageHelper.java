@@ -102,6 +102,12 @@ public class MessageHelper {
                 schemaKey);
     }
 
+    public ApiException missingRelativePaths(String elementType, String schemaKey , String entityKey) {
+        return new ApiException(AiaApiException.AiaApiHttpCodes.BAD_RERQUEST, AiaApiMessages.GENERAL.MISSING_RELATIVE_PATHS,
+                getElementDisplayType(elementType),
+                schemaKey,entityKey);
+    }
+
     public ApiException invalidIndexColumnException(String elementType, String elementKey, String tableName) {
         return new ApiException(AiaApiException.AiaApiHttpCodes.BAD_RERQUEST, AiaApiMessages.GENERAL.INVALID_INDEX_COLUMN,
                 getElementDisplayType(elementType),

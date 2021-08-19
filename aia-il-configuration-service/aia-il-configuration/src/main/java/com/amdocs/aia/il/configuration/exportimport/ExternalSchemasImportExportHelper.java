@@ -128,6 +128,9 @@ public class ExternalSchemasImportExportHelper {
                         .fileNameFormat(externalEntityExportCSV.getFileNameFormat())
                         .storeType(ExternalEntityStoreInfoDTO.StoreTypeEnum.CSV);
             case ExternalSchemaStoreTypes.KAFKA:
+                if(externalEntityExportCSV.getRelativePaths() == null){
+                    throw messageHelper.missingRelativePaths(ExternalEntity.ELEMENT_TYPE, externalEntityExportCSV.getSchemaKey(),externalEntityExportCSV.getEntityKey());
+                }
                 return new ExternalKafkaEntityStoreInfoDTO()
                         .jsonTypePath(externalEntityExportCSV.getJsonTypePath())
                         .jsonTypeValue(externalEntityExportCSV.getJsonTypeValue())

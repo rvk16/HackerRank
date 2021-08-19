@@ -78,6 +78,8 @@ public final class AiaApiMessages {
         public static final AIAAPIMessageTemplate INVALID_EXTERNAL_COLLECTION_RULES =
                 new AIAAPIMessageTemplate(53, "general.invalid.external.collection.rules", AIAAPIMessageTemplate.MessageType.ERROR);
 
+        public static final AIAAPIMessageTemplate MISSING_RELATIVE_PATHS =
+                new AIAAPIMessageTemplate(47, "general.missing.relative.paths", AIAAPIMessageTemplate.MessageType.ERROR);
 
         private GENERAL() {
             // singleton

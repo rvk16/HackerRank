@@ -1,6 +1,5 @@
 package com.amdocs.aia.il.integration.configuration;
 
-import com.amdocs.aia.il.common.model.external.ExternalEntity;
 import com.amdocs.aia.il.configuration.client.dto.*;
 import com.amdocs.aia.il.integration.BaseIntegrationTest;
 import io.restassured.response.Response;
@@ -155,17 +154,55 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
 	}
-
 	@Test
-	public void T008_whenImportZipFile_DeleteAll() {
+	public void T008_whenImportZipFile_SchemasOnlyWithErrors() {
 		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
 		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
 		assertEquals(externalSchemaDTOS.size(),4);
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import_schemasOnly_withChannelError.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
+	}
+	@Test
+	public void T009_whenImportZipFile_addKafkaSchema() {
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_export_addKafkaSchema.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
+		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
+		checkBulkImportResponse(bulkImportResponseDTO,1,2,0,0,0,0);
+
+		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/PartyInteractionAbe", HttpStatus.SC_OK);
+		ExternalSchemaDTO externalSchemaDTO = responseGet.as(ExternalSchemaDTO.class);
+		assertEquals(externalSchemaDTO.getSchemaType(),"DIGITAL1");
+		assertEquals(externalSchemaDTO.getStoreInfo().getStoreType().name(),"KAFKA");
+
+
+		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas/PartyInteractionAbe/entities", HttpStatus.SC_OK);
+		List<ExternalEntityDTO> externalEntitiesDTOs2 = Arrays.asList(responseGet2.getBody().as(ExternalEntityDTO[].class));
+		Map <String,  ExternalEntityDTO>  entities = externalEntitiesDTOs2.stream().collect(Collectors.toMap(ExternalEntityDTO::getEntityKey, Function.identity()));
+		assertEquals(entities.size(),2);
+		assertTrue(entities.containsKey("D1PartyInteraction"));
+		ExternalEntityDTO testEntity = entities.get("D1PartyInteraction");
+		assertEquals(((ExternalKafkaEntityStoreInfoDTO) testEntity.getStoreInfo()).getRelativePaths(),"event/partyInteraction(STR)");
+	}
+
+	@Test
+	public void T010_whenImportZipFile_addKafkaEntityMissingRelativePaths() {
+		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_export_addKafkaEntityMissingRelativePaths.zip");
+		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
+		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
+	}
+
+	@Test
+	public void T011_whenImportZipFile_DeleteAll() {
+		Response responseGet = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
+		List<ExternalSchemaDTO> externalSchemaDTOS = Arrays.asList(responseGet.getBody().as(ExternalSchemaDTO[].class));
+		assertEquals(externalSchemaDTOS.size(),5);
 		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_to_import-deleteAll.zip");
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_OK, zipFileTOImport, "application/zip" );
 		BulkImportResponseDTO bulkImportResponseDTO = response.as(BulkImportResponseDTO.class);
-		checkBulkImportResponse(bulkImportResponseDTO, 0,0,0,0,4,0);
+		checkBulkImportResponse(bulkImportResponseDTO, 0,0,0,0,5,0);
 		Response responseGet2 = assertGetResponseGet(configurationServiceUrl + "/projects/" + PROJECT_KEY + "/configuration/external-schemas", HttpStatus.SC_OK);
 		List<ExternalSchemaDTO> externalSchemaDTOS2 = Arrays.asList(responseGet2.getBody().as(ExternalSchemaDTO[].class));
 		assertEquals(externalSchemaDTOS2.size(),0);

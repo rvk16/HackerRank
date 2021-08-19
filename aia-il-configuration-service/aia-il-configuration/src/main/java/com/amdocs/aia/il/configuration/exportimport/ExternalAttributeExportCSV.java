@@ -25,7 +25,6 @@ public class ExternalAttributeExportCSV  extends AbstractCsvExternalModel implem
     @JsonProperty(value = "datatype",required = true)
     private String datatype = null;
 
-    //ignore service will fill
     @JsonProperty("logicalDatatype (read only)")
     private String logicalDatatype = null;
 
@@ -53,15 +52,11 @@ public class ExternalAttributeExportCSV  extends AbstractCsvExternalModel implem
     @JsonProperty("jsonPath (kafka)")
     private String jsonPath = null;
 
-    //ignore
     @JsonProperty("serializationId (read only)")
     private Integer serializationId = null;
 
-
-
     public ExternalAttributeExportCSV() {
     }
-
 
     public String getEntityKey() {
         return entityKey;
