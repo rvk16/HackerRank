@@ -183,7 +183,7 @@ public class ITImportExportExternalSources extends BaseIntegrationTest {
 	}
 
 	@Test
-	public void T09_whenImportZipFile_addKafkaEntityMissingRelativePaths() {
+	public void T009_whenImportZipFile_addKafkaEntityMissingRelativePaths() {
 		File zipFileTOImport = new File("src/test/resources/data/importexport/external_schemas_export_addKafkaEntityMissingRelativePaths.zip");
 		String url = configurationServiceUrl + configServiceAdditionalUrl + "/external-schemas/import";
 		Response response = assertGetResponsePostWithFileAndContentType(url, HttpStatus.SC_BAD_REQUEST, zipFileTOImport, "application/zip" );
