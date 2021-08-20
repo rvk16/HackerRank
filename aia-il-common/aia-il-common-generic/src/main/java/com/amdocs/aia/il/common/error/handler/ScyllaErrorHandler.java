@@ -1,7 +1,6 @@
 package com.amdocs.aia.il.common.error.handler;
 
 import com.amdocs.aia.il.common.utils.ClassLoaderUtils;
-import com.amdocs.aia.il.common.utils.SneakyThrowUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,11 +24,7 @@ public class ScyllaErrorHandler implements Handler, Serializable {
     private ErrorHandler errorHandler;
 
     static {
-        try {
-            allowedScyllaExceptionTypes = ClassLoaderUtils.getScyllaExceptionType();
-        } catch (Exception e) {
-            SneakyThrowUtil.sneakyThrow(e);
-        }
+        allowedScyllaExceptionTypes = ClassLoaderUtils.getScyllaExceptionType();
     }
 
     public boolean isScyllaException(Class<?> exceptionType) {
@@ -69,7 +64,7 @@ public class ScyllaErrorHandler implements Handler, Serializable {
                 setErrorMetricFlag(checkpoint);
                 return output;
             } catch (Exception e) {
-                SneakyThrowUtil.sneakyThrow(e);
+                throw new RuntimeException(e); //NOSONAR
             }
         }
     }
@@ -90,51 +85,41 @@ public class ScyllaErrorHandler implements Handler, Serializable {
                 setErrorMetricFlag(checkpoint);
                 return;
             } catch (Exception e) {
-                SneakyThrowUtil.sneakyThrow(e);
+                throw new RuntimeException(e); //NOSONAR
             }
         }
     }
 
     private <T> void setErrorMetricFlag(Checkpoint<T> checkpoint) {
-        try {
-            LOGGER.info("setErrorMetricFlag errorHandler.getMetrics {}", errorHandler.getMetrics());
-            if (errorHandler.getMetrics() != null) {
-                String threadName;
-                if (checkpoint.getThreadName().substring(checkpoint.getThreadName().length() - 1).matches(".*\\d.*")) {
-                    threadName = checkpoint.getThreadName().substring(0, checkpoint.getThreadName().length() - 1);
-                } else {
-                    threadName = checkpoint.getThreadName();
-                }
-                LOGGER.info("inside if setErrorMetricFlag errorHandler.getMetrics {}", errorHandler.getMetrics());
-                if (checkpoint.isErrorFlag()) {
-                    LOGGER.info("inside if setErrorMetricFlag checkpoint.getRetryCounter {}", checkpoint.getRetryCounter());
-                    if (checkpoint.getRetryCounter() == 0) {
-                        errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(1, threadName);
-                    }
-                } else {
-                    errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(0, threadName);
-                }
+        LOGGER.info("setErrorMetricFlag errorHandler.getMetrics {}", errorHandler.getMetrics());
+        if (errorHandler.getMetrics() != null) {
+            String threadName;
+            if (checkpoint.getThreadName().substring(checkpoint.getThreadName().length() - 1).matches(".*\\d.*")) {
+                threadName = checkpoint.getThreadName().substring(0, checkpoint.getThreadName().length() - 1);
+            } else {
+                threadName = checkpoint.getThreadName();
             }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.info("inside if setErrorMetricFlag errorHandler.getMetrics {}", errorHandler.getMetrics());
+            if (checkpoint.isErrorFlag()) {
+                LOGGER.info("inside if setErrorMetricFlag checkpoint.getRetryCounter {}", checkpoint.getRetryCounter());
+                if (checkpoint.getRetryCounter() == 0) {
+                    errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(1, threadName);
+                }
+            } else {
+                errorHandler.getMetrics().setScyllaErrorFlagPerDataChannel(0, threadName);
+            }
         }
     }
 
     private <T> void setExceptionMetricCounter(Checkpoint<T> checkpoint) {
-        try {
-            if (errorHandler.getMetrics() != null) {
-                Optional<ExecutionState> executionState = checkpoint.getExecutionStates().entrySet().stream().map(Map.Entry::getValue).findFirst();
-                if (executionState.isPresent()) {
-                    for (Map.Entry<Object, ErrorType> failedTaskMap : executionState.get().getFailedTasks().entrySet()) {
-                        errorHandler.getMetrics().incrementCounterPerScyllaExceptionType(1, failedTaskMap.getValue().getExceptionType().getSimpleName());
-                        break; //NOSONAR
-                    }
+        if (errorHandler.getMetrics() != null) {
+            Optional<ExecutionState> executionState = checkpoint.getExecutionStates().entrySet().stream().map(Map.Entry::getValue).findFirst();
+            if (executionState.isPresent()) {
+                for (Map.Entry<Object, ErrorType> failedTaskMap : executionState.get().getFailedTasks().entrySet()) {
+                    errorHandler.getMetrics().incrementCounterPerScyllaExceptionType(1, failedTaskMap.getValue().getExceptionType().getSimpleName());
+                    break; //NOSONAR
                 }
             }
-        }
-        catch (Exception e){
-            e.printStackTrace();
         }
     }
 

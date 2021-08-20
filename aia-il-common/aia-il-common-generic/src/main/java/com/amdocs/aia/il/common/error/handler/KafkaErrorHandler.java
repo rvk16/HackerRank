@@ -8,7 +8,6 @@ import com.amdocs.aia.il.common.publisher.*;
 import com.amdocs.aia.il.common.stores.KeyColumn;
 import com.amdocs.aia.il.common.utils.ClassLoaderUtils;
 import com.amdocs.aia.il.common.utils.ConversionUtils;
-import com.amdocs.aia.il.common.utils.SneakyThrowUtil;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.slf4j.Logger;
@@ -48,11 +47,7 @@ public class KafkaErrorHandler implements Handler, Serializable {
     }
 
     static {
-        try {
-            allowedKafkaExceptionTypes = ClassLoaderUtils.getKafkaExceptionType();
-        } catch (Exception e) {
-            SneakyThrowUtil.sneakyThrow(e);
-        }
+        allowedKafkaExceptionTypes = ClassLoaderUtils.getKafkaExceptionType();
     }
 
     public boolean isKafkaException(Class<?> exceptionType) {
@@ -93,7 +88,7 @@ public class KafkaErrorHandler implements Handler, Serializable {
 
     @Override
     public <T> void runWithRetriesAndDelay(Checkpoint<T> checkpoint, ErrorHandler.ThrowingOperation f) {
-        return;
+        // Do nothing
     }
 
     public <T> T consumeRetry(Checkpoint<T> checkpoint) {
@@ -109,7 +104,7 @@ public class KafkaErrorHandler implements Handler, Serializable {
             }
             setErrorMetricFlag(checkpoint);
         } catch (Exception e) {
-            SneakyThrowUtil.sneakyThrow(e);
+            throw new RuntimeException(e); //NOSONAR
         }
         return output;
     }
@@ -137,11 +132,10 @@ public class KafkaErrorHandler implements Handler, Serializable {
             publish(failedMessages, checkpoint);
             checkpoint.setErrorFlag(false);
             setErrorMetricFlag(checkpoint);
-            return;
         } catch (Exception e) {
             if ((!ClassLoaderUtils.getKafkaExceptionType().contains(ConversionUtils.getExceptionType(e).getName()))) {
-                LOGGER.error("Error occurred in kafka producer retry mechanism, {}", e);
-                return;
+                LOGGER.error("Error occurred in kafka producer retry mechanism, {}", e.getMessage());
+                throw new RuntimeException(e); //NOSONAR
             }
             sleep(Duration.ofSeconds(checkpoint.getRetryDelay()).toMillis());
             publishRetry(checkpoint);
@@ -367,16 +361,15 @@ public class KafkaErrorHandler implements Handler, Serializable {
     }
 
     private Future<Object> sendMessage(ProducerRecord<String, byte[]> message, Checkpoint checkpoint, Object retryMessage) {
-        Future<Object> objectFuture = producer.send(message, (metadata, e) -> {
+        return producer.send(message, (metadata, e) -> {
             if (e != null) {
-                LOGGER.error("Failed to send a message to Kafka from kafka producer retry mechanism {}", e);
+                LOGGER.error("Failed to send a message to Kafka from kafka producer retry mechanism", e);
                 checkpoint.setErrorFlag(true);
                 checkpoint.addFailedTask(RTPConstants.KAFKA_PUBLISH_TRANSACTION_FAILED_KEY, retryMessage, e.getMessage(), e.getClass());
             } else {
                 LOGGER.debug("Send message to Kafka producer in retry mechanism");
             }
         });
-        return objectFuture;
     }
 
     private <T> void publish(List<Object> failedMessages, Checkpoint<T> checkpoint) throws Exception { //NOSONAR
