@@ -255,6 +255,9 @@ public class ExternalSchemasImportExportHelper {
                 externalEntityExportCSV.setRelativePaths(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getRelativePaths());
                 externalEntityExportCSV.setMergedNodes(((ExternalKafkaEntityStoreInfo)externalEntity.getStoreInfo()).getMergedNodes());
                 break;
+            case ExternalSchemaStoreTypes.SQL:
+                //no additional data
+                break;
             default:
                 throw new IllegalArgumentException(UNKNOWN_EXTERNAL_SCHEMA_STORE_TYPE + externalEntity.getStoreInfo().getType());
         }
