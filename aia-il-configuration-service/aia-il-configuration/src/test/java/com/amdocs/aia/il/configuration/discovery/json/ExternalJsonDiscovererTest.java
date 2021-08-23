@@ -16,6 +16,7 @@ import org.mockito.Answers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
@@ -36,6 +37,14 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {DiscoveryTestConfiguration.class, ExternalJsonDiscovererTest.class}, initializers = YamlFileApplicationContextInitializer.class)
+@TestPropertySource(properties = {
+        "aia.il.discovery.json.swagger-processing-rules.JSON_OVER_KAFKA.additional-root-entities[0].entity-key=Event",
+        "aia.il.discovery.json.swagger-processing-rules.JSON_OVER_KAFKA.additional-root-entities[0].path=",
+        "aia.il.discovery.json.swagger-processing-rules.JSON_OVER_KAFKA.additional-root-entities[1].entity-key=Payload",
+        "aia.il.discovery.json.swagger-processing-rules.JSON_OVER_KAFKA.additional-root-entities[1].path=payload",
+        "aia.il.discovery.json.swagger-processing-rules.JSON_OVER_KAFKA.forced-one-to-one-entity-paths-regex[0]=^payload$",
+        "aia.il.discovery.json.swagger-processing-rules.JSON_OVER_KAFKA.forced-one-to-one-entity-paths-regex[1]=^payload/[^/]+$"
+})
 public class ExternalJsonDiscovererTest {
     @MockBean(answer = Answers.RETURNS_DEEP_STUBS)
     private AiaRepositoryOperations aiaRepositoryOperations;
@@ -128,11 +137,11 @@ public class ExternalJsonDiscovererTest {
         assertEquals(3, productTerm.getAttributes().get(2).getSerializationId());
         final ExternalAttribute nameAtt = findAttribute(productTerm, "name");
         assertNotNull(nameAtt);
-        assertNull(((ExternalKafkaAttributeStoreInfo)nameAtt.getStoreInfo()).getJsonPath());
+        assertNull(((ExternalKafkaAttributeStoreInfo) nameAtt.getStoreInfo()).getJsonPath());
 
         final ExternalAttribute durationUnitsAtt = findAttribute(productTerm, "duration_units");
         assertNotNull(durationUnitsAtt);
-        assertEquals("productTerm/duration/units", ((ExternalKafkaAttributeStoreInfo)durationUnitsAtt.getStoreInfo()).getJsonPath());
+        assertEquals("productTerm/duration/units", ((ExternalKafkaAttributeStoreInfo) durationUnitsAtt.getStoreInfo()).getJsonPath());
 
         final ExternalKafkaEntityStoreInfo entityStoreInfo = (ExternalKafkaEntityStoreInfo) productTerm.getStoreInfo();
 
@@ -175,7 +184,7 @@ public class ExternalJsonDiscovererTest {
         final ExternalAttribute refType = findAttribute(partyInteraction, "ref_type");
         assertNotNull(refType);
 
-        assertEquals("event/partyInteraction(STR)/@type" ,((ExternalKafkaAttributeStoreInfo)refType.getStoreInfo()).getJsonPath());
+        assertEquals("event/partyInteraction(STR)/@type", ((ExternalKafkaAttributeStoreInfo) refType.getStoreInfo()).getJsonPath());
 
 
         final ExternalEntity relatedParty = findCreatedEntity("RelatedParty");
@@ -183,7 +192,7 @@ public class ExternalJsonDiscovererTest {
         final ExternalAttribute referredType = findAttribute(relatedParty, "ref_referredType");
         assertNotNull(referredType);
 
-        assertEquals(	"interactionItem/relatedParty/@referredType,partyInteraction(STR)/relatedParty/@referredType" ,((ExternalKafkaAttributeStoreInfo)referredType.getStoreInfo()).getJsonPath());
+        assertEquals("interactionItem/relatedParty/@referredType,partyInteraction(STR)/relatedParty/@referredType", ((ExternalKafkaAttributeStoreInfo) referredType.getStoreInfo()).getJsonPath());
 
 
         final ExternalEntity relatedChannel = findCreatedEntity("RelatedChannel");
@@ -191,8 +200,7 @@ public class ExternalJsonDiscovererTest {
         final ExternalAttribute refType1 = findAttribute(relatedChannel, "ref_type");
         assertNotNull(refType1);
 
-        assertEquals(	"partyInteraction(STR)/channel/@type,interactionItem/channel/@type" ,((ExternalKafkaAttributeStoreInfo)refType1.getStoreInfo()).getJsonPath());
-
+        assertEquals("partyInteraction(STR)/channel/@type,interactionItem/channel/@type", ((ExternalKafkaAttributeStoreInfo) refType1.getStoreInfo()).getJsonPath());
 
 
     }
@@ -215,8 +223,26 @@ public class ExternalJsonDiscovererTest {
         assertEquals(4, consumer.getEntities().size());
         final ExternalEntity user = findCreatedEntity("User");
         assertNotNull(user);
-        assertEquals("/User", ((ExternalKafkaEntityStoreInfo)user.getStoreInfo()).getRelativePaths());
+        assertEquals("/User", ((ExternalKafkaEntityStoreInfo) user.getStoreInfo()).getRelativePaths());
         assertEquals(8, user.getAttributes().size());
+    }
+
+    @Test
+    public void testDeepIo() {
+        String filename = "deepio.yaml";
+        mockDiscoveryFile(filename);
+        discoverer.setSchemaType(ExternalSchemaType.JSON_OVER_KAFKA);
+        discoverer.setSchemaName("Deep IO");
+        setDiscoveryParams(ImmutableMap.of(FILE_NAME, Collections.singletonList(filename)));
+        discoverer.discover();
+        assertEquals(1, consumer.getSchemas().size());
+        final ExternalSchema schema = consumer.getSchemas().get(0);
+        assertEquals("Deep IO", schema.getName());
+        assertEquals("DeepIO", schema.getSchemaKey());
+        assertEquals(ExternalSchemaType.JSON_OVER_KAFKA, schema.getSchemaType());
+        assertEquals(filename, schema.getOrigin());
+
+        assertEquals(8, consumer.getEntities().size());
     }
 
     private List<String> splitPaths(String pathsAsString) {

@@ -174,8 +174,15 @@ class SwaggerProcessor {
             } else if (RefProperty.isType(property.getType(), property.getFormat())) {
                 // 1:1 relationship
                 processOneToOneReference(entityKey, childPath, propertyKey, (RefProperty) property, new HashSet<>(), propertyKey + "_");
-            } else if (!ObjectProperty.isType(property.getType())) {
-                 processPrimitive(entityKey, propertyKey, property, null, childPath, parentPath);
+            } else if (ObjectProperty.isType(property.getType())) {
+                if (property instanceof ObjectProperty) {
+                    final Map<String, Property> childProperties = ((ObjectProperty) property).getProperties();
+                    if (!childProperties.isEmpty()) {
+                        processOneToOneChildProperties(entityKey, childPath, propertyKey, new HashSet<>(), propertyKey + "_", childProperties);
+                    }
+                }
+            } else {
+                processPrimitive(entityKey, propertyKey, property, null, childPath, parentPath);
             }
         });
     }
@@ -216,29 +223,40 @@ class SwaggerProcessor {
                 final String entityKey = property.getSimpleRef();
                 if (!visited.contains(entityKey)) {
                     visited.add(entityKey);
-                    final String propertyJsonPath = buildEntityJsonPath(parentPath, propertyKey);
-                    getOrCreateProcessedEntityInfo(parentEntityKey).addMergedNodeIfNotExists(propertyJsonPath);
                     final Model childModel = getDefinitionByKey(entityKey);
-                    getModelProperties(childModel).forEach((childPropertyKey, childProperty) -> {
-                        if (ArrayProperty.isType(childProperty.getType())) {
-                            final Property itemsProperty = ((ArrayProperty) childProperty).getItems();
-                            if (RefProperty.isType(itemsProperty.getType(), childProperty.getFormat())) {
-                                processDefinition((((RefProperty) itemsProperty).getSimpleRef()), parentPath, childPropertyKey);
-                            }
-                        } else if (RefProperty.isType(childProperty.getType(), childProperty.getFormat())) {
-                            // currently we drill down only ONE level in 1:1 relation
-                            processOneToOneReference(parentEntityKey, propertyKey, childPropertyKey, (RefProperty) childProperty, visited, attributeKeyPrefix + childPropertyKey + "_");
-                        } else if (!ObjectProperty.isType(childProperty.getType())) {
-                            final String jsonPath = buildAttributeJsonPath(propertyJsonPath, childPropertyKey);
-                            final String attributeKey = attributeKeyPrefix + childPropertyKey;
-                            processPrimitive(parentEntityKey, attributeKey, childProperty, jsonPath,null,null); // flatten attributes
-                        }
-                    });
+                    final Map<String, Property> childProperties = getModelProperties(childModel);
+                    processOneToOneChildProperties(parentEntityKey, parentPath, propertyKey, visited, attributeKeyPrefix, childProperties);
                     visited.remove(entityKey);
                 }
             }
         }
         popFromFullPath(propertyKey);
+    }
+
+    private void processOneToOneChildProperties(String parentEntityKey, String parentPath, String propertyKey, Set<String> visited, String attributeKeyPrefix, Map<String, Property> childProperties) {
+        final String propertyJsonPath = buildEntityJsonPath(parentPath, propertyKey);
+        getOrCreateProcessedEntityInfo(parentEntityKey).addMergedNodeIfNotExists(propertyJsonPath);
+        childProperties.forEach((childPropertyKey, childProperty) -> {
+            if (ArrayProperty.isType(childProperty.getType())) {
+                final Property itemsProperty = ((ArrayProperty) childProperty).getItems();
+                if (RefProperty.isType(itemsProperty.getType(), childProperty.getFormat())) {
+                    processDefinition((((RefProperty) itemsProperty).getSimpleRef()), parentPath, childPropertyKey);
+                }
+            } else if (RefProperty.isType(childProperty.getType(), childProperty.getFormat())) {
+                processOneToOneReference(parentEntityKey, propertyKey, childPropertyKey, (RefProperty) childProperty, visited, attributeKeyPrefix + childPropertyKey + "_");
+            } else if (ObjectProperty.isType(childProperty.getType())) {
+                if (childProperty instanceof ObjectProperty) {
+                    final Map<String, Property> grandchildProperties = ((ObjectProperty) childProperty).getProperties();
+                    if (!grandchildProperties.isEmpty()) {
+                        processOneToOneChildProperties(parentEntityKey, propertyKey, childPropertyKey, visited, attributeKeyPrefix + childPropertyKey + "_", grandchildProperties);
+                    }
+                }
+            } else {
+                final String jsonPath = buildAttributeJsonPath(propertyJsonPath, childPropertyKey);
+                final String attributeKey = attributeKeyPrefix + childPropertyKey;
+                processPrimitive(parentEntityKey, attributeKey, childProperty, jsonPath,null,null); // flatten attributes
+            }
+        });
     }
 
     private boolean shouldForceOnToOneEntityCreation() {
